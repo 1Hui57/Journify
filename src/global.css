@@ -133,12 +133,12 @@ p {
 input {
   outline: none;
   border: none;
-  background: var(--color-white-100);
+  /* background: var(--color-white-100); */
 }
 
 button {
   background-color: none;
-  border: none;
+  /* border: none; */
   /* border-radius: 5px; */
   cursor: pointer;
 }
