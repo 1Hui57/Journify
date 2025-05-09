@@ -1,4 +1,4 @@
-import Header from "../component/Header/Header";
+import Header from "../component/Header";
 import "../global.css";
 
 

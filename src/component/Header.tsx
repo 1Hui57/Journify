@@ -30,14 +30,19 @@ export default function Header() {
     return (
         <header>
             <nav>
-                <div id="header" className=" p-6 flex text-3xl text-primary-900 font-black text-center justify-between">
+                <div id="header" className=" pl-4 pr-4 flex text-3xl    justify-between">
                     <div className='flex'>
-                        <img src="/journify-logo.png" alt="" className='w-8 h-8' />
-                        OURNIFY
+                        <img src="/JOURNIFY.png" alt="" className='w-47 h-20' />
                     </div>
-                    <button className='text-base'>
-                        登入 / 註冊
-                    </button>
+                    <div className='flex justify-between gap-6'>
+                        <button className='text-lg font-bold text-primary-900 text-center'>
+                            開始規劃
+                        </button>
+                        <button className='text-lg font-bold text-primary-900 text-center'>
+                            登入/註冊
+                        </button>
+                    </div>
+
                 </div>
             </nav>
         </header>
