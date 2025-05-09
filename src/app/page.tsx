@@ -21,13 +21,13 @@ export default function Home() {
                 Journify幫你輕鬆安排行程
             </div>
             <p className="text-zinc-500">超過 38,512 人都在使用的排程網站</p>
-            <div className='w-full h-64 flex mt-5 gap-5'>
-                <div className='bg-primary-300 h-full w-2/5 p-12 rounded-4xl flex flex-col '>
+            <div className='w-full h-full md:h-64 flex flex-col md:flex-row mt-5 gap-5'>
+                <div className='bg-primary-300 h-full w-full md:w-2/5 p-12 rounded-4xl flex flex-col'>
                     <h3 className='text-myblue-700'>開始規劃</h3>
                     <h1 className='text-myblue-700'>你的旅程</h1>
                     <button className='text-mywhite-100 bg-myblue-600 w-20 h-10 mt-8 self-end rounded-full font-bold'>START</button>
                 </div>
-                <div className='h-full w-3/5 flex flex-col'>
+                <div className='h-full w-full md:w-3/5 flex flex-col'>
                     <h2 className="text-myblue-700 h-[80px] flex items-center">熱門城市</h2>
                     <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto">
                         <HotCounty />
