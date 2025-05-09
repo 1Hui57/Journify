@@ -2,30 +2,30 @@
 import styles from './Header.module.css';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from "react";
-// import { signOut } from 'firebase/auth';
-// import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function Header() {
 
     const pathname = usePathname();
     const router = useRouter();
 
-    // const [showLogout, setShowLogout] = useState(false);
-    // useEffect(() => {
-    //     // 只有在 /accounting 顯示登出按鈕
-    //     setShowLogout(pathname.startsWith('/accounting'));
-    // }, [pathname]);
+    const [showLogout, setShowLogout] = useState(false);
+    useEffect(() => {
+        // 只有在 /accounting 顯示登出按鈕
+        setShowLogout(pathname.startsWith('/accounting'));
+    }, [pathname]);
 
-    // function handleLogout() {
-    //     signOut(auth)
-    //         .then(() => {
-    //             console.log("使用者已登出");
-    //             router.push('/');
-    //         })
-    //         .catch((error) => {
-    //             console.error("登出失敗：", error);
-    //         });
-    // }
+    function handleLogout() {
+        signOut(auth)
+            .then(() => {
+                console.log("使用者已登出");
+                router.push('/');
+            })
+            .catch((error) => {
+                console.error("登出失敗：", error);
+            });
+    }
 
     return (
         <header className='p-0 m-0 h-[60px] w-full flex items-center'>
