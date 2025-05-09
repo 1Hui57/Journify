@@ -1,0 +1,24 @@
+@import url(global.css);
+
+*, *::before, *::after{
+    box-sizing: border-box;
+}
+
+/* root */
+body{
+    padding: 0;
+    margin: 0;
+    background-color: var(--color-zinc-100);
+}
+
+
+/* .top__startWrapper{
+    background-color: var(--color-primary-300);
+}
+.btn{
+    width:100px;
+    height:35px;
+    background-color: var(--color-blue-400);
+    border-radius: 25px;
+    color: var(--color-white-100);
+} */
