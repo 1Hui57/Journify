@@ -50,7 +50,7 @@ export default function Home() {
                     <img src="/down.png" className="w-4 h-4" />
                 </button>
             </div>
-            <div id="tripWrapper" className="w-full mt-5 mb-5 flex flex-wrap gap-7 pl-2 pr-2">
+            <div id="tripWrapper" className="w-full mt-5 mb-5 flex flex-wrap gap-7 px-2 ">
                 <HomeTripCard />
                 <HomeTripCard />
                 <HomeTripCard />

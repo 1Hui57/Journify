@@ -18,7 +18,7 @@ export default function Login() {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log(user);
-                router.push('/accounting');
+                router.push('/login');
             }
 
         });
