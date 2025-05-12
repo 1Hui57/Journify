@@ -1,3 +1,5 @@
+
+import { AuthProvider } from "@/context/AuthContext";
 import Header from "../component/Header";
 import "../global.css";
 
@@ -15,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <AuthProvider>
         <Header />
         <main className="w-full h-full pt-[60px] m-0">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   )

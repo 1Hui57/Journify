@@ -12,19 +12,21 @@ import { db } from "@/lib/firebase";
 export default function Login() {
 
     const router = useRouter();
-
+    
     useEffect(() => {
         // 建立一個監聽器可以監聽firebase的登入狀態
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log(user);
-                router.push('/login');
+                router.push('/mytrips');
             }
 
         });
         //  return 一個清除函數
         return () => unsubscribe();
     }, [router])
+
+
     // 註冊、登入使用useSate
     const [isSignIn, setIsSignin] = useState(true);
     const [email, setEmail] = useState('');
@@ -50,7 +52,7 @@ export default function Login() {
         try {
             await setPersistence(auth, isStayIn ? browserLocalPersistence : browserSessionPersistence);
             await signInWithEmailAndPassword(auth, email, password);
-            router.push('/accounting');
+            router.push('/');
         } catch (err: any) {
             // console.log("錯誤訊息",err.message);
             setError("帳號或密碼輸入錯誤");
