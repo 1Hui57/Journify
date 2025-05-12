@@ -6,9 +6,10 @@ import { IoMdAdd } from "react-icons/io";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { auth } from '@/lib/firebase';
-import { serverTimestamp, addDoc, collection } from "firebase/firestore";
+import { serverTimestamp, addDoc, collection, query, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from '@/context/AuthContext';
+import { Timestamp } from "firebase/firestore";
 
 export default function MyTrips() {
     interface TripTime {
@@ -16,9 +17,20 @@ export default function MyTrips() {
         tripTo: Date;
     }
     interface Trip {
+        id?: string;
         tripName: string;
         person: Number;
         tripTime: TripTime;
+    }
+    interface FirestoreTripTime {
+        tripFrom: Timestamp;
+        tripTo: Timestamp;
+    }
+
+    interface FirestoreTrip {
+        tripName: string;
+        person: number;
+        tripTime: FirestoreTripTime;
     }
     const router = useRouter();
 
@@ -26,7 +38,7 @@ export default function MyTrips() {
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
 
-
+    // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);
     const [selected, setSelected] = useState<DateRange | undefined>();
     const [deteText, setDateText] = useState<string>("");
@@ -35,6 +47,41 @@ export default function MyTrips() {
     const [tripName, setTripName] = useState<string>("");
     const [tripPerson, setTripPerson] = useState<number>(1);
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
+
+    // 使用者資料庫的旅程資料
+    const [trips, setTrips] = useState<Trip[]>([]);
+
+    // 取得使用者的旅程
+    useEffect(() => {
+        if (!user) return;
+
+        const q = query(
+            collection(db, "users", user.uid, "trips")
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const data: Trip[] = snapshot.docs.map((doc) => {
+                const tripData = doc.data() as FirestoreTrip;
+
+                const tripTime = {
+                    tripFrom: tripData.tripTime.tripFrom.toDate(),
+                    tripTo: tripData.tripTime.tripTo.toDate(),
+                };
+
+                return {
+                    id: doc.id,
+                    tripName: tripData.tripName,
+                    person: tripData.person,
+                    tripTime,
+                };
+            });
+            setTrips(data);
+        });
+
+        // return unsubscribe function to clean up
+        return () => unsubscribe();
+
+    }, [user?.uid]);
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -103,7 +150,6 @@ export default function MyTrips() {
             console.error(" 寫入 Firestore 失敗：", error);
             alert("新增資料時發生錯誤，請稍後再試！");
         }
-
     }
 
     return (
@@ -114,7 +160,8 @@ export default function MyTrips() {
                 </div>
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full ">
                     {/* trip card */}
-                    <TripPageCard />
+                    {trips.map((item) => (<TripPageCard key={item.id} tripName={item.tripName} tripPerson={item.person} tripTime={item.tripTime} />))}
+
 
                 </div>
                 <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
@@ -132,7 +179,7 @@ export default function MyTrips() {
                         <p className="text-myblue-600 font-light text-md "><span className="text-myred-400">* </span>旅程名稱</p>
                         <input type="text" placeholder="輸入旅程名稱" value={tripName} onChange={(e) => { setTripName(e.target.value) }} className="w-full h-12 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                         <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
-                        <input type="number" placeholder="輸入旅程人數"min={1} value={tripPerson} onChange={(e)=>{setTripPerson(Number(e.target.value))}} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
+                        <input type="number" placeholder="輸入旅程人數" min={1} value={tripPerson} onChange={(e) => { setTripPerson(Number(e.target.value)) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                         <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                         <input type="text" placeholder="請選擇日期" readOnly className="w-full h-12 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
                             value={deteText} />
@@ -150,13 +197,9 @@ export default function MyTrips() {
                                 建立
                             </button>
                         </div>
-
                     </div>
                 </div>
-
             )}
-
-
         </div>
     )
 
