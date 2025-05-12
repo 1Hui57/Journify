@@ -106,9 +106,9 @@ export default function Login() {
                 {isSignIn ? (
                     <form className="flex flex-col gap-4" onSubmit={handleSignIn}>
                         <input type="text" placeholder="E-mail" value={email}
-                            onChange={(e) => setEmail(e.target.value)} className="border p-2 pl-4 rounded-full w-full bg-mywhite-80" />
+                            onChange={(e) => setEmail(e.target.value)} className=" p-2 pl-4 rounded-full w-full bg-mywhite-80" />
                         <input type="password" placeholder="Password" value={password}
-                            onChange={(e) => setPassword(e.target.value)} className="border p-2 pl-4 rounded-full w-full bg-mywhite-80" />
+                            onChange={(e) => setPassword(e.target.value)} className=" p-2 pl-4 rounded-full w-full bg-mywhite-80" />
                         <label className="flex items-center gap-2 text-sm pl-3 text-myblue-600">
                             <input type="checkbox" id="stayIn" checked={isStayIn} onChange={(e) => { setIsStayIn(e.target.checked) }} />
                             Stay signed in.
@@ -118,11 +118,11 @@ export default function Login() {
                 ) : (
                     <form className="flex flex-col gap-4" onSubmit={handleSignUp}>
                         <input type="text" placeholder="E-mail" value={email}
-                            onChange={(e) => setEmail(e.target.value)} className="border p-2 pl-4 rounded-full w-full bg-mywhite-80" />
+                            onChange={(e) => setEmail(e.target.value)} className=" p-2 pl-4 rounded-full w-full bg-mywhite-80" />
                         <input type="password" placeholder="Password" value={password}
-                            onChange={(e) => setPassword(e.target.value)} className="border p-2 pl-4 rounded-full w-full bg-mywhite-80" />
+                            onChange={(e) => setPassword(e.target.value)} className=" p-2 pl-4 rounded-full w-full bg-mywhite-80" />
                         <input type="password" placeholder="Confirm Password" value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)} className="border p-2 pl-4 rounded-full w-full bg-mywhite-80" />
+                            onChange={(e) => setConfirmPassword(e.target.value)} className=" p-2 pl-4 rounded-full w-full bg-mywhite-80" />
                         <label className="flex items-center gap-2 text-sm pl-3 text-myblue-600">
                             <input type="checkbox" id="stayIn" checked={isStayIn} onChange={(e) => { setIsStayIn(e.target.checked) }} />
                             Stay signed in after successful registration.

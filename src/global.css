@@ -132,7 +132,7 @@ p {
 
 input {
   outline: none;
-  border: none;
+  /* border: var(--color-mywhite-5); */
   /* background: var(--color-white-100); */
 }
 
@@ -246,4 +246,10 @@ button {
   font-family: var(--font-family);
   font-weight: var(--font-weight-700);
   line-height: 2rem;
+}
+
+.rdp{
+  --rdp-accent-color: #ab6b45; /* Change the accent color to indigo. */
+  --rdp-accent-background-color: #cf9573; /* Change the accent background color. */
+  /* Add more CSS variables here. */
 }
