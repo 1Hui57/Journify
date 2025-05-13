@@ -75,7 +75,7 @@ export default function MyTrips() {
                     tripName: tripData.tripName,
                     person: tripData.person,
                     tripTime,
-                    isPublic: isPublic,
+                    isPublic:tripData.isPublic,
                 };
             });
             setTrips(data);

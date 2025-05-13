@@ -5,23 +5,59 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
 import SearchBar from "@/component/SearchBar";
 import HomeTripCard from "@/component/HomeTripCard";
-// import "../style/style.css"
-// import { auth } from '@/lib/firebase';
-// import {
-//     createUserWithEmailAndPassword, signInWithEmailAndPassword,
-//     setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged
-// } from "firebase/auth";
-// import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-// import { db } from "@/lib/firebase";
+import { query, collection, onSnapshot, where,doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { Timestamp } from "firebase/firestore";
 
+interface FirestoreTripTime {
+    tripFrom: Timestamp;
+    tripTo: Timestamp;
+}
+
+interface FirestoreTrip {
+    userId:string
+    tripId:string;
+    tripName: string;
+    person: number;
+    tripTime: FirestoreTripTime;
+    isPublic: boolean;
+    createAt:Timestamp;
+}
 export default function Home() {
+
+    const [publicTrips, setPublicTrips] = useState<FirestoreTrip[]>();
+    // 讀取公開的旅程並渲染
+    useEffect(() => {
+        const publicTripRef = query(
+            collection(db, "all_trips"),
+            where("isPublic", "==", true)
+        );
+
+        const unsubscribe = onSnapshot(publicTripRef, (snapshot) => {
+            const data: FirestoreTrip[] = snapshot.docs.map((doc) => {
+                const tripData = doc.data() as FirestoreTrip;
+                return {
+                    userId: tripData.userId,
+                    tripId: tripData.tripId,
+                    tripName: tripData.tripName,
+                    person: tripData.person,
+                    tripTime: tripData.tripTime,
+                    isPublic:tripData.isPublic,
+                    createAt:tripData.createAt
+                };
+            });
+            setPublicTrips(data);
+        });
+        return () => unsubscribe();
+    }, []);
+
     return (
         <div className='flex flex-col max-w-6xl w-full h-full m-auto pl-8 pr-8'>
             <div className='w-full h-fit pt-8 mb-2 flex flex-col gap-5'>
                 <p className="w-full sm:text-2xl text-xl font-extrabold text-myblue-700 leading-relaxed">Journify幫你輕鬆安排行程</p>
                 <p className="text-zinc-500 sm:text-[20px] text-base-400 font-400">超過 38,512 人都在使用的排程網站</p>
             </div>
-            
+
             <div className='w-full h-full md:h-64 flex flex-col md:flex-row mt-5  mb-5 gap-5'>
                 <div className='bg-primary-300 h-42 w-full md:w-2/5 p-6 pl-8 rounded-4xl flex flex-col sm:h-full'>
                     <p className='text-myblue-700 text-xl-700'>開始規劃</p>
@@ -34,6 +70,7 @@ export default function Home() {
                         <p className="w-full text-myblue-700 text-2xl-700">熱門城市</p>
                     </div>
                     <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
+                        {}
                         <HotCounty />
                         <HotCounty />
                         <HotCounty />
@@ -51,14 +88,15 @@ export default function Home() {
                 </button>
             </div>
             <div id="tripWrapper" className="w-full mt-5 mb-5 flex flex-wrap gap-7 px-2 ">
+                {publicTrips && publicTrips.map((item)=>(<HomeTripCard key={item.tripId} item={item}/>))}
+                {/* <HomeTripCard />
                 <HomeTripCard />
                 <HomeTripCard />
                 <HomeTripCard />
                 <HomeTripCard />
                 <HomeTripCard />
                 <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard />
+                <HomeTripCard /> */}
             </div>
         </div>
     )
