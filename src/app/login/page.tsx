@@ -52,7 +52,7 @@ export default function Login() {
         try {
             await setPersistence(auth, isStayIn ? browserLocalPersistence : browserSessionPersistence);
             await signInWithEmailAndPassword(auth, email, password);
-            router.push('/');
+            router.back();
         } catch (err: any) {
             // console.log("錯誤訊息",err.message);
             setError("帳號或密碼輸入錯誤");
@@ -76,7 +76,7 @@ export default function Login() {
                 email: user.email,
                 createdAt: serverTimestamp(),
             });
-            router.push('/accounting');
+            router.back();
         } catch (err: any) {
             if (err.message === "Firebase: Password should be at least 6 characters (auth/weak-password).") {
                 setError("密碼需大於6個字元");
