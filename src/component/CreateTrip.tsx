@@ -54,6 +54,13 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
         }
         // 如果還沒選結束日期
         else if (!selected?.to) {
+            if (triggerDate < selected.from) {
+                setSelected({
+                    from: triggerDate,
+                    to: undefined,
+                })
+                return;
+            }
             setSelected({
                 from: selected.from,
                 to: triggerDate,
