@@ -76,7 +76,7 @@ export default function Login() {
                 email: user.email,
                 createdAt: serverTimestamp(),
             });
-            router.push('/accounting');
+            router.back();
         } catch (err: any) {
             if (err.message === "Firebase: Password should be at least 6 characters (auth/weak-password).") {
                 setError("密碼需大於6個字元");

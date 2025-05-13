@@ -2,8 +2,9 @@
 import { Dispatch, useEffect, useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { serverTimestamp, addDoc, collection, query, onSnapshot, doc } from "firebase/firestore";
+import { serverTimestamp, addDoc, setDoc, collection, query, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { v4 as uuidv4 } from 'uuid';
 
 interface CreateTripProps {
     userId: string | undefined;
@@ -18,6 +19,7 @@ interface Trip {
     tripName: string;
     person: Number;
     tripTime: TripTime;
+    isPublic:Boolean;
 }
 export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
@@ -105,20 +107,31 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             return;
         }
 
+        const tripId = uuidv4();
+
         const newTrip: Trip = {
             tripName: tripName,
             person: Number(tripPerson),
-            tripTime: tripTime
+            tripTime: tripTime,
+            isPublic:false
         };
+        const newAlltrip = {
+            ...newTrip,
+            userId:userId,
+            tripId:tripId,
+            createdAt: serverTimestamp(),
+        }
 
         try {
-            await addDoc(collection(db, "users", userId, "trips"), newTrip);
-            // setSpendings([...spendings,{id:Math.random(),type,cost: Number(cost),content}]);
+            // 寫入使用者自己的旅程
+            await setDoc(doc(db, "users", userId, "trips", tripId), newTrip);
+            // 寫入all_trips，便於首頁查詢
+            await setDoc(doc(db,"all_trips",tripId),newAlltrip);
             setTripName("");
             setTripPerson(1);
             setTripTime(undefined);
-            console.log("寫入成功");
             setIsAddTrip(false);
+            console.log("寫入成功");
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);

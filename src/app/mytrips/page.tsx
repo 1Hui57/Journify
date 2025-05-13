@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { IoMdAdd } from "react-icons/io";
 import "react-day-picker/style.css";
 import { auth } from '@/lib/firebase';
-import { serverTimestamp, addDoc, collection, query, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import { addDoc, collection, query, onSnapshot, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
@@ -21,6 +21,7 @@ export default function MyTrips() {
         tripName: string;
         person: Number;
         tripTime: TripTime;
+        isPublic: boolean;
     }
     interface FirestoreTripTime {
         tripFrom: Timestamp;
@@ -31,6 +32,7 @@ export default function MyTrips() {
         tripName: string;
         person: number;
         tripTime: FirestoreTripTime;
+        isPublic: boolean;
     }
     const router = useRouter();
 
@@ -38,6 +40,7 @@ export default function MyTrips() {
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
+    let isPublic = false;
 
     // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);
@@ -72,6 +75,7 @@ export default function MyTrips() {
                     tripName: tripData.tripName,
                     person: tripData.person,
                     tripTime,
+                    isPublic: isPublic,
                 };
             });
             setTrips(data);
@@ -79,7 +83,8 @@ export default function MyTrips() {
         return () => unsubscribe();
     }, [user?.uid]);
 
-    async function deleteTrip(userId: string|undefined, tripId: string) {
+    // 刪除旅程
+    async function deleteTrip(userId: string | undefined, tripId: string) {
         if (userId && tripId) {
             try {
                 const tripRef = doc(db, "users", userId, "trips", tripId);
@@ -92,6 +97,26 @@ export default function MyTrips() {
         return
     }
 
+    // 變更個人旅程隱私權限，公開同時將旅程寫入公開旅程資料表
+    async function updateTripPrivate(userId: string, tripId: string, isPublic: boolean) {
+        try {
+            const tripsRef = doc(db, "users", userId, "trips", tripId);
+            const publicRef = doc(db, "all_trips", tripId)
+            await updateDoc(tripsRef, {
+                isPublic: !isPublic
+            });
+            await updateDoc(publicRef, {
+                isPublic: !isPublic
+            });
+            console.log("旅程的公開狀態已更新");
+        }
+
+        catch (error) {
+            console.error("更新旅程公開狀態失敗:", error);
+            alert("新增資料時發生錯誤，請稍後再試！");
+        }
+    }
+
 
     return (
         <div className="w-full h-full ">
@@ -101,7 +126,7 @@ export default function MyTrips() {
                 </div>
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
-                    {trips.map((item) => (<TripPageCard key={item.id} tripName={item.tripName} tripPerson={item.person} tripTime={item.tripTime} deleteTrip={deleteTrip} userId={userId} tripId={item.id} />))}
+                    {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}/>))}
                 </div>
                 <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
