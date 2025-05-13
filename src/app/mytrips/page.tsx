@@ -3,10 +3,9 @@ import TripPageCard from "@/component/TripPageCard";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { IoMdAdd } from "react-icons/io";
-import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { auth } from '@/lib/firebase';
-import { serverTimestamp, addDoc, collection, query, onSnapshot, doc } from "firebase/firestore";
+import { serverTimestamp, addDoc, collection, query, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
@@ -80,6 +79,18 @@ export default function MyTrips() {
         return () => unsubscribe();
     }, [user?.uid]);
 
+    async function deleteTrip(userId: string|undefined, tripId: string) {
+        if (userId && tripId) {
+            try {
+                const tripRef = doc(db, "users", userId, "trips", tripId);
+                await deleteDoc(tripRef);
+                console.log("Trip deleted successfully");
+            } catch (error) {
+                console.error("Failed to delete trip:", error);
+            }
+        }
+        return
+    }
 
 
     return (
@@ -90,7 +101,7 @@ export default function MyTrips() {
                 </div>
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
-                    {trips.map((item) => (<TripPageCard key={item.id} tripName={item.tripName} tripPerson={item.person} tripTime={item.tripTime} />))}
+                    {trips.map((item) => (<TripPageCard key={item.id} tripName={item.tripName} tripPerson={item.person} tripTime={item.tripTime} deleteTrip={deleteTrip} userId={userId} tripId={item.id} />))}
                 </div>
                 <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
@@ -100,7 +111,7 @@ export default function MyTrips() {
                     建立旅程
                 </button>
             </div>
-            {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip}/>}
+            {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} />}
         </div>
     )
 }

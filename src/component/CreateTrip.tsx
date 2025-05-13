@@ -54,6 +54,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
         }
         // 如果還沒選結束日期
         else if (!selected?.to) {
+            // 如果to的日期早於from，現在選擇日期的改成from
             if (triggerDate < selected.from) {
                 setSelected({
                     from: triggerDate,
