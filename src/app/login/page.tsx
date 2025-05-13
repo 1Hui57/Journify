@@ -52,7 +52,7 @@ export default function Login() {
         try {
             await setPersistence(auth, isStayIn ? browserLocalPersistence : browserSessionPersistence);
             await signInWithEmailAndPassword(auth, email, password);
-            router.push('/');
+            router.back();
         } catch (err: any) {
             // console.log("錯誤訊息",err.message);
             setError("帳號或密碼輸入錯誤");

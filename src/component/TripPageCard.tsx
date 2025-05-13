@@ -1,3 +1,4 @@
+import { MdOutlinePeopleAlt } from "react-icons/md";
 
 interface TripTime {
     tripFrom: Date;
@@ -16,12 +17,19 @@ export default function TripPageCard({ tripName, tripPerson, tripTime }: TripPag
                 <img src="/Osaka.jpg" className="w-full h-full object-cover" />
             </div>
             <div className="w-full h-full py-1 px-2">
-                <p className="text-myblue-700 font-bold">{tripName}</p>
-                {tripTime && (
-                    <p className="text-myzinc-400">
-                        {tripTime.tripFrom.toLocaleDateString()} ~ {tripTime.tripTo.toLocaleDateString()}
-                    </p>
-                )}
+                <p className="text-myblue-700 font-bold line-clamp-1">{tripName}</p>
+                <div className="w-full flex ">
+                    {tripTime && (
+                        <p className="text-myzinc-400 text-sm line-clamp-1">
+                            {tripTime.tripFrom.toLocaleDateString()} ~ {tripTime.tripTo.toLocaleDateString()}
+                        </p>
+                    )}
+                    <div className="w-fit flex ml-auto items-end gap-1 text-myzinc-400">
+                        <MdOutlinePeopleAlt className="w-5 h-5"/>
+                        <p>{String(tripPerson)}</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     )

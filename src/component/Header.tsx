@@ -18,6 +18,7 @@ export default function Header() {
     function handleLogout() {
         signOut(auth)
             .then(() => {
+                router.push("/")
                 console.log("使用者已登出");
             })
             .catch((error) => {

@@ -18,20 +18,20 @@ export default function Home() {
     return (
         <div className='flex flex-col max-w-6xl w-full h-full m-auto pl-8 pr-8'>
             <div className='w-full h-fit pt-8 mb-2 flex flex-col gap-5'>
-                <p className="w-full sm:text-3xl text-2xl font-extrabold text-myblue-700 leading-relaxed">Journify幫你輕鬆安排行程</p>
-                <p className="text-zinc-500 sm:text-[20px] text-[18px] font-400">超過 38,512 人都在使用的排程網站</p>
+                <p className="w-full sm:text-2xl text-xl font-extrabold text-myblue-700 leading-relaxed">Journify幫你輕鬆安排行程</p>
+                <p className="text-zinc-500 sm:text-[20px] text-base-400 font-400">超過 38,512 人都在使用的排程網站</p>
             </div>
             
             <div className='w-full h-full md:h-64 flex flex-col md:flex-row mt-5  mb-5 gap-5'>
-                <div className='bg-primary-300 h-42 w-full md:w-2/5 p-6 rounded-4xl flex flex-col sm:h-full'>
-                    <h3 className='text-myblue-700'>開始規劃</h3>
-                    <h1 className='text-myblue-700'>你的旅程</h1>
-                    <button className='text-mywhite-100 bg-myblue-600 w-20 h-10  self-end rounded-full font-bold'>START</button>
+                <div className='bg-primary-300 h-42 w-full md:w-2/5 p-6 pl-8 rounded-4xl flex flex-col sm:h-full'>
+                    <p className='text-myblue-700 text-xl-700'>開始規劃</p>
+                    <p className='text-myblue-700 text-2xl-700'>你的旅程</p>
+                    <button className='text-mywhite-100 bg-myblue-600 w-20 h-10  self-end rounded-full font-bold md:mt-8'>START</button>
                 </div>
                 <div className='h-full w-full md:w-3/5 flex flex-col '>
-                    <div className="w-full  h-[70px] flex gap-5 pl-3 md:pl-0 mb-2">
+                    <div className="w-full h-[70px] flex gap-5 pl-3 md:pl-0 mb-2 items-center">
                         <div className="w-1 h-[40px] bg-primary-400"></div>
-                        <h2 className="w-full text-myblue-700">熱門城市</h2>
+                        <p className="w-full text-myblue-700 text-2xl-700">熱門城市</p>
                     </div>
                     <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
                         <HotCounty />
@@ -44,7 +44,7 @@ export default function Home() {
             <SearchBar />
             <div className="w-full pl-3 flex gap-5 mt-6  items-center">
                 <div className="w-1 h-[40px] bg-primary-400"></div>
-                <h2 className="w-fit text-myblue-700">熱門旅程</h2>
+                <p className="w-fit text-myblue-700 text-2xl-700">熱門旅程</p>
                 <button className="w-fit self-end mt-3 flex items-center gap-2 pr-2 ml-auto">
                     <p className="w-20 text-md font-400 text-zinc-400 text-right">熱門程度</p>
                     <img src="/down.png" className="w-4 h-4" />
