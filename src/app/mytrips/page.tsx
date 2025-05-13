@@ -77,8 +77,6 @@ export default function MyTrips() {
             });
             setTrips(data);
         });
-
-        // return unsubscribe function to clean up
         return () => unsubscribe();
 
     }, [user?.uid]);
@@ -92,14 +90,27 @@ export default function MyTrips() {
 
     // 選取日期
     function handleOnSelect(range: DateRange | undefined, triggerDate: Date) {
-        if (selected?.from && selected?.to) {
+        // 如果還沒選開始日期
+        if (!selected?.from) {
             setSelected({
                 from: triggerDate,
                 to: undefined,
             });
-            return;
         }
-        setSelected(range);
+        // 如果還沒選結束日期
+        else if (!selected?.to) {
+            setSelected({
+                from: selected.from,
+                to: triggerDate,
+            });
+        }
+        // 如果開始與結束日期都已選，則重新選取範圍
+        else{
+            setSelected({
+            from: triggerDate,
+            to: undefined,
+        });
+        }
     }
 
     //input日期顯示
