@@ -6,6 +6,8 @@ import { db } from "@/lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import { AiFillLike } from "react-icons/ai"; //實心讚
 import { AiOutlineLike } from "react-icons/ai"; //線條讚
+import { AiOutlineHeart } from "react-icons/ai"; //線條愛心
+import { AiFillHeart } from "react-icons/ai"; //實心愛心
 import { BsBookmark } from "react-icons/bs"; //線條儲存
 import { BsBookmarkFill } from "react-icons/bs"; //實心儲存
 import { IoLocationOutline } from "react-icons/io5"; //地圖標示
@@ -34,11 +36,11 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
     const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24)+1);
 
     return (
-        <div className="relative w-full h-80 rounded-md overflow-hidden ">
+        <div className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
             {item.tripCountry === "" ?
                 <></>
-                : <div className='absolute top-3 left-3 w-full h-fit text-mywhite-100 flex'>
-                    <IoLocationOutline className='w-7 h-7' />
+                : <div className='absolute top-3 left-3 w-fit h-fit text-mywhite-100 flex items-end'>
+                    <IoLocationOutline className='w-7 h-6 mr-1' />
                     <p className='text-base-500 line-clamp-1'>{item.tripCountry}</p>
                 </div>}
             <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-3xl object-cover" />
@@ -48,7 +50,7 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
                 <div className="w-full h-fit flex justify-between items-center text-myblue-800">
                     <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">匿名</p>
                     <div className="relative flex-grow w-fit flex justify-end">
-                        <AiOutlineLike className='w-5 h-6 mr-1' />
+                        <AiOutlineHeart className='w-6 h-6 mr-1' />
                         <p>150</p>
                         <BsBookmark className='w-5 h-6 ml-2' />
                     </div>

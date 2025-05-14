@@ -35,6 +35,7 @@ export default function MyTrips() {
         isPublic: boolean;
     }
     const router = useRouter();
+    const [isLoading, setIsloading] = useState<boolean>(true);
 
     // useContext取得使用者登入狀態
     const { isUserSignIn, loading } = useAuth();
@@ -74,10 +75,12 @@ export default function MyTrips() {
                     tripName: tripData.tripName,
                     person: tripData.person,
                     tripTime,
-                    isPublic:tripData.isPublic,
+                    isPublic: tripData.isPublic,
                 };
             });
             setTrips(data);
+            setIsloading(false);
+
         });
         return () => unsubscribe();
     }, [user?.uid]);
@@ -87,7 +90,7 @@ export default function MyTrips() {
         if (userId && tripId) {
             try {
                 const tripRef = doc(db, "users", userId, "trips", tripId);
-                const allTripRef = doc(db,"all_trips",tripId);
+                const allTripRef = doc(db, "all_trips", tripId);
                 await deleteDoc(tripRef);
                 await deleteDoc(allTripRef);
                 console.log("Trip deleted successfully");
@@ -121,13 +124,19 @@ export default function MyTrips() {
 
     return (
         <div className="w-full h-full ">
+            {isLoading &&
+                <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
+                    <img src="/loading.gif" className="w-30 h-30 " />
+                    <p className="text-mywhite-100">旅雀加載中...請稍後</p>
+                </div>
+            }
             <div className="w-full h-fit flex flex-col p-10 mb-20">
                 <div className="w-fit h-fit mb-6">
                     <p className="text-3xl font-bold text-myblue-800">我的旅程</p>
                 </div>
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
-                    {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}/>))}
+                    {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate} />))}
                 </div>
                 <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
