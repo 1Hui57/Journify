@@ -163,10 +163,10 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
                     />
                 </div>
                 <div className="w-fit h-fit flex ml-auto gap-3">
-                    <button className="mt-4 px-4 py-2  text-myblue-800 rounded-full hover:bg-myzinc-200" onClick={() => { setIsAddTrip(false) }}>
+                    <button className="mt-4 px-4 py-2 text-base-400 text-myblue-600 rounded-full hover:bg-myzinc-200" onClick={() => { setIsAddTrip(false) }}>
                         取消
                     </button>
-                    <button className="mt-4 px-4 py-2 text-myblue-800 bg-primary-300 text-base-400 rounded-full hover:text-primary-300 hover:bg-myblue-600"
+                    <button className="mt-4 px-4 py-2  text-myblue-600 bg-primary-300 text-base-500 rounded-full hover:text-primary-300 hover:bg-myblue-700"
                         onClick={handleClick}>
                         建立
                     </button>
