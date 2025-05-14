@@ -62,7 +62,7 @@ export default function Home() {
                 <p className="text-zinc-500 sm:text-[20px] text-base-400 font-400">超過 38,512 人都在使用的排程網站</p>
             </div>
 
-            <div className='w-full h-full md:h-64 flex flex-col md:flex-row mt-5  mb-5 gap-5'>
+            <div className='w-full h-fit md:h-46 flex flex-col md:flex-row mt-5  mb-5 gap-5'>
                 <div className='bg-primary-300 h-42 w-full md:w-2/5 p-6 pl-8 rounded-4xl flex flex-col sm:h-full'>
                     <p className='text-myblue-700 text-xl-700'>開始規劃</p>
                     <p className='text-myblue-700 text-2xl-700'>你的旅程</p>
