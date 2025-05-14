@@ -22,6 +22,7 @@ interface FirestoreTrip {
     tripTime: FirestoreTripTime;
     isPublic: boolean;
     createAt:Timestamp;
+    tripCountry:string;
 }
 export default function Home() {
 
@@ -43,7 +44,8 @@ export default function Home() {
                     person: tripData.person,
                     tripTime: tripData.tripTime,
                     isPublic:tripData.isPublic,
-                    createAt:tripData.createAt
+                    createAt:tripData.createAt,
+                    tripCountry:tripData.tripCountry
                 };
             });
             setPublicTrips(data);
@@ -87,16 +89,8 @@ export default function Home() {
                     <img src="/down.png" className="w-4 h-4" />
                 </button>
             </div>
-            <div id="tripWrapper" className="w-full mt-5 mb-5 flex flex-wrap gap-7 px-2 ">
+            <div id="tripWrapper" className="w-full mt-5 mb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 px-2 ">
                 {publicTrips && publicTrips.map((item)=>(<HomeTripCard key={item.tripId} item={item}/>))}
-                {/* <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard />
-                <HomeTripCard /> */}
             </div>
         </div>
     )
