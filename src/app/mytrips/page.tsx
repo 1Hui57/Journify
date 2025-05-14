@@ -40,7 +40,6 @@ export default function MyTrips() {
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
-    let isPublic = false;
 
     // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);

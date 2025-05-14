@@ -32,7 +32,7 @@ export default function Header() {
                 <img src="/journify.png" alt="" className='w-32 h-7 cursor-pointer' onClick={() => { router.push('/') }} />
                 <div className='flex justify-between gap-6'>
                     <button className='text-base-500  text-primary-900 text-center' onClick={() => { router.push('/mytrips') }}>
-                        開始規劃
+                        我的旅程
                     </button>
                     {isUserSignIn ?
                         <button onClick={handleLogout} className='text-base-500  text-primary-900 text-center'>

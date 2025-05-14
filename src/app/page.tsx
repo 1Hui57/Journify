@@ -26,6 +26,8 @@ interface FirestoreTrip {
 }
 export default function Home() {
 
+    const router = useRouter();
+
     const [publicTrips, setPublicTrips] = useState<FirestoreTrip[]>();
     // 讀取公開的旅程並渲染
     useEffect(() => {
@@ -64,7 +66,7 @@ export default function Home() {
                 <div className='bg-primary-300 h-42 w-full md:w-2/5 p-6 pl-8 rounded-4xl flex flex-col sm:h-full'>
                     <p className='text-myblue-700 text-xl-700'>開始規劃</p>
                     <p className='text-myblue-700 text-2xl-700'>你的旅程</p>
-                    <button className='text-mywhite-100 bg-myblue-600 w-20 h-10  self-end rounded-full font-bold md:mt-8'>START</button>
+                    <button onClick={()=>{router.push("/mytrips")}}className='text-mywhite-100 bg-myblue-600 w-20 h-10  self-end rounded-full font-bold md:mt-8'>START</button>
                 </div>
                 <div className='h-full w-full md:w-3/5 flex flex-col '>
                     <div className="w-full h-[70px] flex gap-5 pl-3 md:pl-0 mb-2 items-center">
