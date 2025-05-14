@@ -253,3 +253,12 @@ button {
   --rdp-accent-background-color: #cf9573; /* Change the accent background color. */
   /* Add more CSS variables here. */
 }
+
+@media (max-width: 450px) {
+    #logo {
+        content: url('/journify-logo.png');
+        width:30px;
+        height:30px;
+    }
+}
+
