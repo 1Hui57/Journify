@@ -21,6 +21,7 @@ interface Trip {
     person: Number;
     tripTime: TripTime;
     isPublic: Boolean;
+    tripCountry:string;
 }
 export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
@@ -115,13 +116,15 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             tripName: tripName,
             person: Number(tripPerson),
             tripTime: tripTime,
-            isPublic: false
+            isPublic: false,
+            tripCountry:tripCountry
         };
         const newAlltrip = {
             ...newTrip,
             userId: userId,
             tripId: tripId,
             createdAt: serverTimestamp(),
+            tripCountry:tripCountry
         }
 
         try {
@@ -149,7 +152,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
                 <input type="text" placeholder="輸入旅程名稱" value={tripName} onChange={(e) => { setTripName(e.target.value) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
-                <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
+                <p className="text-myblue-600 font-light text-md">國家 ( 選填 ) </p>
                 <CountrySelect setTripCountry={setTripCountry}/>
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                 <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
