@@ -5,6 +5,7 @@ import "react-day-picker/style.css";
 import { serverTimestamp, addDoc, setDoc, collection, query, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { v4 as uuidv4 } from 'uuid';
+import CountrySelect from "./CountrySelect";
 
 interface CreateTripProps {
     userId: string | undefined;
@@ -19,7 +20,7 @@ interface Trip {
     tripName: string;
     person: Number;
     tripTime: TripTime;
-    isPublic:Boolean;
+    isPublic: Boolean;
 }
 export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
@@ -30,6 +31,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
     const [tripName, setTripName] = useState<string>("");
     const [tripPerson, setTripPerson] = useState<number | undefined>();
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
+    const [tripCountry, setTripCountry] = useState<string>("");
 
     // 人數input規則
     const personInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,12 +115,12 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             tripName: tripName,
             person: Number(tripPerson),
             tripTime: tripTime,
-            isPublic:false
+            isPublic: false
         };
         const newAlltrip = {
             ...newTrip,
-            userId:userId,
-            tripId:tripId,
+            userId: userId,
+            tripId: tripId,
             createdAt: serverTimestamp(),
         }
 
@@ -126,7 +128,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             // 寫入使用者自己的旅程
             await setDoc(doc(db, "users", userId, "trips", tripId), newTrip);
             // 寫入all_trips，便於首頁查詢
-            await setDoc(doc(db,"all_trips",tripId),newAlltrip);
+            await setDoc(doc(db, "all_trips", tripId), newAlltrip);
             setTripName("");
             setTripPerson(1);
             setTripTime(undefined);
@@ -140,15 +142,17 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
     }
 
     return (
-        <div className="fixed inset-0 bg-myzinc900-50  flex  items-center justify-center overflow-y-auto" onClick={() => setIsAddTrip(false)}>
-            <div className="bg-white p-6 rounded-lg shadow-lg w-120 h-168 mt-20 md:mt-0" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-myzinc900-50  flex  items-center justify-center overflow-y-auto pt-47" onClick={() => setIsAddTrip(false)}>
+            <div className="bg-white p-6 rounded-lg shadow-lg w-120 h-fit " onClick={(e) => e.stopPropagation()}>
                 <div className="text-lg font-bold text-myblue-800 mb-2">建立旅程</div>
                 <p className="text-myblue-600 font-light text-md "><span className="text-myred-400">* </span>旅程名稱</p>
-                <input type="text" placeholder="輸入旅程名稱" value={tripName} onChange={(e) => { setTripName(e.target.value) }} className="w-full h-12 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
+                <input type="text" placeholder="輸入旅程名稱" value={tripName} onChange={(e) => { setTripName(e.target.value) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
+                <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
+                <CountrySelect setTripCountry={setTripCountry}/>
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
-                <input type="text" placeholder="請選擇日期" readOnly className="w-full h-12 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
+                <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
                     value={deteText} />
                 <div className="w-fit mx-auto mt-2 text-primary-400 ">
                     <DayPicker mode="range" required selected={selected} onSelect={handleOnSelect}
