@@ -59,14 +59,14 @@ export default function Home() {
     // 使用者按愛心
 
     return (
-        <div className='flex flex-col max-w-6xl w-full h-full m-auto'>
+        <div className=' w-full h-full '>
             {isLoading &&
                 <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
                     <img src="/loading.gif" className="w-30 h-30 " />
                     <p className="text-mywhite-100">旅雀加載中...請稍後</p>
                 </div>
             }
-            <div className="w-full h-full px-8">
+            <div className="w-full h-full max-w-6xl px-8 m-auto">
                 <div className='w-full h-fit pt-8 mb-2 flex flex-col gap-5'>
                     <p className="w-full sm:text-2xl text-xl font-extrabold text-myblue-700 leading-relaxed">Journify幫你輕鬆安排行程</p>
                     <p className="text-zinc-500 sm:text-[20px] text-base-400 font-400">超過 38,512 人都在使用的排程網站</p>
