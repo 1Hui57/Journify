@@ -29,10 +29,10 @@ export default function Header() {
     return (
         <header className='p-0 m-0 h-[60px] w-full flex items-center shadow-md bg-mywhite-100 fixed top-0 left-0 z-50'>
             <div id="header" className="w-full h-full pl-4 pr-4 flex text-3xl justify-between items-center">
-                <img src="/journify.png" alt="" className='w-32 h-7 cursor-pointer' onClick={() => { router.push('/') }} />
+                <img id="logo" src="/JOURNIFY.png" alt="" className='w-32 h-7 cursor-pointer' onClick={() => { router.push('/') }} />
                 <div className='flex justify-between gap-6'>
                     <button className='text-base-500  text-primary-900 text-center' onClick={() => { router.push('/mytrips') }}>
-                        開始規劃
+                        我的旅程
                     </button>
                     {isUserSignIn ?
                         <button onClick={handleLogout} className='text-base-500  text-primary-900 text-center'>

@@ -40,7 +40,6 @@ export default function MyTrips() {
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
-    let isPublic = false;
 
     // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);
@@ -88,7 +87,9 @@ export default function MyTrips() {
         if (userId && tripId) {
             try {
                 const tripRef = doc(db, "users", userId, "trips", tripId);
+                const allTripRef = doc(db,"all_trips",tripId);
                 await deleteDoc(tripRef);
+                await deleteDoc(allTripRef);
                 console.log("Trip deleted successfully");
             } catch (error) {
                 console.error("Failed to delete trip:", error);
