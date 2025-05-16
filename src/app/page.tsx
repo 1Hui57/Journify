@@ -22,8 +22,9 @@ interface FirestoreTrip {
     person: number;
     tripTime: FirestoreTripTime;
     isPublic: boolean;
-    createAt: Timestamp;
     tripCountry: string;
+    createAt: Timestamp;
+    updateAt: Timestamp;
 }
 export default function Home() {
 
@@ -47,6 +48,7 @@ export default function Home() {
                     tripTime: tripData.tripTime,
                     isPublic: tripData.isPublic,
                     createAt: tripData.createAt,
+                    updateAt:tripData.updateAt,
                     tripCountry: tripData.tripCountry
                 };
             });

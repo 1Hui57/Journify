@@ -24,6 +24,7 @@ interface Trip {
     tripTime: TripTime;
     isPublic: boolean;
     createAt: Timestamp;
+    updateAt: Timestamp;
     tripCountry: string;
 }
 interface HomeTripCardProps {
@@ -33,7 +34,24 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
     // 計算天數
     const tripStartDate = item.tripTime.tripFrom.toDate();
     const tripEndDate = item.tripTime.tripTo.toDate();
-    const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24)+1);
+    let tripUpdateTime;
+    let formatted;
+    if (item.updateAt && item.updateAt !== undefined) {
+        tripUpdateTime = item.updateAt.toDate();
+        formatted = tripUpdateTime.toLocaleString("zh-TW", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        });
+    } else {
+        tripUpdateTime = "未設定";
+    }
+
+    const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
 
     return (
         <div className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
@@ -45,10 +63,14 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
                 </div>}
             <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-3xl object-cover" />
             <div className="w-full h-fit pl-2 pr-2 pt-1 flex flex-col gap-1">
-                <p className="text-base-400 text-myblue-300">{`${tripDays} 天`}</p>
                 <p className="text-myblue-800 text-base-700 font-bold line-clamp-1">{item.tripName}</p>
+                <div className='w-full h-fit flex justify-between'>
+                    <p className="text-base-400 text-myblue-300">{`${tripDays} 天`}</p>
+                    <p className="text-base-400 text-myblue-300">最後更新:{formatted}</p>
+                </div>
+                
                 <div className="w-full h-fit flex justify-between items-center text-myblue-800">
-                    <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">匿名</p>
+                    <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由 匿名 建立</p>
                     <div className="relative flex-grow w-fit flex justify-end">
                         <AiOutlineHeart className='w-6 h-6 mr-1' />
                         <p>150</p>
