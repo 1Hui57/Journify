@@ -1,3 +1,5 @@
+'use client'
+import { useRouter } from 'next/navigation';
 import { MdOutlinePeopleAlt } from "react-icons/md";
 import { IoIosMore } from "react-icons/io";
 import { useState } from "react";
@@ -25,10 +27,10 @@ export default function TripPageCard({ tripPerson, deleteTrip, userId, item, upd
 
     const [ isPublic, setIsPublic] = useState<boolean>(item.isPublic);
     const [isMoreHover, setIsMoreHover] = useState<boolean>(false);
-
+    const router = useRouter();
 
     return (
-        <div className="bg-mywhite-100 h-50 w-full rounded-md overflow-hidden shadow-md cursor-pointer transition-transform duration-200 hover:scale-105">
+        <div onClick={()=>router.push(`/mytrips/edit/${item.id}`)} className="bg-mywhite-100 h-50 w-full rounded-md overflow-hidden shadow-md cursor-pointer transition-transform duration-200 hover:scale-105">
             <div className="relative w-full h-[70%] text-myzinc-900">
                 <img src="/Osaka.jpg" className="w-full h-full object-cover" />
                 <IoIosMore className="absolute top-0 right-1.5 w-6 h-7" onMouseEnter={() => setIsMoreHover(true)} onMouseLeave={() => setIsMoreHover(false)} />
