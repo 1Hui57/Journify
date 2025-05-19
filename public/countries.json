@@ -1,866 +1,1192 @@
 [
-    {
-        "countryCode": "AF", 
-        "countryName": "阿富汗"
-    },
-    {
-        "countryCode": "DZ", 
-        "countryName": "阿爾及利亞"
-    },
-    {
-        "countryCode": "AS", 
-        "countryName": "美屬薩摩亞"
-    },
-    {
-        "countryCode": "AD", 
-        "countryName": "安道爾"
-    },
-    {
-        "countryCode": "AO", 
-        "countryName": "安哥拉"
-    },
-    {
-        "countryCode": "AI", 
-        "countryName": "安圭拉"
-    },
-    {
-        "countryCode": "AG", 
-        "countryName": "安提瓜和巴布達"
-    },
-    {
-        "countryCode": "AM", 
-        "countryName": "亞美尼亞"
-    },
-    {
-        "countryCode": "AW", 
-        "countryName": "阿魯巴"
-    },
-    {
-        "countryCode": "AU", 
-        "countryName": "澳大利亞"
-    },
-    {
-        "countryCode": "AT", 
-        "countryName": "奧地利"
-    },
-    {
-        "countryCode": "AZ", 
-        "countryName": "阿塞拜疆"
-    },
-    {
-        "countryCode": "BS", 
-        "countryName": "巴哈馬"
-    },
-    {
-        "countryCode": "BH", 
-        "countryName": "巴林"
-    },
-    {
-        "countryCode": "BD", 
-        "countryName": "孟加拉國"
-    },
-    {
-        "countryCode": "BB", 
-        "countryName": "巴巴多斯"
-    },
-    {
-        "countryCode": "BY", 
-        "countryName": "白俄羅斯"
-    },
-    {
-        "countryCode": "BE", 
-        "countryName": "比利時"
-    },
-    {
-        "countryCode": "BZ", 
-        "countryName": "伯利茲"
-    },
-    {
-        "countryCode": "BJ", 
-        "countryName": "貝寧"
-    },
-    {
-        "countryCode": "BM", 
-        "countryName": "百慕大"
-    },
-    {
-        "countryCode": "BT", 
-        "countryName": "不丹"
-    },
-    {
-        "countryCode": "BO", 
-        "countryName": "玻利維亞"
-    },
-    {
-        "countryCode": "BA", 
-        "countryName": "波斯尼亞和黑塞哥維那"
-    },
-    {
-        "countryCode": "BW", 
-        "countryName": "博茨瓦納"
-    },
-    {
-        "countryCode": "BN", 
-        "countryName": "文萊"
-    },
-    {
-        "countryCode": "BF", 
-        "countryName": "布基納法索"
-    },
-    {
-        "countryCode": "BI", 
-        "countryName": "布隆迪"
-    },
-    {
-        "countryCode": "KH", 
-        "countryName": "柬埔寨"
-    },
-    {
-        "countryCode": "CM", 
-        "countryName": "喀麥隆"
-    },
-    {
-        "countryCode": "CA", 
-        "countryName": "加拿大"
-    },
-    {
-        "countryCode": "CV", 
-        "countryName": "佛得角"
-    },
-    {
-        "countryCode": "KY", 
-        "countryName": "開曼群島"
-    },
-    {
-        "countryCode": "CF", 
-        "countryName": "中非共和國"
-    },
-    {
-        "countryCode": "TD", 
-        "countryName": "查德"
-    },
-    {
-        "countryCode": "CN", 
-        "countryName": "中國"
-    },
-    {
-        "countryCode": "CC", 
-        "countryName": "科科斯群島"
-    },
-    {
-        "countryCode": "CO", 
-        "countryName": "哥倫比亞"
-    },
-    {
-        "countryCode": "KM", 
-        "countryName": "葛摩"
-    },
-    {
-        "countryCode": "CG", 
-        "countryName": "剛果共和國"
-    },
-    {
-        "countryCode": "CD", 
-        "countryName": "剛果民主共和國"
-    },
-    {
-        "countryCode": "CR", 
-        "countryName": "哥斯達黎加"
-    },
-    {
-        "countryCode": "HR", 
-        "countryName": "克羅地亞"
-    },
-    {
-        "countryCode": "CU", 
-        "countryName": "古巴"
-    },
-    {
-        "countryCode": "CZ", 
-        "countryName": "捷克共和國"
-    },
-    {
-        "countryCode": "DK", 
-        "countryName": "丹麥"
-    },
-    {
-        "countryCode": "DJ", 
-        "countryName": "吉布提"
-    },
-    {
-        "countryCode": "DM", 
-        "countryName": "多米尼加"
-    },
-    {
-        "countryCode": "DO", 
-        "countryName": "多米尼加共和國"
-    },
-    {
-        "countryCode": "EC", 
-        "countryName": "厄瓜多爾"
-    },
-    {
-        "countryCode": "EG", 
-        "countryName": "埃及"
-    },
-    {
-        "countryCode": "SV", 
-        "countryName": "薩爾瓦多"
-    },
-    {
-        "countryCode": "GQ", 
-        "countryName": "赤道幾內亞"
-    },
-    {
-        "countryCode": "ER", 
-        "countryName": "厄立特裡亞"
-    },
-    {
-        "countryCode": "EE", 
-        "countryName": "愛沙尼亞"
-    },
-    {
-        "countryCode": "ET", 
-        "countryName": "埃塞俄比亞"
-    },
-    {
-        "countryCode": "FO", 
-        "countryName": "法羅群島"
-    },
-    {
-        "countryCode": "FJ", 
-        "countryName": "斐濟"
-    },
-    {
-        "countryCode": "FI", 
-        "countryName": "芬蘭"
-    },
-    {
-        "countryCode": "FR", 
-        "countryName": "法國"
-    },
-    {
-        "countryCode": "GF", 
-        "countryName": "法屬圭亞那"
-    },
-    {
-        "countryCode": "PF", 
-        "countryName": "法屬玻里尼西亞"
-    },
-    {
-        "countryCode": "GA", 
-        "countryName": "加彭"
-    },
-    {
-        "countryCode": "GM", 
-        "countryName": "甘比亞"
-    },
-    {
-        "countryCode": "GE", 
-        "countryName": "格魯吉亞"
-    },
-    {
-        "countryCode": "DE", 
-        "countryName": "德國"
-    },
-    {
-        "countryCode": "GH", 
-        "countryName": "迦納"
-    },
-    {
-        "countryCode": "GI", 
-        "countryName": "直布羅陀"
-    },
-    {
-        "countryCode": "GR", 
-        "countryName": "希臘"
-    },
-    {
-        "countryCode": "GL", 
-        "countryName": "格陵蘭"
-    },
-    {
-        "countryCode": "GD", 
-        "countryName": "格瑞那達"
-    },
-    {
-        "countryCode": "GP", 
-        "countryName": "瓜德羅普"
-    },
-    {
-        "countryCode": "GU", 
-        "countryName": "關島"
-    },
-    {
-        "countryCode": "GT", 
-        "countryName": "瓜地馬拉"
-    },
-    {
-        "countryCode": "GG", 
-        "countryName": "耿西"
-    },
-    {
-        "countryCode": "GN", 
-        "countryName": "幾內亞"
-    },
-    {
-        "countryCode": "GW", 
-        "countryName": "幾內亞比索"
-    },
-    {
-        "countryCode": "GY", 
-        "countryName": "蓋亞那"
-    },
-    {
-        "countryCode": "HT", 
-        "countryName": "海地"
-    },
-    {
-        "countryCode": "VA", 
-        "countryName": "梵蒂岡"
-    },
-    {
-        "countryCode": "HN", 
-        "countryName": "洪都拉斯"
-    },
-    {
-        "countryCode": "HK", 
-        "countryName": "香港"
-    },
-    {
-        "countryCode": "HU", 
-        "countryName": "匈牙利"
-    },
-    {
-        "countryCode": "IS", 
-        "countryName": "冰島"
-    },
-    {
-        "countryCode": "IN", 
-        "countryName": "印度"
-    },
-    {
-        "countryCode": "ID", 
-        "countryName": "印度尼西亞"
-    },
-    {
-        "countryCode": "IR", 
-        "countryName": "伊朗"
-    },
-    {
-        "countryCode": "IQ", 
-        "countryName": "伊拉克"
-    },
-    {
-        "countryCode": "IE", 
-        "countryName": "愛爾蘭"
-    },
-    {
-        "countryCode": "IL", 
-        "countryName": "以色列"
-    },
-    {
-        "countryCode": "IT", 
-        "countryName": "義大利"
-    },
-    {
-        "countryCode": "JM", 
-        "countryName": "牙買加"
-    },
-    {
-        "countryCode": "JP", 
-        "countryName": "日本"
-    },
-    {
-        "countryCode": "JE", 
-        "countryName": "澤西"
-    },
-    {
-        "countryCode": "JO", 
-        "countryName": "約旦"
-    },
-    {
-        "countryCode": "KZ", 
-        "countryName": "哈薩克"
-    },
-    {
-        "countryCode": "KE", 
-        "countryName": "肯亞"
-    },
-    {
-        "countryCode": "KI", 
-        "countryName": "吉里巴斯"
-    },
-    {
-        "countryCode": "KP", 
-        "countryName": "朝鮮"
-    },
-    {
-        "countryCode": "KR", 
-        "countryName": "韓國"
-    },
-    {
-        "countryCode": "KW", 
-        "countryName": "科威特"
-    },
-    {
-        "countryCode": "KG", 
-        "countryName": "吉爾吉斯"
-    },
-    {
-        "countryCode": "LA", 
-        "countryName": "寮國"
-    },
-    {
-        "countryCode": "LV", 
-        "countryName": "拉脫維亞"
-    },
-    {
-        "countryCode": "LB", 
-        "countryName": "黎巴嫩"
-    },
-    {
-        "countryCode": "LS", 
-        "countryName": "賴索托"
-    },
-    {
-        "countryCode": "LY", 
-        "countryName": "利比亞"
-    },
-    {
-        "countryCode": "LI", 
-        "countryName": "列支敦斯登"
-    },
-    {
-        "countryCode": "LT", 
-        "countryName": "立陶宛"
-    },
-    {
-        "countryCode": "LU", 
-        "countryName": "盧森堡"
-    },
-    {
-        "countryCode": "MO", 
-        "countryName": "澳門"
-    },
-    {
-        "countryCode": "MG", 
-        "countryName": "馬達加斯加"
-    },
-    {
-        "countryCode": "MW", 
-        "countryName": "馬拉威"
-    },
-    {
-        "countryCode": "MY", 
-        "countryName": "馬來西亞"
-    },
-    {
-        "countryCode": "MV", 
-        "countryName": "馬爾地夫"
-    },
-    {
-        "countryCode": "ML", 
-        "countryName": "馬利"
-    },
-    {
-        "countryCode": "MH", 
-        "countryName": "馬紹爾群島"
-    },
-    {
-        "countryCode": "MQ", 
-        "countryName": "馬丁尼克"
-    },
-    {
-        "countryCode": "MR", 
-        "countryName": "茅利塔尼亞"
-    },
-    {
-        "countryCode": "MU", 
-        "countryName": "模里西斯"
-    },
-    {
-        "countryCode": "YT", 
-        "countryName": "馬約特"
-    },
-    {
-        "countryCode": "MX", 
-        "countryName": "墨西哥"
-    },
-    {
-        "countryCode": "FM", 
-        "countryName": "密克羅尼西亞聯邦"
-    },
-    {
-        "countryCode": "MC", 
-        "countryName": "摩納哥"
-    },
-    {
-        "countryCode": "MN", 
-        "countryName": "蒙古"
-    },
-    {
-        "countryCode": "MS", 
-        "countryName": "蒙塞拉特"
-    },
-    {
-        "countryCode": "MA", 
-        "countryName": "摩洛哥"
-    },
-    {
-        "countryCode": "MZ", 
-        "countryName": "莫桑比克"
-    },
-    {
-        "countryCode": "MM", 
-        "countryName": "緬甸"
-    },
-    {
-        "countryCode": "NA", 
-        "countryName": "納米比亞"
-    },
-    {
-        "countryCode": "NR", 
-        "countryName": "諾魯"
-    },
-    {
-        "countryCode": "NP", 
-        "countryName": "尼泊爾"
-    },
-    {
-        "countryCode": "NL", 
-        "countryName": "荷蘭"
-    },
-    {
-        "countryCode": "NC", 
-        "countryName": "新喀裡多尼亞"
-    },
-    {
-        "countryCode": "NZ", 
-        "countryName": "新西蘭"
-    },
-    {
-        "countryCode": "NI", 
-        "countryName": "尼加拉瓜"
-    },
-    {
-        "countryCode": "NE", 
-        "countryName": "尼日爾"
-    },
-    {
-        "countryCode": "NG", 
-        "countryName": "尼日利亞"
-    },
-    {
-        "countryCode": "NU", 
-        "countryName": "紐埃"
-    },
-    {
-        "countryCode": "MP", 
-        "countryName": "北馬裡亞納群島"
-    },
-    {
-        "countryCode": "NO", 
-        "countryName": "挪威"
-    },
-    {
-        "countryCode": "OM", 
-        "countryName": "阿曼"
-    },
-    {
-        "countryCode": "PK", 
-        "countryName": "巴基斯坦"
-    },
-    {
-        "countryCode": "PW", 
-        "countryName": "帛琉"
-    },
-    {
-        "countryCode": "PS", 
-        "countryName": "巴勒斯坦領土"
-    },
-    {
-        "countryCode": "PA", 
-        "countryName": "巴拿馬"
-    },
-    {
-        "countryCode": "PG", 
-        "countryName": "巴布亞新幾內亞"
-    },
-    {
-        "countryCode": "PE", 
-        "countryName": "秘魯"
-    },
-    {
-        "countryCode": "PH", 
-        "countryName": "菲律賓"
-    },
-    {
-        "countryCode": "PN", 
-        "countryName": "皮特凱恩群島"
-    },
-    {
-        "countryCode": "PL", 
-        "countryName": "波蘭"
-    },
-    {
-        "countryCode": "PT", 
-        "countryName": "葡萄牙"
-    },
-    {
-        "countryCode": "PR", 
-        "countryName": "波多黎各"
-    },
-    {
-        "countryCode": "QA", 
-        "countryName": "卡塔爾"
-    },
-    {
-        "countryCode": "RU", 
-        "countryName": "俄羅斯"
-    },
-    {
-        "countryCode": "RW", 
-        "countryName": "盧旺達"
-    },
-    {
-        "countryCode": "RE", 
-        "countryName": "留尼汪"
-    },
-    {
-        "countryCode": "SH", 
-        "countryName": "聖赫勒拿"
-    },
-    {
-        "countryCode": "KN", 
-        "countryName": "聖基茨和尼維斯"
-    },
-    {
-        "countryCode": "LC", 
-        "countryName": "聖盧西亞"
-    },
-    {
-        "countryCode": "PM", 
-        "countryName": "聖皮埃爾和密克隆群島"
-    },
-    {
-        "countryCode": "VC", 
-        "countryName": "聖文森特和格林納丁斯"
-    },
-    {
-        "countryCode": "WS", 
-        "countryName": "薩摩亞"
-    },
-    {
-        "countryCode": "SM", 
-        "countryName": "聖馬力諾"
-    },
-    {
-        "countryCode": "ST", 
-        "countryName": "聖多美和普林西比"
-    },
-    {
-        "countryCode": "SA", 
-        "countryName": "沙特阿拉伯"
-    },
-    {
-        "countryCode": "SN", 
-        "countryName": "塞內加爾"
-    },
-    {
-        "countryCode": "RS", 
-        "countryName": "塞爾維亞"
-    },
-    {
-        "countryCode": "SC", 
-        "countryName": "塞舌爾"
-    },
-    {
-        "countryCode": "SG", 
-        "countryName": "新加坡"
-    },
-    {
-        "countryCode": "SK", 
-        "countryName": "斯洛伐克"
-    },
-    {
-        "countryCode": "SI", 
-        "countryName": "斯洛文尼亞"
-    },
-    {
-        "countryCode": "SB", 
-        "countryName": "所羅門群島"
-    },
-    {
-        "countryCode": "SO", 
-        "countryName": "索馬裡"
-    },
-    {
-        "countryCode": "ZA", 
-        "countryName": "南非"
-    },
-    {
-        "countryCode": "ES", 
-        "countryName": "西班牙"
-    },
-    {
-        "countryCode": "LK", 
-        "countryName": "斯裡蘭卡"
-    },
-    {
-        "countryCode": "SD", 
-        "countryName": "蘇丹"
-    },
-    {
-        "countryCode": "SR", 
-        "countryName": "蘇裡南"
-    },
-    {
-        "countryCode": "SJ", 
-        "countryName": "斯瓦爾巴特和揚馬延"
-    },
-    {
-        "countryCode": "SZ", 
-        "countryName": "斯威士蘭"
-    },
-    {
-        "countryCode": "SE", 
-        "countryName": "瑞典"
-    },
-    {
-        "countryCode": "CH", 
-        "countryName": "瑞士"
-    },
-    {
-        "countryCode": "SY", 
-        "countryName": "敘利亞"
-    },
-    {
-        "countryCode": "TW", 
-        "countryName": "台灣"
-    },
-    {
-        "countryCode": "TJ", 
-        "countryName": "塔吉克斯坦"
-    },
-    {
-        "countryCode": "TZ", 
-        "countryName": "坦桑尼亞"
-    },
-    {
-        "countryCode": "TH", 
-        "countryName": "泰國"
-    },
-    {
-        "countryCode": "TL", 
-        "countryName": "東帝汶"
-    },
-    {
-        "countryCode": "TG", 
-        "countryName": "多哥"
-    },
-    {
-        "countryCode": "TK", 
-        "countryName": "托克勞"
-    },
-    {
-        "countryCode": "TO", 
-        "countryName": "東加"
-    },
-    {
-        "countryCode": "TT", 
-        "countryName": "特立尼達和多巴哥"
-    },
-    {
-        "countryCode": "TN", 
-        "countryName": "突尼斯"
-    },
-    {
-        "countryCode": "TR", 
-        "countryName": "土耳其"
-    },
-    {
-        "countryCode": "TM", 
-        "countryName": "土庫曼斯坦"
-    },
-    {
-        "countryCode": "TC", 
-        "countryName": "特克斯和凱科斯群島"
-    },
-    {
-        "countryCode": "TV", 
-        "countryName": "圖瓦盧"
-    },
-    {
-        "countryCode": "UG", 
-        "countryName": "烏干達"
-    },
-    {
-        "countryCode": "UA", 
-        "countryName": "烏克蘭"
-    },
-    {
-        "countryCode": "AE", 
-        "countryName": "阿拉伯聯合酋長國"
-    },
-    {
-        "countryCode": "GB", 
-        "countryName": "英國"
-    },
-    {
-        "countryCode": "UM", 
-        "countryName": "美國邊遠小島"
-    },
-    {
-        "countryCode": "US", 
-        "countryName": "美國"
-    },
-    {
-        "countryCode": "UZ", 
-        "countryName": "烏茲別克斯坦"
-    },
-    {
-        "countryCode": "VU", 
-        "countryName": "瓦努阿圖"
-    },
-    {
-        "countryCode": "VE", 
-        "countryName": "委內瑞拉"
-    },
-    {
-        "countryCode": "VN", 
-        "countryName": "越南"
-    },
-    {
-        "countryCode": "VG", 
-        "countryName": "英屬維京群島"
-    },
-    {
-        "countryCode": "VI", 
-        "countryName": "美屬維京群島"
-    },
-    {
-        "countryCode": "WF", 
-        "countryName": "瓦利斯和富圖納"
-    },
-    {
-        "countryCode": "EH", 
-        "countryName": "西撒哈拉"
-    },
-    {
-        "countryCode": "YE", 
-        "countryName": "葉門"
-    },
-    {
-        "countryCode": "ZM", 
-        "countryName": "贊比亞"
-    },
-    {
-        "countryCode": "ZW", 
-        "countryName": "津巴布韋"
-    },
-    {
-        "countryCode": "AX", 
-        "countryName": "奧蘭群島"
-    }
+  {
+    "countryCode": "AF",
+    "countryName": "阿富汗",
+    "lat": 34.28,
+    "lng": 67.11
+  },
+  {
+    "countryCode": "DZ",
+    "countryName": "阿爾及利亞",
+    "lat": 36.42,
+    "lng": 3.08
+  },
+  {
+    "countryCode": "AS",
+    "countryName": "美屬薩摩亞",
+    "lat": -14.16,
+    "lng": -170.43
+  },
+  {
+    "countryCode": "AD",
+    "countryName": "安道爾",
+    "lat": 42.31,
+    "lng": 1.32
+  },
+  {
+    "countryCode": "AO",
+    "countryName": "安哥拉",
+    "lat": -9.5,
+    "lng": 16.357
+  },
+  {
+    "countryCode": "AI",
+    "countryName": "安圭拉",
+    "lat": 18.227,
+    "lng": -63.04
+  },
+  {
+    "countryCode": "AG",
+    "countryName": "安提瓜和巴布達",
+    "lat": 17.20,
+    "lng": -63.04
+  },
+  {
+    "countryCode": "AM",
+    "countryName": "亞美尼亞",
+    "lat": 40.10,
+    "lng": 44.31
+  },
+  {
+    "countryCode": "AW",
+    "countryName": "阿魯巴",
+    "lat": 12.32,
+    "lng": -70.02
+  },
+  {
+    "countryCode": "AU",
+    "countryName": "澳大利亞",
+    "lat": -35.15,
+    "lng": 149.08
+  },
+  {
+    "countryCode": "AT",
+    "countryName": "奧地利",
+    "lat": 48.12,
+    "lng": 16.22
+  },
+  {
+    "countryCode": "AZ",
+    "countryName": "阿塞拜疆",
+    "lat": 40.29,
+    "lng":49.56
+  },
+  {
+    "countryCode": "BS",
+    "countryName": "巴哈馬",
+    "lat": 25.05,
+    "lng": -77.20
+  },
+  {
+    "countryCode": "BH",
+    "countryName": "巴林",
+    "lat": 26.10,
+    "lng": 50.30
+  },
+  {
+    "countryCode": "BD",
+    "countryName": "孟加拉國",
+    "lat": 23.43,
+    "lng": 90.26
+  },
+  {
+    "countryCode": "BB",
+    "countryName": "巴巴多斯",
+    "lat": 13.95,
+    "lng": -59.30
+  },
+  {
+    "countryCode": "BY",
+    "countryName": "白俄羅斯",
+    "lat": 53.52,
+    "lng": 27.30
+  },
+  {
+    "countryCode": "BE",
+    "countryName": "比利時",
+    "lat": 50.51,
+    "lng": 4.21
+  },
+  {
+    "countryCode": "BZ",
+    "countryName": "伯利茲",
+    "lat": 17.18,
+    "lng": -88.30
+  },
+  {
+    "countryCode": "BJ",
+    "countryName": "貝寧",
+    "lat": 6.23,
+    "lng": 2.42
+  },
+  {
+    "countryCode": "BM",
+    "countryName": "百慕達",
+    "lat": 31.29,
+    "lng": 87.11
+  },
+  {
+    "countryCode": "BT",
+    "countryName": "不丹",
+    "lat": 27.31,
+    "lng": 89.45
+  },
+  {
+    "countryCode": "BO",
+    "countryName": "玻利維亞",
+    "lat": -16.20,
+    "lng": -68.10
+  },
+  {
+    "countryCode": "BA",
+    "countryName": "波斯尼亞和黑塞哥維那",
+    "lat": 43.52,
+    "lng": 18.26
+  },
+  {
+    "countryCode": "BW",
+    "countryName": "博茨瓦納",
+    "lat": -24.45,
+    "lng": 25.57
+  },
+  {
+    "countryCode": "BN",
+    "countryName": "汶萊",
+    "lat": 4.52,
+    "lng": 115.00
+  },
+  {
+    "countryCode": "BF",
+    "countryName": "布基納法索",
+    "lat": 12.15,
+    "lng": -1.30
+  },
+  {
+    "countryCode": "BI",
+    "countryName": "布隆迪",
+    "lat": -3.16,
+    "lng": 29.18
+  },
+  {
+    "countryCode": "KH",
+    "countryName": "柬埔寨",
+    "lat": 11.33,
+    "lng": 104.55
+  },
+  {
+    "countryCode": "CM",
+    "countryName": "喀麥隆",
+    "lat": 3.50,
+    "lng": 11.35
+  },
+  {
+    "countryCode": "CA",
+    "countryName": "加拿大",
+    "lat": 45.27,
+    "lng": -75.42
+  },
+  {
+    "countryCode": "CV",
+    "countryName": "佛得角",
+    "lat": 15.02,
+    "lng": -23.34
+  },
+  {
+    "countryCode": "KY",
+    "countryName": "開曼群島",
+    "lat": 19.20,
+    "lng": -81.24
+  },
+  {
+    "countryCode": "CF",
+    "countryName": "中非共和國",
+    "lat": 4.23,
+    "lng": 18.35
+  },
+  {
+    "countryCode": "TD",
+    "countryName": "查德",
+    "lat": 12.10,
+    "lng": 14.59
+  },
+  {
+    "countryCode": "CN",
+    "countryName": "中國",
+    "lat": 39.55,
+    "lng": 116.20
+  },
+  {
+    "countryCode": "CC",
+    "countryName": "科克斯群島",
+    "lat": 96.82,
+    "lng": -12.188
+  },
+  {
+    "countryCode": "CO",
+    "countryName": "哥倫比亞",
+    "lat": 4.34,
+    "lng": -74.00
+  },
+  {
+    "countryCode": "KM",
+    "countryName": "葛摩",
+    "lat": -11.40,
+    "lng": 43.16
+  },
+  {
+    "countryCode": "CG",
+    "countryName": "剛果共和國",
+    "lat": -4.09,
+    "lng": 15.12
+  },
+  {
+    "countryCode": "CD",
+    "countryName": "剛果民主共和國",
+    "lat": -5.04,
+    "lng": 18.78
+  },
+  {
+    "countryCode": "CR",
+    "countryName": "哥斯達黎加",
+    "lat": 9.05,
+    "lng": -84.02
+  },
+  {
+    "countryCode": "HR",
+    "countryName": "克羅地亞",
+    "lat": 45.50,
+    "lng": 15.58
+  },
+  {
+    "countryCode": "CU",
+    "countryName": "古巴",
+    "lat": 23.08,
+    "lng": -82.22
+  },
+  {
+    "countryCode": "CZ",
+    "countryName": "捷克共和國",
+    "lat": 50.05,
+    "lng": 114.00
+  },
+  {
+    "countryCode": "DK",
+    "countryName": "丹麥",
+    "lat": 55.41,
+    "lng":12.34
+  },
+  {
+    "countryCode": "DJ",
+    "countryName": "吉布提",
+    "lat": 11.08,
+    "lng": 42.20
+  },
+  {
+    "countryCode": "DM",
+    "countryName": "多明尼加",
+    "lat": 15.20,
+    "lng": -61.24
+  },
+  {
+    "countryCode": "DO",
+    "countryName": "多米尼加共和國",
+    "lat": 18.30,
+    "lng": -69.59
+  },
+  {
+    "countryCode": "EC",
+    "countryName": "厄瓜多爾",
+    "lat": -0.15,
+    "lng": -78.35
+  },
+  {
+    "countryCode": "EG",
+    "countryName": "埃及",
+    "lat": 30.01,
+    "lng": 31.14
+  },
+  {
+    "countryCode": "SV",
+    "countryName": "薩爾瓦多",
+    "lat": 13.40,
+    "lng": -89.10
+  },
+  {
+    "countryCode": "GQ",
+    "countryName": "赤道幾內亞",
+    "lat": 3.45,
+    "lng": 8.5
+  },
+  {
+    "countryCode": "ER",
+    "countryName": "厄立特裡亞",
+    "lat": 15.19,
+    "lng": 38.55
+  },
+  {
+    "countryCode": "EE",
+    "countryName": "愛沙尼亞",
+    "lat": 59.22,
+    "lng": 24.48
+  },
+  {
+    "countryCode": "ET",
+    "countryName": "埃塞俄比亞",
+    "lat": 9.02,
+    "lng": 38.42
+  },
+  {
+    "countryCode": "FO",
+    "countryName": "法羅群島"
+    ,
+    "lat": 62.05,
+    "lng": -6.56
+  },
+  {
+    "countryCode": "FJ",
+    "countryName": "斐濟",
+    "lat": -18.06,
+    "lng": 178.3
+  },
+  {
+    "countryCode": "FI",
+    "countryName": "芬蘭",
+    "lat": 60.15,
+    "lng": 25.03
+  },
+  {
+    "countryCode": "FR",
+    "countryName": "法國",
+    "lat": 48.864716,
+    "lng": 2.349014
+  },
+  {
+    "countryCode": "GF",
+    "countryName": "法屬圭亞那",
+    "lat": 5.05,
+    "lng": -52.18
+  },
+  {
+    "countryCode": "PF",
+    "countryName": "法屬玻里尼西亞",
+    "lat": -17.32,
+    "lng": -147.34
+  },
+  {
+    "countryCode": "GA",
+    "countryName": "加彭",
+    "lat": 0.25,
+    "lng": 9.26
+  },
+  {
+    "countryCode": "GM",
+    "countryName": "甘比亞",
+    "lat": 13.28,
+    "lng": -16.4
+  },
+  {
+    "countryCode": "GE",
+    "countryName": "格魯吉亞",
+    "lat": 41.43,
+    "lng": 44.5
+  },
+  {
+    "countryCode": "DE",
+    "countryName": "德國",
+    "lat": 52.3,
+    "lng": 13.25
+  },
+  {
+    "countryCode": "GH",
+    "countryName": "迦納",
+    "lat": 5.35,
+    "lng": -0.06
+  },
+  {
+    "countryCode": "GI",
+    "countryName": "直布羅陀",
+    "lat": -5.35,
+    "lng": 36.14
+  },
+  {
+    "countryCode": "GR",
+    "countryName": "希臘",
+    "lat": 37.58,
+    "lng":23.46
+  },
+  {
+    "countryCode": "GL",
+    "countryName": "格陵蘭",
+    "lat": 64.1,
+    "lng": -51.35
+  },
+  {
+    "countryCode": "GP",
+    "countryName": "瓜德羅普",
+    "lat": 16,
+    "lng": -61.44
+  },
+  {
+    "countryCode": "GT",
+    "countryName": "瓜地馬拉",
+    "lat": 14.4,
+    "lng": -90.22
+  },
+  {
+    "countryCode": "GG",
+    "countryName": "耿西",
+    "lat": 49.26,
+    "lng": -2.33
+  },
+  {
+    "countryCode": "GN",
+    "countryName": "幾內亞",
+    "lat": 9.29,
+    "lng": -13.49
+  },
+  {
+    "countryCode": "GW",
+    "countryName": "幾內亞比索",
+    "lat": 11.45,
+    "lng": -45.45
+  },
+  {
+    "countryCode": "GY",
+    "countryName": "蓋亞那",
+    "lat": 6.5,
+    "lng": -58.12
+  },
+  {
+    "countryCode": "HT",
+    "countryName": "海地",
+    "lat": 18.4,
+    "lng": -72.2
+  },
+  {
+    "countryCode": "VA",
+    "countryName": "梵蒂岡",
+    "lat": 12.45,
+    "lng": 41.90
+  },
+  {
+    "countryCode": "HN",
+    "countryName": "洪都拉斯",
+    "lat": 14.05,
+    "lng": -87.14
+  },
+  {
+    "countryCode": "HK",
+    "countryName": "香港",
+    "lat": 22.32,
+    "lng": 114.17
+  },
+  {
+    "countryCode": "HU",
+    "countryName": "匈牙利",
+    "lat": 47.2,
+    "lng": 19.05
+  },
+  {
+    "countryCode": "IS",
+    "countryName": "冰島",
+    "lat": 64.1,
+    "lng": -21.57
+  },
+  {
+    "countryCode": "IN",
+    "countryName": "印度",
+    "lat": 28.37,
+    "lng": 77.13
+  },
+  {
+    "countryCode": "ID",
+    "countryName": "印度尼西亞",
+    "lat": -6.09,
+    "lng": 106.49
+  },
+  {
+    "countryCode": "IR",
+    "countryName": "伊朗",
+    "lat": 35.44,
+    "lng": 54.3
+  },
+  {
+    "countryCode": "IQ",
+    "countryName": "伊拉克",
+    "lat": 33.2,
+    "lng": 44.3
+  },
+  {
+    "countryCode": "IE",
+    "countryName": "愛爾蘭",
+    "lat": 53.21,
+    "lng": -6.15
+  },
+  {
+    "countryCode": "IL",
+    "countryName": "以色列",
+    "lat": 31.47,
+    "lng": 35.12
+  },
+  {
+    "countryCode": "IT",
+    "countryName": "義大利",
+    "lat": 41.54,
+    "lng": 12.29
+  },
+  {
+    "countryCode": "JM",
+    "countryName": "牙買加",
+    "lat": 18,
+    "lng": -76.5
+  },
+  {
+    "countryCode": "JP",
+    "countryName": "日本",
+    "lat": 35.68,
+    "lng": 139.69
+  },
+  {
+    "countryCode": "JO",
+    "countryName": "約旦",
+    "lat": 31.57,
+    "lng": 35.52
+  },
+  {
+    "countryCode": "KZ",
+    "countryName": "哈薩克",
+    "lat": 54.1,
+    "lng": 71.3
+  },
+  {
+    "countryCode": "KE",
+    "countryName": "肯亞",
+    "lat": -1.17,
+    "lng": 36.48
+  },
+  {
+    "countryCode": "KI",
+    "countryName": "吉里巴斯",
+    "lat": 1.3,
+    "lng": 173
+  },
+  {
+    "countryCode": "KP",
+    "countryName": "北韓",
+    "lat": 38.96,
+    "lng": 125.85
+  },
+  {
+    "countryCode": "KR",
+    "countryName": "韓國",
+    "lat": 37.56,
+    "lng": 126.97
+  },
+  {
+    "countryCode": "KW",
+    "countryName": "科威特",
+    "lat": 29.3,
+    "lng": 48
+  },
+  {
+    "countryCode": "KG",
+    "countryName": "吉爾吉斯",
+    "lat": 42.54,
+    "lng": 74.46
+  },
+  {
+    "countryCode": "LA",
+    "countryName": "寮國",
+    "lat": 17.58,
+    "lng": 102.36
+  },
+  {
+    "countryCode": "LV",
+    "countryName": "拉脫維亞",
+    "lat": 56.53,
+    "lng": 24.08
+  },
+  {
+    "countryCode": "LB",
+    "countryName": "黎巴嫩",
+    "lat": 33.53,
+    "lng": 35.31
+  },
+  {
+    "countryCode": "LS",
+    "countryName": "賴索托",
+    "lat": -29.18,
+    "lng": 27.3
+  },
+  {
+    "countryCode": "LY",
+    "countryName": "利比亞",
+    "lat": 6.18,
+    "lng": -10.47
+  },
+  {
+    "countryCode": "LI",
+    "countryName": "列支敦斯登",
+    "lat": 47.08,
+    "lng": 9.31
+  },
+  {
+    "countryCode": "LT",
+    "countryName": "立陶宛",
+    "lat": 54.38,
+    "lng": 25.19
+  },
+  {
+    "countryCode": "LU",
+    "countryName": "盧森堡",
+    "lat": 49.37,
+    "lng": 6.09
+  },
+  {
+    "countryCode": "MO",
+    "countryName": "澳門",
+    "lat": 22.11,
+    "lng": 113.32
+  },
+  {
+    "countryCode": "MG",
+    "countryName": "馬達加斯加",
+    "lat": -18.55,
+    "lng": 47.31
+  },
+  {
+    "countryCode": "MW",
+    "countryName": "馬拉威",
+    "lat": -14,
+    "lng": 33.48
+  },
+  {
+    "countryCode": "MY",
+    "countryName": "馬來西亞",
+    "lat": 3.09,
+    "lng": 101.41
+  },
+  {
+    "countryCode": "MV",
+    "countryName": "馬爾地夫",
+    "lat": 4,
+    "lng": 73.28
+  },
+  {
+    "countryCode": "ML",
+    "countryName": "馬利",
+    "lat": 12.34,
+    "lng": -7.55
+  },
+  {
+    "countryCode": "MH",
+    "countryName": "馬紹爾群島",
+    "lat": 35.54,
+    "lng": 14.31
+  },
+  {
+    "countryCode": "MQ",
+    "countryName": "馬丁尼克",
+    "lat": 14.46,
+    "lng": -61.02
+  },
+  {
+    "countryCode": "MR",
+    "countryName": "茅利塔尼亞",
+    "lat": -20.1,
+    "lng":57.3
+  },
+  {
+    "countryCode": "YT",
+    "countryName": "馬約特",
+    "lat": -12.48,
+    "lng": 45.14
+  },
+  {
+    "countryCode": "MX",
+    "countryName": "墨西哥",
+    "lat": 19.2,
+    "lng": -99.1
+  },
+  {
+    "countryCode": "FM",
+    "countryName": "密克羅尼西亞聯邦",
+    "lat": 6.55,
+    "lng": 158.09
+  },
+  {
+    "countryCode": "MC",
+    "countryName": "摩納哥",
+    "lat": 43.73,
+    "lng": 7.41
+  },
+  {
+    "countryCode": "MN",
+    "countryName": "蒙古",
+    "lat":  46.62,
+    "lng": 117.10
+  },
+  {
+    "countryCode": "MA",
+    "countryName": "摩洛哥",
+    "lat": 34.84,
+    "lng": -3.17
+  },
+  {
+    "countryCode": "MZ",
+    "countryName": "莫桑比克",
+    "lat": -25.58,
+    "lng": 32.32
+  },
+  {
+    "countryCode": "MM",
+    "countryName": "緬甸",
+    "lat": 16.45,
+    "lng": 96.20
+  },
+  {
+    "countryCode": "NA",
+    "countryName": "納米比亞",
+    "lat": -22.35,
+    "lng": 17.04
+  },
+  {
+    "countryCode": "NP",
+    "countryName": "尼泊爾",
+    "lat": 27.45,
+    "lng": 85.20
+  },
+  {
+    "countryCode": "NL",
+    "countryName": "荷蘭",
+    "lat": 52.23,
+    "lng": 4.54
+  },
+  {
+    "countryCode": "NC",
+    "countryName": "新喀裡多尼亞",
+    "lat": -22.17,
+    "lng": 166.3
+  },
+  {
+    "countryCode": "NZ",
+    "countryName": "新西蘭",
+    "lat": -41.19,
+    "lng": 174.46
+  },
+  {
+    "countryCode": "NI",
+    "countryName": "尼加拉瓜",
+    "lat": 12.06,
+    "lng": -86.2
+  },
+  {
+    "countryCode": "NE",
+    "countryName": "尼日爾",
+    "lat": 13.27,
+    "lng": 2.06
+  },
+  {
+    "countryCode": "NG",
+    "countryName": "尼日利亞",
+    "lat": 9.05,
+    "lng": 33.48
+  },
+  {
+    "countryCode": "NU",
+    "countryName": "紐埃",
+    "lat": -14,
+    "lng": 7.32
+  },
+  {
+    "countryCode": "MP",
+    "countryName": "北馬裡亞納群島",
+    "lat": 15.12,
+    "lng": 145.45
+  },
+  {
+    "countryCode": "NO",
+    "countryName": "挪威",
+    "lat": 59.55,
+    "lng": 10.45
+  },
+  {
+    "countryCode": "OM",
+    "countryName": "阿曼",
+    "lat": 23.37,
+    "lng": 58.36
+  },
+  {
+    "countryCode": "PK",
+    "countryName": "巴基斯坦",
+    "lat": 33.4,
+    "lng": 73.1
+  },
+  {
+    "countryCode": "PW",
+    "countryName": "帛琉",
+    "lat": 7.2,
+    "lng": 134.28
+  },
+  {
+    "countryCode": "PA",
+    "countryName": "巴拿馬",
+    "lat": 9,
+    "lng": -79.25
+  },
+  {
+    "countryCode": "PG",
+    "countryName": "巴布亞新幾內亞",
+    "lat": -9.24,
+    "lng": 147.08
+  },
+  {
+    "countryCode": "PE",
+    "countryName": "秘魯",
+    "lat": -12,
+    "lng": -77
+  },
+  {
+    "countryCode": "PH",
+    "countryName": "菲律賓",
+    "lat": 14.4,
+    "lng": 121.03
+  },
+  {
+    "countryCode": "PL",
+    "countryName": "波蘭",
+    "lat": 52.13,
+    "lng": 21
+  },
+  {
+    "countryCode": "PT",
+    "countryName": "葡萄牙",
+    "lat": 38.42,
+    "lng": -9.1
+  },
+  {
+    "countryCode": "PR",
+    "countryName": "波多黎各",
+    "lat": 18.82,
+    "lng": -66.07
+  },
+  {
+    "countryCode": "QA",
+    "countryName": "卡塔爾",
+    "lat": 25.15,
+    "lng": 51.35
+  },
+  {
+    "countryCode": "RU",
+    "countryName": "俄羅斯",
+    "lat": 55.45,
+    "lng": 37.35
+  },
+  {
+    "countryCode": "RW",
+    "countryName": "盧旺達",
+    "lat": -1.59,
+    "lng": -30.04
+  },
+  {
+    "countryCode": "RE",
+    "countryName": "留尼汪",
+    "lat": -21.11,
+    "lng": 55.53
+  },
+  {
+    "countryCode": "SH",
+    "countryName": "聖赫勒拿",
+    "lat": -15.92,
+    "lng": -5.71
+  },
+  {
+    "countryCode": "KN",
+    "countryName": "聖基茨和尼維斯",
+    "lat": 17.17,
+    "lng": -62.43
+  },
+  {
+    "countryCode": "LC",
+    "countryName": "聖盧西亞",
+    "lat": 14.02,
+    "lng": -60.58
+  },
+  {
+    "countryCode": "PM",
+    "countryName": "聖皮埃爾和密克隆群島",
+    "lat": 46.46,
+    "lng": -56.12
+  },
+  {
+    "countryCode": "VC",
+    "countryName": "聖文森特和格林納丁斯",
+    "lat": 13.10,
+    "lng": -61.1
+  },
+  {
+    "countryCode": "WS",
+    "countryName": "薩摩亞",
+    "lat": -13.5,
+    "lng": -171.5
+  },
+  {
+    "countryCode": "SM",
+    "countryName": "聖馬力諾",
+    "lat": 43.55,
+    "lng": 12.3
+  },
+  {
+    "countryCode": "ST",
+    "countryName": "聖多美和普林西比",
+    "lat": 0.1,
+    "lng": 6.39
+  },
+  {
+    "countryCode": "SA",
+    "countryName": "沙烏地阿拉伯",
+    "lat": 24.41,
+    "lng": 46.42
+  },
+  {
+    "countryCode": "SN",
+    "countryName": "塞內加爾",
+    "lat": 14.34,
+    "lng": -17.29
+  },
+  {
+    "countryCode": "RS",
+    "countryName": "塞爾維亞",
+    "lat": 44.78,
+    "lng": 20.70
+  },
+  {
+    "countryCode": "SC",
+    "countryName": "塞舌爾",
+    "lat": -4.58,
+    "lng": 55.67
+  },
+  {
+    "countryCode": "SG",
+    "countryName": "新加坡",
+    "lat": 1.283,
+    "lng": 103.85
+  },
+  {
+    "countryCode": "SK",
+    "countryName": "斯洛伐克",
+    "lat": 48.1,
+    "lng": 17.07
+  },
+  {
+    "countryCode": "SI",
+    "countryName": "斯洛文尼亞",
+    "lat": 46.04,
+    "lng": 14.33
+  },
+  {
+    "countryCode": "SB",
+    "countryName": "所羅門群島",
+    "lat": -9.27,
+    "lng": 159.57
+  },
+  {
+    "countryCode": "SO",
+    "countryName": "索馬裡",
+    "lat": 45.25,
+    "lng": 2.02
+  },
+  {
+    "countryCode": "ZA",
+    "countryName": "南非",
+    "lat": -33.92,
+    "lng": 18.42
+  },
+  {
+    "countryCode": "ES",
+    "countryName": "西班牙",
+    "lat": 40.25,
+    "lng": -3.45
+  },
+  {
+    "countryCode": "LK",
+    "countryName": "斯里蘭卡",
+    "lat": 7.87,
+    "lng": 80.77
+  },
+  {
+    "countryCode": "SD",
+    "countryName": "蘇丹",
+    "lat": 15.31,
+    "lng": 32.35
+  },
+  {
+    "countryCode": "SR",
+    "countryName": "蘇裡南",
+    "lat": 5.5,
+    "lng": -55.1
+  },
+  {
+    "countryCode": "SZ",
+    "countryName": "斯威士蘭",
+    "lat": -26.18,
+    "lng": 31.06
+  },
+  {
+    "countryCode": "SE",
+    "countryName": "瑞典",
+    "lat": 59.2,
+    "lng": 18.03
+  },
+  {
+    "countryCode": "CH",
+    "countryName": "瑞士",
+    "lat": 46.57,
+    "lng": 7.28
+  },
+  {
+    "countryCode": "SY",
+    "countryName": "敘利亞",
+    "lat": 35.98,
+    "lng": 38.92
+  },
+  {
+    "countryCode": "TW",
+    "countryName": "台灣",
+    "lat": 25.03,
+    "lng": 121.56
+  },
+  {
+    "countryCode": "TJ",
+    "countryName": "塔吉克斯坦",
+    "lat": 38.33,
+    "lng": 68.48
+  },
+  {
+    "countryCode": "TZ",
+    "countryName": "坦尚尼亞",
+    "lat": 34.88,
+    "lng": -6.36
+  },
+  {
+    "countryCode": "TH",
+    "countryName": "泰國",
+    "lat": 13.45,
+    "lng": 100.35
+  },
+  {
+    "countryCode": "TL",
+    "countryName": "東帝汶",
+    "lat": -8.87,
+    "lng": 125.72
+  },
+  {
+    "countryCode": "TG",
+    "countryName": "多哥",
+    "lat": 6.09,
+    "lng": 1.2
+  },
+  {
+    "countryCode": "TO",
+    "countryName": "東加",
+    "lat": -21.1,
+    "lng": -174
+  },
+  {
+    "countryCode": "TN",
+    "countryName": "突尼斯",
+    "lat": 36.5,
+    "lng": 10.11
+  },
+  {
+    "countryCode": "TR",
+    "countryName": "土耳其",
+    "lat": 39.57,
+    "lng": 32.54
+  },
+  {
+    "countryCode": "TM",
+    "countryName": "土庫曼斯坦",
+    "lat": 38,
+    "lng": 57.5
+  },
+  {
+    "countryCode": "TV",
+    "countryName": "圖瓦盧",
+    "lat": -8.31,
+    "lng": 179.13
+  },
+  {
+    "countryCode": "UG",
+    "countryName": "烏干達",
+    "lat": 0.2,
+    "lng": 32.3
+  },
+  {
+    "countryCode": "UA",
+    "countryName": "烏克蘭",
+    "lat": 50.3,
+    "lng": 30.28
+  },
+  {
+    "countryCode": "AE",
+    "countryName": "阿拉伯聯合酋長國",
+    "lat": 24.28,
+    "lng": 54.22
+  },
+  {
+    "countryCode": "GB",
+    "countryName": "英國",
+    "lat": 51.36,
+    "lng": -0.05
+  },
+  {
+    "countryCode": "US",
+    "countryName": "美國",
+    "lat": 39.91,
+    "lng": -77.02
+  },
+  {
+    "countryCode": "UZ",
+    "countryName": "烏茲別克斯坦",
+    "lat": 41.2,
+    "lng": 69.1
+  },
+  {
+    "countryCode": "VU",
+    "countryName": "瓦努阿圖",
+    "lat": -17.45,
+    "lng": 168.18
+  },
+  {
+    "countryCode": "VE",
+    "countryName": "委內瑞拉",
+    "lat": 10.3,
+    "lng":-66.55
+  },
+  {
+    "countryCode": "VN",
+    "countryName": "越南",
+    "lat": 21.05,
+    "lng": 105.55
+  },
+  {
+    "countryCode": "YE",
+    "countryName": "葉門",
+    "lat": 15.55,
+    "lng": 48.51
+  },
+  {
+    "countryCode": "ZM",
+    "countryName": "贊比亞",
+    "lat": -14.42,
+    "lng": 28.45
+  },
+  {
+    "countryCode": "ZW",
+    "countryName": "津巴布韋",
+    "lat": -18.35,
+    "lng": 26.50
+  }
+
 ]

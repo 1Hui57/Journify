@@ -10,11 +10,8 @@ import { useAuth } from '@/context/AuthContext';
 import dynamic from 'next/dynamic';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
-  ssr: false,
+    ssr: false,
 });
-
-
-
 
 interface TripTime {
     tripFrom: Date;
@@ -29,6 +26,12 @@ interface Trip {
     createAt: Timestamp;
     updateAt: Timestamp;
 }
+interface Country {
+    countryCode: string;
+    countryName: string;
+    lat: number;
+    lng: number;
+}
 export default function TripEditPage() {
 
     const router = useRouter();
@@ -37,6 +40,8 @@ export default function TripEditPage() {
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [countryData, setCountryData] = useState<Country>();
 
     // 取得此筆旅程資料
     const { tripId } = useParams();
@@ -52,40 +57,55 @@ export default function TripEditPage() {
 
     // 確認使用者有此trip，並取得此筆旅程的概覽
     useEffect(() => {
-
+        fetch("/countries.json")
+            .then((response) => response.json())
+            .then((data) => setCountries(data))
+            .catch((error) => console.log("載入國家失敗ˇ"));
         async function fetchTrip() {
-
             if (!user || !tripId || typeof tripId !== 'string') {
                 router.push('/not-found');
                 return;
             }
 
-            const tripRef = doc(db, "users", user.uid, "trips", tripId);
+            const tripRef = doc(db, 'users', user.uid, 'trips', tripId);
             const tripSnap = await getDoc(tripRef);
+
             if (!tripSnap.exists()) {
                 router.push('/not-found');
                 return;
             }
 
             const tripData = tripSnap.data() as Trip;
+
             if (!tripData) {
                 router.push('/not-found');
                 return;
             }
             setTrip(tripData);
+
+            // 確保 countries 已經載入，才執行
+            if (countries.length > 0) {
+                const matchedCountry = countries.find(
+                    (item) =>  item.countryName===tripData.tripCountry
+                );
+                setCountryData(matchedCountry);
+            }
+            setIsloading(false);
         }
+
         fetchTrip();
-        console.log("GOOGLE MAP KEY", process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
-        setIsloading(false);
-    }, [tripId]);
+    }, [tripId, user, countries]);
 
     if (isLoading) return <div>載入中...</div>;
 
 
     return (
-        <div className='w-full h-full'>
-            編輯頁
-             <MapComponent />
+        <div className='w-full h-full flex '>
+            <div className='w-[30%] h-full'>每日行程編輯區</div>
+            <div className='w-[70%] h-full' >
+                <MapComponent countryData={countryData} />
+            </div>
+
         </div>
     )
 
