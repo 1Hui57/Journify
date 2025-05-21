@@ -71,46 +71,53 @@ export default function TripEditPage() {
         }
     }, [isUserSignIn, loading])
 
-    // 確認使用者有此trip，並取得此筆旅程的概覽
+    // ① 載入國家資料（只做一件事）
     useEffect(() => {
         fetch("/countries.json")
             .then((response) => response.json())
             .then((data) => setCountries(data))
-            .catch((error) => console.log("載入國家失敗ˇ"));
-        async function fetchTrip() {
-            if (!user || !tripId || typeof tripId !== 'string') {
-                router.push('/not-found');
-                return;
-            }
+            .catch((error) => console.error("載入國家失敗", error));
+    }, []);
 
-            const tripRef = doc(db, 'users', user.uid, 'trips', tripId);
+    // ② 取得 trip 資料（前提是 user 與 tripId 存在）
+    useEffect(() => {
+        if (!user || !tripId || typeof tripId !== "string") return;
+
+        const fetchTrip = async () => {
+            const tripRef = doc(db, "users", user.uid, "trips", tripId);
             const tripSnap = await getDoc(tripRef);
 
             if (!tripSnap.exists()) {
-                router.push('/not-found');
+                router.push("/not-found");
                 return;
             }
+
             const tripData = tripSnap.data() as Trip;
-
-            if (!tripData) {
-                router.push('/not-found');
-                return;
-            }
             setTrip(tripData);
-            setTripDays(generateTripDays(tripData.tripTime.tripFrom, tripData.tripTime.tripTo));
 
-            // 確保 countries 已經載入，才執行
-            if (countries.length > 0) {
-                const matchedCountry = countries.find(
-                    (item) => item.countryName === tripData.tripCountry
-                );
-                setCountryData(matchedCountry);
-            }
-            setIsloading(false);
-        }
+            const days = generateTripDays(tripData.tripTime.tripFrom, tripData.tripTime.tripTo);
+            setTripDays(days);
+        };
 
         fetchTrip();
-    }, [tripId, user,countries]);
+    }, [tripId, user]);
+    // ③ countries 與 trip 都準備好後，才找對應國家
+    useEffect(() => {
+        if (!trip || countries.length === 0) return;
+
+        const matchedCountry = countries.find(
+            (item) => item.countryName === trip.tripCountry
+        );
+
+        setCountryData(matchedCountry);
+    }, [trip, countries]);
+
+    // 當三樣關鍵資料都存在後才解除 loading
+    useEffect(() => {
+        if (trip && tripDays.length > 0 && countries.length > 0 && countryData) {
+            setIsloading(false);
+        }
+    }, [trip, tripDays, countries, countryData]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -165,22 +172,25 @@ export default function TripEditPage() {
 
     // 新增天數
     const addTripDate = () => {
-        const lastDate: TripDay = tripDays[tripDays.length - 1];
-        const newDate = new Date(lastDate.rawDate); // 複製日期物件
-        newDate.setDate(newDate.getDate() + 1); // 加一天
+        if (tripDays.length === 0) return;
 
-        const year = newDate.getFullYear();
+        const lastDate: TripDay = tripDays[tripDays.length - 1];
+        const newDate = new Date(lastDate.rawDate);
+        newDate.setDate(newDate.getDate() + 1);
+
         const month = String(newDate.getMonth() + 1).padStart(2, '0');
         const day = String(newDate.getDate()).padStart(2, '0');
+
         const newTripDay: TripDay = {
             id: uuidv4(),
             date: `${month}月${day}日`,
             number: lastDate.number + 1,
             rawDate: newDate,
-            isChoose: false
+            isChoose: false,
         };
+
         setTripDays([...tripDays, newTripDay]);
-    }
+    };
 
     const chooseDate = (id: string) => {
         setTripDays(tripDays.map((item) => {
@@ -212,7 +222,7 @@ export default function TripEditPage() {
                             {tripDays.map((item: TripDay) => {
                                 return (
                                     <div key={item.id}
-                                        onClick={()=>chooseDate(item.id)}
+                                        onClick={() => chooseDate(item.id)}
                                         className={item.isChoose === true ?
                                             'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
                                             : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
