@@ -1,22 +1,7 @@
 'use client'
-interface TripScheduleItem {
-    id: string;
-    name: string;
-    formatted_address: string;
-    lat: number;
-    lng: number;
-    photo: string;
-    startTime: Date;
-    endTime: Date;
-}
-interface TripDaySchedule {
-    id: string;
-    rawDate: Date;
-    date: string;      // 格式：2025.05.12
-    number: number;     // 例如：1
-    isChoose: boolean;
-    data: TripScheduleItem[];
-}
+
+import { TripDaySchedule } from "@/app/type/trip"
+
 interface TripAttractionProps {
     tripDaySchedule: TripDaySchedule
 }

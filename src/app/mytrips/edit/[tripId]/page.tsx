@@ -15,48 +15,13 @@ import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
 import { DiVim } from 'react-icons/di';
+import { Country, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
 
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
 });
-interface TripTime {
-    tripFrom: Timestamp;
-    tripTo: Timestamp;
-}
-interface Trip {
-    tripName: string;
-    person: Number;
-    tripTime: TripTime;
-    isPublic: boolean;
-    tripCountry: string;
-    createAt: Timestamp;
-    updateAt: Timestamp;
-}
-interface Country {
-    countryCode: string;
-    countryName: string;
-    lat: number;
-    lng: number;
-}
-interface TripScheduleItem {
-    id: string;
-    name: string;
-    formatted_address: string;
-    lat: number;
-    lng: number;
-    photo: string;
-    startTime: Date;
-    endTime: Date;
-}
-interface TripDaySchedule {
-    id: string;
-    rawDate: Date;
-    date: string;      // 格式：2025.05.12
-    number: number;     // 例如：1
-    isChoose: boolean;
-    data: TripScheduleItem[];
-}
+
 
 export default function TripEditPage() {
 
@@ -75,7 +40,7 @@ export default function TripEditPage() {
 
     // 旅程的每一天跟目前選擇哪一天
     const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
-    const [dayhasBeenChoosed, setDayhasBeenChoosed] = useState<string>("");
+    const [selectedDay, setSelectedDay] = useState<string>("");
 
     // map 資料
     const [selectedPlace, setSelectedPlace] = useState<any>(null);
@@ -112,16 +77,20 @@ export default function TripEditPage() {
             const tripData = tripSnap.data() as Trip;
             setTrip(tripData);
 
-            const days = generateTripDays(tripData.tripTime.tripFrom, tripData.tripTime.tripTo);
-            setTripDaySchedule(days);
-            // 預設選擇第一天
-            if (days.length > 0) {
-                setDayhasBeenChoosed(days[0].id);
-            }
         };
 
         fetchTrip();
     }, [tripId, user]);
+
+    useEffect(() => {
+        if (!trip) return;
+        const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
+        setTripDaySchedule([...days]);
+        // 預設選擇第一天
+        if (days.length > 0 && selectedDay === "") {
+            setSelectedDay(days[0].id);
+        }
+    }, [trip])
 
     // countries 與 trip 都準備好後，才找對應國家
     useEffect(() => {
@@ -168,25 +137,28 @@ export default function TripEditPage() {
 
     // 計算旅程開始日期至結束日期的每日日期
     const generateTripDays = (_start: Timestamp, _end: Timestamp): TripDaySchedule[] => {
-        const days: TripDaySchedule[] = [];
+        const days: TripDaySchedule[] = tripDaySchedule;
         const currentDate = _start.toDate();
         const endDate = _end.toDate();
         let dayCount = 1;
         while (currentDate <= endDate) {
-            const year = currentDate.getFullYear();
-            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-            const day = String(currentDate.getDate()).padStart(2, '0');
-            const dayId = uuidv4();
-            const rawDate = new Date(currentDate);
-            const isChoose = dayCount === 1 ? true : false;
-            days.push({
-                id: dayId,
-                date: `${month}月${day}日`,
-                number: dayCount,
-                isChoose: isChoose,
-                rawDate: rawDate,
-                data: []
-            });
+            const exists = tripDaySchedule.find((item) => {
+                return item.rawDate.getMonth() === currentDate.getMonth()
+                    && item.rawDate.getDate() === currentDate.getDate()
+            })
+            if (!exists) {
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                const dayId = uuidv4();
+                const rawDate = new Date(currentDate);
+                days.push({
+                    id: dayId,
+                    date: `${month}月${day}日`,
+                    number: dayCount,
+                    rawDate: rawDate,
+                    data: []
+                });
+            }
             currentDate.setDate(currentDate.getDate() + 1); // 加一天
             dayCount++;
         }
@@ -195,34 +167,20 @@ export default function TripEditPage() {
 
     // 新增天數
     const addTripDate = () => {
-        if (tripDaySchedule.length === 0) return;
-
-        const lastDate: TripDaySchedule = tripDaySchedule[tripDaySchedule.length - 1];
-        const newDate = new Date(lastDate.rawDate);
-        newDate.setDate(newDate.getDate() + 1);
-
-        const month = String(newDate.getMonth() + 1).padStart(2, '0');
-        const day = String(newDate.getDate()).padStart(2, '0');
-        const id = uuidv4();
-        const newSchedule: TripDaySchedule = {
-            id: id,
-            rawDate: newDate,
-            date: `${month}月${day}日`,
-            number: lastDate.number + 1,
-            data: [],
-            isChoose: false
-        }
-        setTripDaySchedule([...tripDaySchedule, newSchedule]);
+        if (!trip) return
+        const originEndDate = trip.tripTime.tripTo.toDate()
+        // 加一天
+        const nextDay = new Date(originEndDate.setDate(originEndDate.getDate() + 1));
+        setTrip({
+            ...trip, tripTime: {
+                tripFrom: trip.tripTime.tripFrom,
+                tripTo: Timestamp.fromDate(nextDay)
+            }
+        })
     };
 
-    const chooseDate = (id: string) => {
-        setTripDaySchedule(tripDaySchedule.map((item) => {
-            setDayhasBeenChoosed(id);
-            return {
-                ...item,
-                isChoose: item.id === id // 如果是選中的就 true，其他就 false
-            };
-        }));
+    const selectDate = (id: string) => {
+        setSelectedDay(id);
     }
 
     const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
@@ -260,8 +218,8 @@ export default function TripEditPage() {
                             {tripDaySchedule.map((item: TripDaySchedule) => {
                                 return (
                                     <div key={item.id}
-                                        onClick={() => chooseDate(item.id)}
-                                        className={item.isChoose === true ?
+                                        onClick={() => selectDate(item.id)}
+                                        className={item.id === selectedDay ?
                                             'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
                                             : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
                                     >
@@ -279,7 +237,7 @@ export default function TripEditPage() {
                     </div>
                     <div id='dayContent' className='w-full flex-1'>
                         {tripDaySchedule
-                            .filter(item => item.isChoose)
+                            .filter(item => item.id === selectedDay)
                             .map(item => (
                                 <TripAttractionItem key={item.id} tripDaySchedule={item} />
                             ))}
@@ -288,7 +246,7 @@ export default function TripEditPage() {
                 </div>
             </div>
             <div className='w-full h-full flex-1' >
-                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} addAttractionToDate={addAttractionToDate} dayhasBeenChoosed={dayhasBeenChoosed} />
+                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} addAttractionToDate={addAttractionToDate} dayhasBeenChoosed={selectedDay} />
             </div>
         </div>
     )

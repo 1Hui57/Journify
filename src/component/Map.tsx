@@ -5,45 +5,8 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
+import { Country, Place, TripScheduleItem } from '@/app/type/trip';
 
-interface Country {
-  countryCode: string;
-  countryName: string;
-  lat: number;
-  lng: number;
-}
-interface Location {
-  lat: number;
-  lng: number;
-}
-interface Place {
-  id:string;
-  place_id: string;
-  name?: string;
-  address?: string;
-  location: Location;
-  rating?: number;
-  photos?: google.maps.places.PlacePhoto[];
-  opening_hours?: google.maps.places.PlaceOpeningHours;
-}
-interface TripScheduleItem {
-  id: string;
-  name: string;
-  formatted_address: string;
-  lat: number;
-  lng: number;
-  photo: string;
-  startTime: Date;
-  endTime: Date;
-}
-interface TripDaySchedule {
-  id: string;
-  rawDate: Date;
-  date: string;      // 格式：2025.05.12
-  number: number;     // 例如：1
-  isChoose: boolean;
-  data: TripScheduleItem[];
-}
 interface MapProps {
   countryData: Country | undefined;
   selectedPlace: Place | null;
@@ -107,7 +70,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             setMapCenter(location);
             const id = uuidv4();
             setSelectedPlace({
-              id:id,
+              id: id,
               place_id: placeId,
               name: result.name,
               address: result.formatted_address,
@@ -145,7 +108,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               };
               const id = uuidv4();
               setSelectedPlace({
-                id:id,
+                id: id,
                 place_id: e.placeId,
                 name: place.name,
                 address: place.formatted_address,
@@ -235,7 +198,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
                 const newItem = {
                   id: selectedPlace.id,
-                  place_id:selectedPlace.place_id,
+                  place_id: selectedPlace.place_id,
                   name: selectedPlace.name || '',
                   formatted_address: selectedPlace.address || '',
                   lat: selectedPlace.location.lat,
