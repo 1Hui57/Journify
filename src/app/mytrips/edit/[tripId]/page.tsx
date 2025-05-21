@@ -14,6 +14,7 @@ import TripAttractionItem from "@/component/TripAttractionItem";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
+import { DiVim } from 'react-icons/di';
 
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
@@ -246,19 +247,19 @@ export default function TripEditPage() {
                                 )
                             })}
                             <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>
-                                <IoMdAdd className='w-6 h-8 m-auto' />
-                                <p >新增天數</p>
+                                <IoMdAdd className='w-6 h-6 m-auto' />
+                                {/* <p >新增天數</p> */}
                             </div>
                         </div>
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
                     </div>
                     <div id='dayContent' className='w-full flex-1'>
-                        {/* {tripDaySchedule.map((item)=>{
+                        {tripDaySchedule.map((item)=>{
                             return(
-                                item.
+                                item.isChoose? <TripAttractionItem key={item.id} tripDaySchedule={item}/>:<div></div>
                             )
-                        })} */}
-                        <TripAttractionItem />
+                        })}
+                        
                     </div>
                 </div>
             </div>
