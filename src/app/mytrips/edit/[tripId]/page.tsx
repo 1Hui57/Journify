@@ -110,7 +110,7 @@ export default function TripEditPage() {
         }
 
         fetchTrip();
-    }, [tripId, user]);
+    }, [tripId, user,countries]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
