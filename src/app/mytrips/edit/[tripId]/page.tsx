@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import dynamic from 'next/dynamic';
 import EditTrip from '@/component/EditTrip';
-
+import TripAttractionItem from "@/component/TripAttractionItem";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
@@ -38,12 +38,23 @@ interface Country {
     lat: number;
     lng: number;
 }
-interface TripDay {
+interface TripScheduleItem {
     id: string;
+    name: string;
+    formatted_address: string;
+    lat: number;
+    lng: number;
+    photo: string;
+    startTime: Date;
+    endTime: Date;
+}
+interface TripDaySchedule {
+    id: string;
+    rawDate: Date;
     date: string;      // 格式：2025.05.12
     number: number;     // 例如：1
     isChoose: boolean;
-    rawDate: Date;
+    data: TripScheduleItem[];
 }
 export default function TripEditPage() {
 
@@ -61,7 +72,7 @@ export default function TripEditPage() {
     const [trip, setTrip] = useState<Trip>();
 
     // 旅程的每一天跟目前選擇哪一天
-    const [tripDays, setTripDays] = useState<TripDay[]>([]);
+    const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -71,7 +82,7 @@ export default function TripEditPage() {
         }
     }, [isUserSignIn, loading])
 
-    // ① 載入國家資料（只做一件事）
+    // 載入國家資料
     useEffect(() => {
         fetch("/countries.json")
             .then((response) => response.json())
@@ -79,7 +90,7 @@ export default function TripEditPage() {
             .catch((error) => console.error("載入國家失敗", error));
     }, []);
 
-    // ② 取得 trip 資料（前提是 user 與 tripId 存在）
+    // 取得 trip 資料（前提是 user 與 tripId 存在）
     useEffect(() => {
         if (!user || !tripId || typeof tripId !== "string") return;
 
@@ -96,12 +107,13 @@ export default function TripEditPage() {
             setTrip(tripData);
 
             const days = generateTripDays(tripData.tripTime.tripFrom, tripData.tripTime.tripTo);
-            setTripDays(days);
+            setTripDaySchedule(days);
         };
 
         fetchTrip();
     }, [tripId, user]);
-    // ③ countries 與 trip 都準備好後，才找對應國家
+
+    // countries 與 trip 都準備好後，才找對應國家
     useEffect(() => {
         if (!trip || countries.length === 0) return;
 
@@ -114,10 +126,10 @@ export default function TripEditPage() {
 
     // 當三樣關鍵資料都存在後才解除 loading
     useEffect(() => {
-        if (trip && tripDays.length > 0 && countries.length > 0 && countryData) {
+        if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData) {
             setIsloading(false);
         }
-    }, [trip, tripDays, countries, countryData]);
+    }, [trip, tripDaySchedule, countries, countryData]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -145,8 +157,8 @@ export default function TripEditPage() {
     };
 
     // 計算旅程開始日期至結束日期的每日日期
-    const generateTripDays = (_start: Timestamp, _end: Timestamp): TripDay[] => {
-        const days: TripDay[] = [];
+    const generateTripDays = (_start: Timestamp, _end: Timestamp): TripDaySchedule[] => {
+        const days: TripDaySchedule[] = [];
         const currentDate = _start.toDate();
         const endDate = _end.toDate();
         let dayCount = 1;
@@ -162,7 +174,8 @@ export default function TripEditPage() {
                 date: `${month}月${day}日`,
                 number: dayCount,
                 isChoose: isChoose,
-                rawDate: rawDate
+                rawDate: rawDate,
+                data: []
             });
             currentDate.setDate(currentDate.getDate() + 1); // 加一天
             dayCount++;
@@ -172,28 +185,28 @@ export default function TripEditPage() {
 
     // 新增天數
     const addTripDate = () => {
-        if (tripDays.length === 0) return;
+        if (tripDaySchedule.length === 0) return;
 
-        const lastDate: TripDay = tripDays[tripDays.length - 1];
+        const lastDate: TripDaySchedule = tripDaySchedule[tripDaySchedule.length - 1];
         const newDate = new Date(lastDate.rawDate);
         newDate.setDate(newDate.getDate() + 1);
 
         const month = String(newDate.getMonth() + 1).padStart(2, '0');
         const day = String(newDate.getDate()).padStart(2, '0');
-
-        const newTripDay: TripDay = {
-            id: uuidv4(),
+        const id = uuidv4();
+        const newSchedule: TripDaySchedule = {
+            id: id,
+            rawDate: newDate,
             date: `${month}月${day}日`,
             number: lastDate.number + 1,
-            rawDate: newDate,
-            isChoose: false,
-        };
-
-        setTripDays([...tripDays, newTripDay]);
+            data: [],
+            isChoose: false
+        }
+        setTripDaySchedule([...tripDaySchedule, newSchedule]);
     };
 
     const chooseDate = (id: string) => {
-        setTripDays(tripDays.map((item) => {
+        setTripDaySchedule(tripDaySchedule.map((item) => {
             return {
                 ...item,
                 isChoose: item.id === id // 如果是選中的就 true，其他就 false
@@ -211,7 +224,7 @@ export default function TripEditPage() {
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
             <div className='h-72 md:w-[350px] flex-none md:h-full'>
-                <div className='w-full h-full bg-mywhite-100'>
+                <div className='w-full h-full bg-mywhite-100 flex flex-col'>
                     <div className='w-full h-16 px-5 text-myzinc-800 flex items-center justify-between'>
                         <div className='w-fit text-2xl-700'>{trip?.tripName}</div>
                         {trip && <div className='w-fit text-base-400'>{formatteDate(trip?.tripTime.tripFrom)}~{formatteDate(trip?.tripTime.tripTo)}</div>}
@@ -219,7 +232,7 @@ export default function TripEditPage() {
                     <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollLeft}><FaAngleLeft /></div>
                         <div className='w-full h-full flex overflow-hidden' id="dateChoose" ref={scrollRef}>
-                            {tripDays.map((item: TripDay) => {
+                            {tripDaySchedule.map((item: TripDaySchedule) => {
                                 return (
                                     <div key={item.id}
                                         onClick={() => chooseDate(item.id)}
@@ -238,6 +251,14 @@ export default function TripEditPage() {
                             </div>
                         </div>
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
+                    </div>
+                    <div id='dayContent' className='w-full flex-1'>
+                        {/* {tripDaySchedule.map((item)=>{
+                            return(
+                                item.
+                            )
+                        })} */}
+                        <TripAttractionItem />
                     </div>
                 </div>
             </div>
