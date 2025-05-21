@@ -57,6 +57,7 @@ interface TripDaySchedule {
     isChoose: boolean;
     data: TripScheduleItem[];
 }
+
 export default function TripEditPage() {
 
     const router = useRouter();
@@ -74,6 +75,10 @@ export default function TripEditPage() {
 
     // 旅程的每一天跟目前選擇哪一天
     const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
+    const [dayhasBeenChoosed, setDayhasBeenChoosed] = useState<string>("");
+
+    // map 資料
+    const [selectedPlace, setSelectedPlace] = useState<any>(null);
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -109,6 +114,10 @@ export default function TripEditPage() {
 
             const days = generateTripDays(tripData.tripTime.tripFrom, tripData.tripTime.tripTo);
             setTripDaySchedule(days);
+            // 預設選擇第一天
+            if (days.length > 0) {
+                setDayhasBeenChoosed(days[0].id);
+            }
         };
 
         fetchTrip();
@@ -208,11 +217,26 @@ export default function TripEditPage() {
 
     const chooseDate = (id: string) => {
         setTripDaySchedule(tripDaySchedule.map((item) => {
+            setDayhasBeenChoosed(id);
             return {
                 ...item,
                 isChoose: item.id === id // 如果是選中的就 true，其他就 false
             };
         }));
+    }
+
+    const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
+        setTripDaySchedule((prevSchedule) =>
+            prevSchedule.map((item) => {
+                if (item.id === dayId) {
+                    return {
+                        ...item,
+                        data: [...item.data, tripScheduleItem],
+                    };
+                }
+                return item; // 其他日期保持不變
+            })
+        );
     }
 
 
@@ -254,17 +278,17 @@ export default function TripEditPage() {
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
                     </div>
                     <div id='dayContent' className='w-full flex-1'>
-                        {tripDaySchedule.map((item)=>{
-                            return(
-                                item.isChoose? <TripAttractionItem key={item.id} tripDaySchedule={item}/>:<div></div>
-                            )
-                        })}
-                        
+                        {tripDaySchedule
+                            .filter(item => item.isChoose)
+                            .map(item => (
+                                <TripAttractionItem key={item.id} tripDaySchedule={item} />
+                            ))}
+
                     </div>
                 </div>
             </div>
             <div className='w-full h-full flex-1' >
-                <MapComponent countryData={countryData} />
+                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} addAttractionToDate={addAttractionToDate} dayhasBeenChoosed={dayhasBeenChoosed} />
             </div>
         </div>
     )

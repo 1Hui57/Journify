@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
+import { v4 as uuidv4 } from 'uuid';
 
 interface Country {
   countryCode: string;
@@ -11,13 +12,49 @@ interface Country {
   lat: number;
   lng: number;
 }
+interface Location {
+  lat: number;
+  lng: number;
+}
+interface Place {
+  id:string;
+  place_id: string;
+  name?: string;
+  address?: string;
+  location: Location;
+  rating?: number;
+  photos?: google.maps.places.PlacePhoto[];
+  opening_hours?: google.maps.places.PlaceOpeningHours;
+}
+interface TripScheduleItem {
+  id: string;
+  name: string;
+  formatted_address: string;
+  lat: number;
+  lng: number;
+  photo: string;
+  startTime: Date;
+  endTime: Date;
+}
+interface TripDaySchedule {
+  id: string;
+  rawDate: Date;
+  date: string;      // 格式：2025.05.12
+  number: number;     // 例如：1
+  isChoose: boolean;
+  data: TripScheduleItem[];
+}
 interface MapProps {
-  countryData: Country | undefined
+  countryData: Country | undefined;
+  selectedPlace: Place | null;
+  setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
+  addAttractionToDate: (dayId: string, selectedPlace: TripScheduleItem) => void;
+  dayhasBeenChoosed: string;
 }
 const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
-export default function MapComponent({ countryData }: MapProps) {
+export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, addAttractionToDate, dayhasBeenChoosed }: MapProps) {
   // 取得此行程countryData
   const defaultCenter = countryData
     ? { lat: countryData.lat, lng: countryData.lng }
@@ -32,7 +69,7 @@ export default function MapComponent({ countryData }: MapProps) {
   });
 
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [selectedPlace, setSelectedPlace] = useState<any>(null);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
@@ -68,7 +105,10 @@ export default function MapComponent({ countryData }: MapProps) {
               lng: result.geometry.location.lng(),
             };
             setMapCenter(location);
+            const id = uuidv4();
             setSelectedPlace({
+              id:id,
+              place_id: placeId,
               name: result.name,
               address: result.formatted_address,
               location,
@@ -103,8 +143,10 @@ export default function MapComponent({ countryData }: MapProps) {
                 lat: place.geometry.location.lat(),
                 lng: place.geometry.location.lng(),
               };
-              // setMapCenter(location);
+              const id = uuidv4();
               setSelectedPlace({
+                id:id,
+                place_id: e.placeId,
                 name: place.name,
                 address: place.formatted_address,
                 location,
@@ -127,6 +169,10 @@ export default function MapComponent({ countryData }: MapProps) {
     if (inputRef.current) {
       inputRef.current.value = "";
     }
+  }
+
+  function addAttractionAndChooseTime() {
+
   }
 
   if (loadError) return <div>地圖載入錯誤</div>;
@@ -152,9 +198,12 @@ export default function MapComponent({ countryData }: MapProps) {
         <div
           className='absolute bottom-3 left-3 w-60 md:w-80 h-fit flex flex-col bg-mywhite-100 rounded-[8px] z-10 shadow-[0_2px_6px_rgba(0,0,0,0.1)]'
         >
-          {selectedPlace.photos?.length > 0 && (
+          {selectedPlace?.photos && selectedPlace.photos.length > 0 && selectedPlace.photos[0] && (
             <div className='relative w-full h-20 md:h-40 rounded-t-[8px] overflow-hidden'>
-              <RxCross2 onClick={() => { closeAttractionData() }} className='absolute right-2 top-2 z-20 w-6 h-6 rounded-full bg-mywhite-50' />
+              <RxCross2
+                onClick={closeAttractionData}
+                className='absolute right-2 top-2 z-20 w-6 h-6 rounded-full bg-mywhite-50'
+              />
               <img
                 src={selectedPlace.photos[0].getUrl({ maxWidth: 1000, maxHeight: 350 })}
                 alt="地點照片"
@@ -167,7 +216,7 @@ export default function MapComponent({ countryData }: MapProps) {
             <div className='w-full h-fit text-lg-700 break-words'>{selectedPlace.name}</div>
             <div className='w-full h-fit md:mb-2 text-sm-400 md:text-base-400 break-words'>{selectedPlace.address}</div>
             {selectedPlace.rating && <div className='w-full h-fit mb-1 text-sm-400 md:text-base-400  break-words'>⭐ 評分：{selectedPlace.rating}</div>}
-            {selectedPlace.opening_hours?.weekday_text?.length > 0 && (
+            {selectedPlace.opening_hours?.weekday_text && selectedPlace.opening_hours?.weekday_text?.length > 0 && (
               <div className='w-full'>
                 <div className='mb-1'>
                   <p className='text-sm-400 md:text-base-400'>🕒 營業時間：</p>
@@ -180,7 +229,26 @@ export default function MapComponent({ countryData }: MapProps) {
               </div>
             )}
             <button
-              className='mt-3 w-full px-5 py-2 bg-myblue-400 text-base-700 text-primary-300 rounded-md cursor-pointer' onClick={() => { alert(`已加入「${selectedPlace.name}」到行程表`); }}>
+              className='mt-3 w-full px-5 py-2 bg-myblue-400 text-base-700 text-primary-300 rounded-md cursor-pointer'
+              onClick={() => {
+                if (!dayhasBeenChoosed) return;
+
+                const newItem = {
+                  id: selectedPlace.id,
+                  place_id:selectedPlace.place_id,
+                  name: selectedPlace.name || '',
+                  formatted_address: selectedPlace.address || '',
+                  lat: selectedPlace.location.lat,
+                  lng: selectedPlace.location.lng,
+                  photo: selectedPlace.photos?.[0]?.getUrl() || '',
+                  startTime: new Date(), // 可自訂起始時間
+                  endTime: new Date(),   // 可自訂結束時間
+                };
+
+                addAttractionToDate(dayhasBeenChoosed, newItem);
+                setSelectedPlace(null); // 清除選擇，避免重複加
+              }}
+            >
               加入行程
             </button>
           </div>
