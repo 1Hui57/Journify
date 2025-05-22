@@ -1,9 +1,17 @@
 'use client'
 
+import { SelectTripDay, TripScheduleItem } from '@/app/type/trip';
+import { Timestamp } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import { RxCross2 } from "react-icons/rx";
+interface TimeComponentProps {
+    selectedDay: SelectTripDay;
+    addAttractionToDate: (dayId: string, selectedPlace: TripScheduleItem) => void;
+    pendingPlace:TripScheduleItem | null;
+    setShowTimePop:React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export default function TimeComponent() {
+export default function TimeComponent({ addAttractionToDate, selectedDay, pendingPlace, setShowTimePop }: TimeComponentProps) {
     const [startHour, setStartHour] = useState('10');
     const [startMinute, setStartMinute] = useState('00');
     const [endHour, setEndHour] = useState('10');
@@ -12,8 +20,8 @@ export default function TimeComponent() {
     const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
     const minutes = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0'));
 
-    const startTime = `${startHour}:${startMinute}`;
-    const endTime = `${endHour}:${endMinute}`;
+    const stringStartTime = `${startHour}:${startMinute}`;
+    const stringEndTime = `${endHour}:${endMinute}`;
 
     // 🟡 將開始時間換成數字方便比較（例如 10:30 => 1030）
     const startTimeValue = parseInt(startHour + startMinute);
@@ -34,10 +42,29 @@ export default function TimeComponent() {
             setEndMinute(firstValid.minute);
         }
     }, [startHour, startMinute]);
+    function dateTimeToTimestamp(date: Date, time: string): Timestamp {
+        const hours = parseInt(time.slice(0, 2), 10);
+        const minutes = parseInt(time.slice(2), 10);
+        const combined = new Date(date); // clone 避免改原本 date
+        combined.setHours(hours);
+        combined.setMinutes(minutes);
+        combined.setSeconds(0);
+        combined.setMilliseconds(0);
+        return Timestamp.fromDate(combined); // ✅ timestamp (毫秒)
+    }
+
+    function timestampToDateTime(ts: number) {
+        const dateObj = new Date(ts);
+        const date = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        const hours = dateObj.getHours().toString().padStart(2, '0');
+        const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+        const time = `${hours}${minutes}`;
+        return { date, time }; // 回傳原始 Date 物件和時間字串
+    }
 
     return (
         <div className='relative w-72 h-56 bg-mywhite-100 text-myblue-600 flex flex-col p-3 rounded-md shadow-2xl'>
-            <RxCross2 className='absolute top-2 right-2 w-5 h-5'/>
+            <RxCross2 className='absolute top-2 right-2 w-5 h-5' onClick={()=>setShowTimePop(false)}/>
             <div className='w-fit text-lg-700 text-myblue-600 mb-5 mx-auto'>
                 巴黎歌劇院
             </div>
@@ -74,7 +101,14 @@ export default function TimeComponent() {
                         ))}
                 </select>
             </div>
-            <button className=' p-2 text-base-500 text-primary-300 bg-myblue-400 rounded-md hover:text-primary-300 hover:bg-myblue-700'>確認加入</button>
+            <button 
+            onClick={()=>{
+                if (!selectedDay || selectedDay.date === null || pendingPlace===null) return;
+                addAttractionToDate(selectedDay.id,pendingPlace);
+                setShowTimePop(false);
+            }}
+
+            className=' p-2 text-base-500 text-primary-300 bg-myblue-400 rounded-md hover:text-primary-300 hover:bg-myblue-700'>確認加入</button>
         </div>
     );
 }

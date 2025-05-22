@@ -2,24 +2,26 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { Timestamp } from 'firebase/firestore';
 import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
-import { Country, Place, TripScheduleItem } from '@/app/type/trip';
+import { Country, Place, SelectTripDay, TripScheduleItem } from '@/app/type/trip';
 import TimeComponent from './TimeComponent';
 
 
 interface MapProps {
   countryData: Country | undefined;
   selectedPlace: Place | null;
+  selectedDay: SelectTripDay;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
-  addAttractionToDate: (dayId: string, selectedPlace: TripScheduleItem) => void;
-  selectedDay: string;
+  setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
+  setShowTimePop:React.Dispatch<React.SetStateAction<boolean>>;
 }
 const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
-export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, addAttractionToDate, selectedDay }: MapProps) {
+export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace, setShowTimePop }: MapProps) {
   // 取得此行程countryData
   const defaultCenter = countryData
     ? { lat: countryData.lat, lng: countryData.lng }
@@ -34,14 +36,9 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   });
 
   const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [isAdding, setIsAdding] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
-  // 景點時間
-  const [showTimePop, setShowTimePop] = useState<boolean>(false);
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
 
   useEffect(() => {
 
@@ -140,10 +137,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     }
   }
 
-  function addAttractionAndChooseTime() {
-
-  }
-
   if (loadError) return <div>地圖載入錯誤</div>;
   if (!isLoaded) return <div>地圖載入中...</div>;
 
@@ -200,7 +193,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             <button
               className='mt-3 w-full px-5 py-2 bg-myblue-400 text-base-700 text-primary-300 rounded-md cursor-pointer'
               onClick={() => {
-                if (!selectedDay) return;
+                if (!selectedDay || selectedDay.date === null) return;
 
                 const newItem = {
                   id: selectedPlace.id,
@@ -210,12 +203,10 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                   lat: selectedPlace.location.lat,
                   lng: selectedPlace.location.lng,
                   photo: selectedPlace.photos?.[0]?.getUrl() || '',
-                  startTime: new Date(), // 可自訂起始時間
-                  endTime: new Date(),   // 可自訂結束時間
                 };
-
-                addAttractionToDate(selectedDay, newItem);
+                setPendingPlace(newItem);
                 setSelectedPlace(null); // 清除選擇，避免重複加
+                setShowTimePop(true);
               }}
             >
               加入行程

@@ -7,22 +7,17 @@ import { db } from '@/lib/firebase';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
-
 import dynamic from 'next/dynamic';
-import EditTrip from '@/component/EditTrip';
 import TripAttractionItem from "@/component/TripAttractionItem";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
-import { DiVim } from 'react-icons/di';
-import { Country, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
+import { Country, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
-
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
 });
-
 
 export default function TripEditPage() {
 
@@ -41,10 +36,17 @@ export default function TripEditPage() {
 
     // 旅程的每一天跟目前選擇哪一天
     const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
-    const [selectedDay, setSelectedDay] = useState<string>("");
+    const [selectedDay, setSelectedDay] = useState<SelectTripDay>({ id: "", date: null });
 
     // map 資料
     const [selectedPlace, setSelectedPlace] = useState<any>(null);
+
+    // 顯示timePop
+    const [showTimePop, setShowTimePop] = useState<boolean>(false);
+
+    // 準備加入的景點資料 & 時間
+    const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
+
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -89,8 +91,8 @@ export default function TripEditPage() {
         const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
         setTripDaySchedule([...days]);
         // 預設選擇第一天
-        if (days.length > 0 && selectedDay === "") {
-            setSelectedDay(days[0].id);
+        if (days.length > 0 && selectedDay.id === "") {
+            setSelectedDay({ id: days[0].id, date: days[0].rawDate });
         }
     }, [trip])
 
@@ -180,8 +182,8 @@ export default function TripEditPage() {
         })
     };
 
-    const selectDate = (id: string) => {
-        setSelectedDay(id);
+    const selectDate = (id: string, date: Date) => {
+        setSelectedDay({ id: id, date: date });
     }
 
     // 新增景點
@@ -208,9 +210,9 @@ export default function TripEditPage() {
 
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
-            <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <TimeComponent/>
-            </div>
+            {showTimePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <TimeComponent  addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace} setShowTimePop={setShowTimePop}/>
+            </div>}
             <div className='h-72 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
                     <div className='w-full h-16 px-5 text-myzinc-800 flex items-center justify-between'>
@@ -223,8 +225,8 @@ export default function TripEditPage() {
                             {tripDaySchedule.map((item: TripDaySchedule) => {
                                 return (
                                     <div key={item.id}
-                                        onClick={() => selectDate(item.id)}
-                                        className={item.id === selectedDay ?
+                                        onClick={() => selectDate(item.id, item.rawDate)}
+                                        className={item.id === selectedDay.id ?
                                             'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
                                             : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
                                     >
@@ -242,7 +244,7 @@ export default function TripEditPage() {
                     </div>
                     <div id='dayContent' className='w-full flex-1'>
                         {tripDaySchedule
-                            .filter(item => item.id === selectedDay)
+                            .filter(item => item.id === selectedDay.id)
                             .map(item => (
                                 <TripAttractionItem key={item.id} tripDaySchedule={item} />
                             ))}
@@ -251,7 +253,9 @@ export default function TripEditPage() {
                 </div>
             </div>
             <div className='w-full h-full flex-1' >
-                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} />
+                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
+                    selectedDay={selectedDay} setPendingPlace={setPendingPlace}
+                    setShowTimePop={setShowTimePop} />
             </div>
         </div>
     )

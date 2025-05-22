@@ -21,13 +21,14 @@ export interface Country {
 }
 export interface TripScheduleItem {
   id: string;
+  place_id:string;
   name: string;
   formatted_address: string;
   lat: number;
   lng: number;
   photo: string;
-  startTime: Date;
-  endTime: Date;
+  startTime?: Timestamp;
+  endTime?: Timestamp;
 }
 export interface TripDaySchedule {
   id: string;
@@ -49,4 +50,8 @@ export interface Place {
   rating?: number;
   photos?: google.maps.places.PlacePhoto[];
   opening_hours?: google.maps.places.PlaceOpeningHours;
+}
+export interface SelectTripDay{
+    id:string;
+    date:Date|null;
 }
