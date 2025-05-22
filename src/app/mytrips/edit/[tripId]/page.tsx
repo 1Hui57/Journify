@@ -201,6 +201,23 @@ export default function TripEditPage() {
         );
     }
 
+    function dateTimeToTimestamp(date: Date, time: string): Timestamp {
+        const hours = parseInt(time.slice(0, 2), 10);
+        const minutes = parseInt(time.slice(2), 10);
+        const combined = new Date(date); // clone 避免改原本 date
+        combined.setHours(hours);
+        combined.setMinutes(minutes);
+        combined.setSeconds(0);
+        combined.setMilliseconds(0);
+        return Timestamp.fromDate(combined); // ✅ timestamp (毫秒)
+    }
+
+    function timestampToDateTime(ts: Timestamp) {
+        const date = ts.toDate();
+        const time = date.toTimeString().slice(0, 5);
+        return { date, time };
+    }
+
 
 
 
@@ -211,7 +228,8 @@ export default function TripEditPage() {
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
             {showTimePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <TimeComponent  addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace} setShowTimePop={setShowTimePop}/>
+                <TimeComponent addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace}
+                    setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp} />
             </div>}
             <div className='h-72 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
@@ -246,7 +264,7 @@ export default function TripEditPage() {
                         {tripDaySchedule
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
-                                <TripAttractionItem key={item.id} tripDaySchedule={item} />
+                                <TripAttractionItem key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} />
                             ))}
 
                     </div>
