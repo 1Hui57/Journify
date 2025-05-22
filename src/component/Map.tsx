@@ -6,18 +6,20 @@ import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, TripScheduleItem } from '@/app/type/trip';
+import TimeComponent from './TimeComponent';
+
 
 interface MapProps {
   countryData: Country | undefined;
   selectedPlace: Place | null;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
   addAttractionToDate: (dayId: string, selectedPlace: TripScheduleItem) => void;
-  dayhasBeenChoosed: string;
+  selectedDay: string;
 }
 const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
-export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, addAttractionToDate, dayhasBeenChoosed }: MapProps) {
+export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, addAttractionToDate, selectedDay }: MapProps) {
   // 取得此行程countryData
   const defaultCenter = countryData
     ? { lat: countryData.lat, lng: countryData.lng }
@@ -36,6 +38,10 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  // 景點時間
+  const [showTimePop, setShowTimePop] = useState<boolean>(false);
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
 
   useEffect(() => {
 
@@ -194,7 +200,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             <button
               className='mt-3 w-full px-5 py-2 bg-myblue-400 text-base-700 text-primary-300 rounded-md cursor-pointer'
               onClick={() => {
-                if (!dayhasBeenChoosed) return;
+                if (!selectedDay) return;
 
                 const newItem = {
                   id: selectedPlace.id,
@@ -208,7 +214,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                   endTime: new Date(),   // 可自訂結束時間
                 };
 
-                addAttractionToDate(dayhasBeenChoosed, newItem);
+                addAttractionToDate(selectedDay, newItem);
                 setSelectedPlace(null); // 清除選擇，避免重複加
               }}
             >
@@ -217,7 +223,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
           </div>
         </div>
       )}
-
       {/* 地圖本體 */}
       <GoogleMap
         mapContainerStyle={containerStyle}

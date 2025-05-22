@@ -16,6 +16,7 @@ import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
 import { DiVim } from 'react-icons/di';
 import { Country, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
+import TimeComponent from '@/component/TimeComponent';
 
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
@@ -82,6 +83,7 @@ export default function TripEditPage() {
         fetchTrip();
     }, [tripId, user]);
 
+    // 轉換旅程天數
     useEffect(() => {
         if (!trip) return;
         const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
@@ -111,7 +113,6 @@ export default function TripEditPage() {
     }, [trip, tripDaySchedule, countries, countryData]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
-
     const scrollLeft = () => {
         scrollRef.current?.scrollBy({ left: -150, behavior: 'smooth' });
     };
@@ -183,6 +184,7 @@ export default function TripEditPage() {
         setSelectedDay(id);
     }
 
+    // 新增景點
     const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
         setTripDaySchedule((prevSchedule) =>
             prevSchedule.map((item) => {
@@ -206,6 +208,9 @@ export default function TripEditPage() {
 
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
+            <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <TimeComponent/>
+            </div>
             <div className='h-72 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
                     <div className='w-full h-16 px-5 text-myzinc-800 flex items-center justify-between'>
@@ -246,7 +251,7 @@ export default function TripEditPage() {
                 </div>
             </div>
             <div className='w-full h-full flex-1' >
-                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} addAttractionToDate={addAttractionToDate} dayhasBeenChoosed={selectedDay} />
+                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace} addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} />
             </div>
         </div>
     )
