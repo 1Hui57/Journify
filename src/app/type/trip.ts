@@ -73,3 +73,7 @@ export interface SelectTripDay {
   id: string;
   date: Date | null;
 }
+export interface TansportData{
+  duration:number;
+  distance:number;
+}

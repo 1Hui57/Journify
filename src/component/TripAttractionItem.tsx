@@ -2,7 +2,7 @@
 
 import { TripDaySchedule } from "@/app/type/trip"
 import { Timestamp } from "firebase/firestore";
-import { DiVim } from "react-icons/di";
+import TripTransportItem from "./tripTransportItem";
 
 interface TripAttractionProps {
     tripDaySchedule: TripDaySchedule;
@@ -38,17 +38,15 @@ export default function TripAttractionItem({ tripDaySchedule, timestampToDateTim
 
                             </div>
                         </div>
-                        {index < tripDaySchedule.attractionData.length - 1 &&
-                            (<div key={index} className="w-fit h-12 border-l-4 border-dashed border-myblue-300  ml-8  mb-2 flex items-center">
-                                <div className="w-3 h-full border-"></div>
-                                交通
-                            </div>)
-                        }
+                        {index < tripDaySchedule.attractionData.length - 1 &&(()=>{
+                            const tripTransport = tripDaySchedule.transportData.find(transportItem => transportItem.fromAttractionId === item.id);
+                            if (!tripTransport || tripTransport === undefined || tripTransport.modeOption === undefined) return;
+                            return(
+                                <TripTransportItem key={index} tripTransport={tripTransport}/>
+                            )
+                        })()};
                     </div>
-
-
                 )
-
             }
         </div>
     )

@@ -12,8 +12,9 @@ import TripAttractionItem from "@/component/TripAttractionItem";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
-import { Country, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem, TripTransport } from '@/app/type/trip';
+import { Country, SelectTripDay, TansportData, Trip, TripDaySchedule, TripScheduleItem, TripTransport } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
+import SelectTransport from '@/component/SelectTransport';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
@@ -47,6 +48,12 @@ export default function TripEditPage() {
     // 準備加入的景點資料 & 時間
     const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
 
+    // 顯示transportPop
+    const [showTransportPop, setShowTransportPop] = useState<boolean>(true);
+    // 選擇交通工具或自訂
+    const [transporation, setTransporation] = useState<string>('drive');
+    // 交通時間、距離
+    const [transportData, setTansportData] = useState<TansportData | null>(null);
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -277,6 +284,9 @@ export default function TripEditPage() {
                 <TimeComponent addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace}
                     setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp} />
             </div>}
+            {showTransportPop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <SelectTransport setTransporation={setTransporation}/>
+            </div>}
             <div className='h-72 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
                     <div className='w-full h-16 px-5 text-myzinc-800 flex items-center justify-between'>
@@ -312,14 +322,13 @@ export default function TripEditPage() {
                             .map(item => (
                                 <TripAttractionItem key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} />
                             ))}
-
                     </div>
                 </div>
             </div>
             <div className='w-full h-full flex-1' >
                 <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                     selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                    setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule}/>
+                    setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} />
             </div>
         </div>
     )

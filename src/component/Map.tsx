@@ -94,30 +94,31 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
     currentDay.transportData.forEach((item) => {
       if (!item.modeOption || item.modeOption.length === 0) {
-        const origin = `place_id:${item.fromAttractionPlaceId}`;
-        const destination = `place_id:${item.toAttractionPlaceId}`;
+        const origin = [{ placeId: item.fromAttractionPlaceId }];
+        const destination = [{ placeId: item.toAttractionPlaceId }];
         const modes = ["DRIVING", "WALKING", "TRANSIT"] as const;
+        // console.log("origin", origin);
+        // console.log("destination", destination);
+        // console.log("place_id from", item.fromAttractionPlaceId);
+        // console.log("place_id to", item.toAttractionPlaceId);
 
-        modes.forEach((modeStr) => {
-          const mode = modeStr as "DRIVING" | "WALKING" | "TRANSIT";
-          const travelMode = google.maps.TravelMode[mode];
-
+        modes.forEach((mode) => {
           const service = new google.maps.DistanceMatrixService();
           service.getDistanceMatrix(
             {
-              origins: [origin],
-              destinations: [destination],
-              travelMode,
+              origins: origin,
+              destinations: destination,
+              travelMode: mode as google.maps.TravelMode,
             },
             (response, status) => {
-              if (
-                status === 'OK' &&
-                response &&
-                response.rows[0].elements[0].status === 'OK'
-              ) {
+              // console.log(response);
+              // console.log(status);
+
+              if (status === 'OK' && response && response.rows[0].elements[0].status === 'OK') {
                 const element = response.rows[0].elements[0];
                 const duration = element.duration.value;
-                const distance = element.distance.value; // ✅ 取得距離資料
+                const distance = element.distance.value;
+
 
                 setTripDaySchedule((prev) =>
                   prev.map((day) => {
@@ -125,9 +126,9 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
                     const updatedTransports = day.transportData.map((t) => {
                       if (t.id !== item.id) return t;
-
                       const updatedOptions = [...(t.modeOption || [])];
-                      updatedOptions.push({ mode, duration, distance }); // ✅ 三個欄位都要有
+
+                      updatedOptions.push({ mode, duration, distance });
 
                       return { ...t, modeOption: updatedOptions };
                     });
@@ -141,7 +142,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         });
       }
     });
-    console.log(tripDaySchedule);
   }, [selectedDay.id, tripDaySchedule]);
 
   const handleMapLoad = (map: google.maps.Map) => {
@@ -187,6 +187,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   };
 
   function closeAttractionData() {
+    console.log(selectedPlace);
     setSelectedPlace(null);
     if (inputRef.current) {
       inputRef.current.value = "";
