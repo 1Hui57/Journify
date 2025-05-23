@@ -159,7 +159,7 @@ export default function TripEditPage() {
                     date: `${month}月${day}日`,
                     number: dayCount,
                     rawDate: rawDate,
-                    data: []
+                    attractionData: []
                 });
             }
             currentDate.setDate(currentDate.getDate() + 1); // 加一天
@@ -193,7 +193,7 @@ export default function TripEditPage() {
                 if (item.id === dayId) {
                     return {
                         ...item,
-                        data: [...item.data, tripScheduleItem],
+                        attractionData: [...item.attractionData, tripScheduleItem],
                     };
                 }
                 return item; // 其他日期保持不變

@@ -35,7 +35,7 @@ export interface TripDaySchedule {
   rawDate: Date;
   date: string; // 格式：2025.05.12
   number: number; // 例如：1
-  data: TripScheduleItem[];
+  attractionData: TripScheduleItem[];
 }
 export interface Location {
   lat: number;
