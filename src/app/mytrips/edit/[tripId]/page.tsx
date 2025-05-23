@@ -159,7 +159,8 @@ export default function TripEditPage() {
                     date: `${month}月${day}日`,
                     number: dayCount,
                     rawDate: rawDate,
-                    attractionData: []
+                    attractionData: [],
+                    transprotData:[]
                 });
             }
             currentDate.setDate(currentDate.getDate() + 1); // 加一天
@@ -186,20 +187,28 @@ export default function TripEditPage() {
         setSelectedDay({ id: id, date: date });
     }
 
-    // 新增景點
-    const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
-        setTripDaySchedule((prevSchedule) =>
-            prevSchedule.map((item) => {
-                if (item.id === dayId) {
-                    return {
-                        ...item,
-                        attractionData: [...item.attractionData, tripScheduleItem],
-                    };
-                }
-                return item; // 其他日期保持不變
-            })
-        );
-    }
+const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
+    setTripDaySchedule((prevSchedule) =>
+        prevSchedule.map((item) => {
+            if (item.id === dayId) {
+                const updatedAttractions = [...item.attractionData, tripScheduleItem];
+
+                // 根據 startTime 排序，沒有 startTime 的會排在最後
+                const sortedAttractions = updatedAttractions.sort((a, b) => {
+                    if (!a.startTime) return 1;
+                    if (!b.startTime) return -1;
+                    return a.startTime.toMillis() - b.startTime.toMillis();
+                });
+
+                return {
+                    ...item,
+                    attractionData: sortedAttractions,
+                };
+            }
+            return item;
+        })
+    );
+};
 
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
