@@ -19,6 +19,14 @@ export interface Country {
   lat: number;
   lng: number;
 }
+export interface TripDaySchedule {
+  id: string;
+  rawDate: Date;
+  date: string; // 格式：2025.05.12
+  number: number; // 例如：1
+  attractionData: TripScheduleItem[];
+  transportData: TripTransport[];
+}
 export interface TripScheduleItem {
   id: string;
   place_id: string;
@@ -31,23 +39,21 @@ export interface TripScheduleItem {
   endTime?: Timestamp;
   note?: string;
 }
-type TripTransport = {
+export interface TripTransport {
   id: string; //自動生成的流水號
   fromAttractionId: string; //上面景點的id(非place_id)
   toAttractionId: string; //下面景點的id(非place_id)
   fromAttractionPlaceId: string; //上面景點的place_id
   toAttractionPlaceId: string; //上面景點的place_id
-  duration: number; // 使用者輸入的持續時間
-  mode: string;
+  selectedMode: string;
+  modeOption?: TransportMode[];
+  customDuration: number | null; // 使用者輸入的持續時間
   note?: string;
-};
-export interface TripDaySchedule {
-  id: string;
-  rawDate: Date;
-  date: string; // 格式：2025.05.12
-  number: number; // 例如：1
-  attractionData: TripScheduleItem[];
-  transprotData: TripTransport[];
+}
+export interface TransportMode {
+  mode: "WALKING" | "DRIVING" | "TRANSIT";
+  duration: number; // 單位為秒
+  distance: number; // 單位為公尺
 }
 export interface Location {
   lat: number;

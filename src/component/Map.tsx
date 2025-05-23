@@ -6,22 +6,22 @@ import { Timestamp } from 'firebase/firestore';
 import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
-import { Country, Place, SelectTripDay, TripScheduleItem } from '@/app/type/trip';
-import TimeComponent from './TimeComponent';
-
+import { Country, Place, SelectTripDay, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
 
 interface MapProps {
   countryData: Country | undefined;
   selectedPlace: Place | null;
   selectedDay: SelectTripDay;
+  tripDaySchedule: TripDaySchedule[];
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
   setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
-  setShowTimePop:React.Dispatch<React.SetStateAction<boolean>>;
+  setShowTimePop: React.Dispatch<React.SetStateAction<boolean>>;
+  setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
 }
 const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
-export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace, setShowTimePop }: MapProps) {
+export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace, setShowTimePop, tripDaySchedule, setTripDaySchedule }: MapProps) {
   // 取得此行程countryData
   const defaultCenter = countryData
     ? { lat: countryData.lat, lng: countryData.lng }
@@ -88,6 +88,62 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     });
   }, [isLoaded]);
 
+  useEffect(() => {
+    const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
+    if (!currentDay) return;
+
+    currentDay.transportData.forEach((item) => {
+      if (!item.modeOption || item.modeOption.length === 0) {
+        const origin = `place_id:${item.fromAttractionPlaceId}`;
+        const destination = `place_id:${item.toAttractionPlaceId}`;
+        const modes = ["DRIVING", "WALKING", "TRANSIT"] as const;
+
+        modes.forEach((modeStr) => {
+          const mode = modeStr as "DRIVING" | "WALKING" | "TRANSIT";
+          const travelMode = google.maps.TravelMode[mode];
+
+          const service = new google.maps.DistanceMatrixService();
+          service.getDistanceMatrix(
+            {
+              origins: [origin],
+              destinations: [destination],
+              travelMode,
+            },
+            (response, status) => {
+              if (
+                status === 'OK' &&
+                response &&
+                response.rows[0].elements[0].status === 'OK'
+              ) {
+                const element = response.rows[0].elements[0];
+                const duration = element.duration.value;
+                const distance = element.distance.value; // ✅ 取得距離資料
+
+                setTripDaySchedule((prev) =>
+                  prev.map((day) => {
+                    if (day.id !== selectedDay.id) return day;
+
+                    const updatedTransports = day.transportData.map((t) => {
+                      if (t.id !== item.id) return t;
+
+                      const updatedOptions = [...(t.modeOption || [])];
+                      updatedOptions.push({ mode, duration, distance }); // ✅ 三個欄位都要有
+
+                      return { ...t, modeOption: updatedOptions };
+                    });
+
+                    return { ...day, transportData: updatedTransports };
+                  })
+                );
+              }
+            }
+          );
+        });
+      }
+    });
+    console.log(tripDaySchedule);
+  }, [selectedDay.id, tripDaySchedule]);
+
   const handleMapLoad = (map: google.maps.Map) => {
     // 如果placesServiceRef尚未初始化，則在此綁訂在map上
     if (!placesServiceRef.current) {
@@ -136,6 +192,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
       inputRef.current.value = "";
     }
   }
+
 
   if (loadError) return <div>地圖載入錯誤</div>;
   if (!isLoaded) return <div>地圖載入中...</div>;

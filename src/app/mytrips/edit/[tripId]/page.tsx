@@ -12,7 +12,7 @@ import TripAttractionItem from "@/component/TripAttractionItem";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
-import { Country, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
+import { Country, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem, TripTransport } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
@@ -160,7 +160,7 @@ export default function TripEditPage() {
                     number: dayCount,
                     rawDate: rawDate,
                     attractionData: [],
-                    transprotData:[]
+                    transportData: []
                 });
             }
             currentDate.setDate(currentDate.getDate() + 1); // 加一天
@@ -187,28 +187,65 @@ export default function TripEditPage() {
         setSelectedDay({ id: id, date: date });
     }
 
-const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
-    setTripDaySchedule((prevSchedule) =>
-        prevSchedule.map((item) => {
-            if (item.id === dayId) {
-                const updatedAttractions = [...item.attractionData, tripScheduleItem];
+    // 更新tripDaySchedul的atttaction的排序跟transport
+    const updateTripScheduleWithTransport = (tripDaySchedule: TripDaySchedule[]): TripDaySchedule[] => {
+        return tripDaySchedule.map((day) => {
+            // attraction 按照時間排序
+            const sortedAttractions = [...day.attractionData].sort((a, b) => {
+                if (!a.startTime) return 1;
+                if (!b.startTime) return -1;
+                return a.startTime.toMillis() - b.startTime.toMillis();
+            });
+            //建立一個新的transport陣列用來放新的資料
+            const newTransport: TripTransport[] = [];
 
-                // 根據 startTime 排序，沒有 startTime 的會排在最後
-                const sortedAttractions = updatedAttractions.sort((a, b) => {
-                    if (!a.startTime) return 1;
-                    if (!b.startTime) return -1;
-                    return a.startTime.toMillis() - b.startTime.toMillis();
-                });
+            for (let i = 0; i < sortedAttractions.length - 1; i++) {
+                const from = sortedAttractions[i];
+                const to = sortedAttractions[i + 1];
+                // 找有沒有已經有的transport資料
+                const existing = day.transportData.find(
+                    item => item.fromAttractionId === from.id && item.toAttractionId === to.id
+                );
 
-                return {
-                    ...item,
-                    attractionData: sortedAttractions,
-                };
+                if (existing) {
+                    newTransport.push(existing);
+                } else {
+                    newTransport.push({
+                        id: uuidv4(),
+                        fromAttractionId: from.id,
+                        toAttractionId: to.id,
+                        fromAttractionPlaceId: from.place_id,
+                        toAttractionPlaceId: to.place_id,
+                        customDuration: 0,
+                        selectedMode: '大眾交通',
+                        note: ''
+                    });
+                }
             }
-            return item;
-        })
-    );
-};
+
+            return {
+                ...day,
+                attractionData: sortedAttractions,
+                transportData: newTransport,
+            };
+        });
+    };
+
+    // 新增景點
+    const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
+        setTripDaySchedule((prevSchedule) => {
+            const newTripSchedule = prevSchedule.map((item) => {
+                if (item.id === dayId) {
+                    return {
+                        ...item,
+                        attractionData: [...item.attractionData, tripScheduleItem],
+                    };
+                }
+                return item; // 其他日期保持不變
+            });
+            return updateTripScheduleWithTransport(newTripSchedule);
+        });
+    }
 
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
@@ -282,7 +319,7 @@ const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) 
             <div className='w-full h-full flex-1' >
                 <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                     selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                    setShowTimePop={setShowTimePop} />
+                    setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule}/>
             </div>
         </div>
     )
