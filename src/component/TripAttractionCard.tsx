@@ -7,6 +7,9 @@ import { IoMdTime } from "react-icons/io";
 import { MdEditNote, MdDeleteOutline } from "react-icons/md";
 import TripTransportItem from "./TripTransportItem";
 import { useState } from "react";
+import { IoChevronDown } from "react-icons/io5";
+import { IoChevronUp } from "react-icons/io5";
+
 
 interface TripAttractionCardProps {
     tripScheduleItem: TripScheduleItem;
@@ -25,20 +28,34 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
 
     return (
         <div className="w-full" key={tripScheduleItem.id}>
-            <div onClick={() => setIsExpanded(prev => !prev)}
-                className={`relative w-full  mb-2 bg-primary-100  rounded-md shadow-md flex ${isExpanded ? 'h-60' : 'h-26'}`}>
-                <AiOutlineMore className="absolute top-2 right-0 w-6 h-6 " onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} />
+            <div
+                className={`relative w-full  mb-2 bg-primary-100  rounded-md shadow-md cursor-pointer flex ${isExpanded ? 'h-60' : 'h-26'}`}>
+                <AiOutlineMore className="absolute top-2 right-0 w-6 h-6 " onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => {
+                    e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
+                }} />
+                {isExpanded ? <IoChevronUp onClick={() => setIsExpanded(prev => !prev)} className="absolute bottom-1 right-2 w-5 h-5" /> : <IoChevronDown onClick={() => setIsExpanded(prev => !prev)} className="absolute bottom-1 right-2 w-5 h-5" />
+                }
                 {isHover &&
-                    <div className="absolute top-8 right-0 w-fit h-fit px-4 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10" onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
-                        <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
+                    <div className="absolute top-8 right-0 w-fit h-fit px-4 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10"
+                        onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}
+                        onClick={(e) => {
+                            e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
+                        }}>
+                        <div onClick={(e) => {
+                            e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
+                        }}
+                            className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <IoMdTime />
                             <p>時間</p>
                         </div>
-                        <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
+                        <div onClick={(e) => {
+                            e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
+                        }}
+                            className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <MdEditNote />
                             <p>筆記</p>
                         </div>
-                        <div onClick={() => deleteAttractionfromDate(selectedDay.id, tripScheduleItem.id)}
+                        <div onClick={(e) => { e.stopPropagation(); deleteAttractionfromDate(selectedDay.id, tripScheduleItem.id) }}
                             className="w-full text-center hover:text-myred-400 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <MdDeleteOutline />
                             <p>刪除</p>
