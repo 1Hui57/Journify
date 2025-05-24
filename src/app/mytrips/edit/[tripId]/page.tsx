@@ -246,6 +246,23 @@ export default function TripEditPage() {
         });
     }
 
+    // 刪除景點
+    const deleteAttractionfromDate = (dayId: string, tripScheduleItemId: string) => {
+        setTripDaySchedule((prevSchedule) => {
+            const newTripSchedule = prevSchedule.map((day) => {
+                if (day.id === dayId) {
+                    const newAttractions = day.attractionData.filter((item) => item.id!==tripScheduleItemId);
+                    return {
+                        ...day,
+                        attractionData:newAttractions
+                    }
+                }
+                else return day; // 其他日期保持不變
+            });
+            return updateTripScheduleWithTransport(newTripSchedule);
+        });
+    }
+
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
         const minutes = parseInt(time.slice(2), 10);
@@ -269,9 +286,10 @@ export default function TripEditPage() {
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
             {showTimePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
                 <TimeComponent addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace}
-                    setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp} />
+                    setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp}
+                    setSelectedPlace={setSelectedPlace} />
             </div>}
-            <div className='h-72 md:w-[350px] flex-none md:h-full'>
+            <div className='h-96 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
                     <div className='w-full h-16 px-5 text-myzinc-800 flex items-center justify-between'>
                         <div className='w-fit text-2xl-700'>{trip?.tripName}</div>
@@ -304,7 +322,8 @@ export default function TripEditPage() {
                         {tripDaySchedule
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
-                                <TripAttractionItem key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule} selectedDay={selectedDay}/>
+                                <TripAttractionItem key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule} 
+                                selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
                             ))}
                     </div>
                 </div>

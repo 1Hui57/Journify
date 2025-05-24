@@ -262,11 +262,11 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                   photo: selectedPlace.photos?.[0]?.getUrl() || '',
                 };
                 setPendingPlace(newItem);
-                setSelectedPlace(null); // 清除選擇，避免重複加
+                // setSelectedPlace(null); // 清除選擇，避免重複加
                 setShowTimePop(true);
               }}
             >
-              加入行程
+              加入旅程
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { SelectTripDay, TripScheduleItem } from '@/app/type/trip';
+import { Place, SelectTripDay, TripScheduleItem } from '@/app/type/trip';
 import { Timestamp } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import { RxCross2 } from "react-icons/rx";
@@ -11,10 +11,11 @@ interface TimeComponentProps {
     setShowTimePop: React.Dispatch<React.SetStateAction<boolean>>;
     setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
     dateTimeToTimestamp: (date: Date, time: string) => Timestamp;
+    setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
 }
 
 export default function TimeComponent({ addAttractionToDate, selectedDay, pendingPlace, setShowTimePop,
-    setPendingPlace, dateTimeToTimestamp }: TimeComponentProps) {
+    setPendingPlace, dateTimeToTimestamp, setSelectedPlace }: TimeComponentProps) {
     const [startHour, setStartHour] = useState('10');
     const [startMinute, setStartMinute] = useState('00');
     const [endHour, setEndHour] = useState('10');
@@ -97,6 +98,7 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
                     };
                     addAttractionToDate(selectedDay.id, updatedPlace);
                     setPendingPlace(null);
+                    setSelectedPlace(null);
                     setShowTimePop(false);
                 }}
                 className=' p-2 text-base-500 text-primary-300 bg-myblue-400 rounded-md hover:text-primary-300 hover:bg-myblue-700'>確認加入</button>

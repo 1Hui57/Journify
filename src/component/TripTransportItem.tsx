@@ -70,29 +70,21 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
     }
 
     return (
-        <div className="w-fit h-12 border-l-4 border-dashed border-myblue-300  ml-8  mb-2 flex items-center">
+        <div className="w-fit h-12 border-l-4 border-dashed border-myblue-300  ml-6  mb-2 flex items-center">
             <select value={transporation}
-                onChange={(e) => {updateTransport(e.target.value,selectedDay.id,tripTransport.id)}}
-                className="ml-2 mr-4 W-8">
+                onChange={(e) => { updateTransport(e.target.value, selectedDay.id, tripTransport.id) }}
+                className="ml-2 mr-4 w-20 text-sm-400 text-myblue-600">
                 <option value="DRIVING">開車</option>
                 <option value="WALKING">步行</option>
                 <option value="TRANSIT">大眾運輸</option>
                 <option value="CUSTOM">自訂</option>
             </select>
             {tripTransport.modeOption &&
-                <div className="text-sm-400">
-                    <div>
-                        時間：
-                        {duration === undefined ? '暫無資料' : formatDuration(duration)}
-                    </div>
-                    <div>
-                        距離：
-                        {distance === undefined ? '暫無資料' : formatDistance(distance)}
-                    </div>
+                <div className="text-sm-400 text-sm-400 text-myblue-600 flex gap-2">
+                    <div>{duration === undefined ? '暫無資料' : formatDuration(duration)}</div>
+                    <div>{distance === undefined ? '暫無資料' : formatDistance(distance)}</div>
                 </div>
-
             }
-
         </div>
     )
 }
