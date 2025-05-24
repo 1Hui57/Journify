@@ -99,7 +99,6 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
                     setPendingPlace(null);
                     setShowTimePop(false);
                 }}
-
                 className=' p-2 text-base-500 text-primary-300 bg-myblue-400 rounded-md hover:text-primary-300 hover:bg-myblue-700'>確認加入</button>
         </div>
     );

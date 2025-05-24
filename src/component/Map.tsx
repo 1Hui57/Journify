@@ -119,7 +119,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                 const duration = element.duration.value;
                 const distance = element.distance.value;
 
-
                 setTripDaySchedule((prev) =>
                   prev.map((day) => {
                     if (day.id !== selectedDay.id) return day;

@@ -45,7 +45,7 @@ export interface TripTransport {
   toAttractionId: string; //下面景點的id(非place_id)
   fromAttractionPlaceId: string; //上面景點的place_id
   toAttractionPlaceId: string; //上面景點的place_id
-  selectedMode: string;
+  selectedMode: string; //預設為大眾運輸
   modeOption?: TransportMode[];
   customDuration: number | null; // 使用者輸入的持續時間
   note?: string;
@@ -73,7 +73,7 @@ export interface SelectTripDay {
   id: string;
   date: Date | null;
 }
-export interface TansportData{
-  duration:number;
-  distance:number;
+export interface TansportData {
+  duration: number;
+  distance: number;
 }

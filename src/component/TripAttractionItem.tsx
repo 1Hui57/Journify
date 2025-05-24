@@ -1,14 +1,17 @@
 'use client'
 
-import { TripDaySchedule } from "@/app/type/trip"
+import { SelectTripDay, TripDaySchedule } from "@/app/type/trip"
 import { Timestamp } from "firebase/firestore";
-import TripTransportItem from "./tripTransportItem";
+import TripTransportItem from "./TripTransportItem";
+
 
 interface TripAttractionProps {
     tripDaySchedule: TripDaySchedule;
     timestampToDateTime: (ts: Timestamp) => { date: Date, time: string };
+    setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
+    selectedDay: SelectTripDay;
 }
-export default function TripAttractionItem({ tripDaySchedule, timestampToDateTime }: TripAttractionProps) {
+export default function TripAttractionItem({ tripDaySchedule, timestampToDateTime, setTripDaySchedule, selectedDay }: TripAttractionProps) {
 
     return (
         <div className="w-full h-full px-4">
@@ -42,9 +45,9 @@ export default function TripAttractionItem({ tripDaySchedule, timestampToDateTim
                             const tripTransport = tripDaySchedule.transportData.find(transportItem => transportItem.fromAttractionId === item.id);
                             if (!tripTransport || tripTransport === undefined || tripTransport.modeOption === undefined) return;
                             return(
-                                <TripTransportItem key={index} tripTransport={tripTransport}/>
+                                <TripTransportItem key={index} tripTransport={tripTransport} setTripDaySchedule={setTripDaySchedule} selectedDay={selectedDay}/>
                             )
-                        })()};
+                        })()}
                     </div>
                 )
             }
