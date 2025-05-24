@@ -8,12 +8,13 @@ import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import dynamic from 'next/dynamic';
-import TripAttractionItem from "@/component/TripAttractionItem";
+import TripAttractionItem from "@/component/TripAttractionWrapper";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
 import { Country, SelectTripDay, TansportData, Trip, TripDaySchedule, TripScheduleItem, TripTransport } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
+import TripAttractionWrappwer from '@/component/TripAttractionWrapper';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
@@ -322,7 +323,7 @@ export default function TripEditPage() {
                         {tripDaySchedule
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
-                                <TripAttractionItem key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule} 
+                                <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule} 
                                 selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
                             ))}
                     </div>
