@@ -15,6 +15,7 @@ import { IoMdAdd } from "react-icons/io"; //加號
 import { Country, SelectTripDay, TansportData, Trip, TripDaySchedule, TripScheduleItem, TripTransport } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
 import TripAttractionWrappwer from '@/component/TripAttractionWrapper';
+import NoteComponent from '@/component/NoteComponent';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
@@ -42,11 +43,16 @@ export default function TripEditPage() {
     // map 資料
     const [selectedPlace, setSelectedPlace] = useState<any>(null);
 
-    // 顯示timePop
+    // 顯示timePop、NotePop
     const [showTimePop, setShowTimePop] = useState<boolean>(false);
+    const [showNotePop, setShowNotePop] = useState<boolean>(true);
 
     // 準備加入的景點資料 & 時間
     const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
+
+    // 準備修改的景點
+    const [EditTripScheduleItemId, setEditTripScheduleItemId] = useState<string|null>(null);
+
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -231,7 +237,11 @@ export default function TripEditPage() {
         });
     };
 
-    // 新增景點
+    /**
+    * 新增景點到指定的日期行程中
+    * @param {string} dayId - 需要新增景點的日期 ID
+    * @param {TripScheduleItem} tripScheduleItem - 要新增的景點數據
+    */
     const addAttractionToDate = (dayId: string, tripScheduleItem: TripScheduleItem) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((item) => {
@@ -247,15 +257,19 @@ export default function TripEditPage() {
         });
     }
 
-    // 刪除景點
+    /**
+    * 從指定的日期中刪除指定景點
+    * @param {string} dayId - 需要刪除景點的日期 ID
+    * @param {string} tripScheduleItemId - 要刪除的景點 ID
+    */
     const deleteAttractionfromDate = (dayId: string, tripScheduleItemId: string) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((day) => {
                 if (day.id === dayId) {
-                    const newAttractions = day.attractionData.filter((item) => item.id!==tripScheduleItemId);
+                    const newAttractions = day.attractionData.filter((item) => item.id !== tripScheduleItemId);
                     return {
                         ...day,
-                        attractionData:newAttractions
+                        attractionData: newAttractions
                     }
                 }
                 else return day; // 其他日期保持不變
@@ -263,6 +277,17 @@ export default function TripEditPage() {
             return updateTripScheduleWithTransport(newTripSchedule);
         });
     }
+
+    // 編輯景點筆記
+    const editAttractionNote = (tripDaySchedule: TripDaySchedule[], dayId: string, tripScheduleItemId: string, note: string) => {
+        const day = tripDaySchedule.find(item => item.id === dayId);
+        if (!day) return;
+        const tripAttractionsList = day.attractionData;
+        const tripScheduleItem = tripAttractionsList.find(item => item.id === tripScheduleItemId);
+        if (!tripScheduleItem) return;
+
+    }
+    // 編輯景點時間
 
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
@@ -289,6 +314,9 @@ export default function TripEditPage() {
                 <TimeComponent addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace}
                     setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp}
                     setSelectedPlace={setSelectedPlace} />
+            </div>}
+            {showNotePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <NoteComponent EditTripScheduleItemId={EditTripScheduleItemId}/>
             </div>}
             <div className='h-96 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
@@ -323,8 +351,8 @@ export default function TripEditPage() {
                         {tripDaySchedule
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
-                                <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule} 
-                                selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
+                                <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
+                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId}/>
                             ))}
                     </div>
                 </div>

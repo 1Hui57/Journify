@@ -51,7 +51,7 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
         <div className='relative w-72 h-56 bg-mywhite-100 text-myblue-600 flex flex-col p-3 rounded-md shadow-2xl'>
             <RxCross2 className='absolute top-2 right-2 w-5 h-5' onClick={() => setShowTimePop(false)} />
             <div className='w-fit text-lg-700 text-myblue-600 mb-5 mx-auto'>
-                巴黎歌劇院
+                {pendingPlace?.name}
             </div>
             <div className='mb-4 w-[216px] mx-auto'>
                 <label>開始時間：</label>

@@ -19,9 +19,11 @@ interface TripAttractionCardProps {
     setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
     selectedDay: SelectTripDay;
     deleteAttractionfromDate: (dayId: string, tripScheduleItemId: string) => void;
+    setEditTripScheduleItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function TripAttractionCard({ tripScheduleItem, index, selectedDay, tripDaySchedule, timestampToDateTime, setTripDaySchedule, deleteAttractionfromDate }: TripAttractionCardProps) {
+export default function TripAttractionCard({ tripScheduleItem, index, selectedDay, tripDaySchedule,
+    timestampToDateTime, setTripDaySchedule, deleteAttractionfromDate, setEditTripScheduleItemId }: TripAttractionCardProps) {
 
     const [isHover, setIsHover] = useState<boolean>(false);
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -37,20 +39,13 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                 }
                 {isHover &&
                     <div className="absolute top-8 right-0 w-fit h-fit px-4 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10"
-                        onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}
-                        onClick={(e) => {
-                            e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
-                        }}>
-                        <div onClick={(e) => {
-                            e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
-                        }}
+                        onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => { e.stopPropagation(); }}>
+                        <div onClick={(e) => { e.stopPropagation();setEditTripScheduleItemId(tripScheduleItem.id) }}
                             className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <IoMdTime />
                             <p>時間</p>
                         </div>
-                        <div onClick={(e) => {
-                            e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
-                        }}
+                        <div onClick={(e) => { e.stopPropagation();setEditTripScheduleItemId(tripScheduleItem.id) }}
                             className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <MdEditNote />
                             <p>筆記</p>
@@ -80,9 +75,9 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                             </div>
                         );
                     })()}
-                    {isExpanded && <div className="w-full h-30  text-sm-400 ">
+                    {isExpanded && <div className="w-full h-30  text-xs-400  border-t-2 border-myblue-200 border-dotted">
                         <p>筆記：</p>
-                        <p>超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多限制64個字</p>
+                        <p>超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多限制76個字元</p>
                     </div>}
                 </div>
             </div>

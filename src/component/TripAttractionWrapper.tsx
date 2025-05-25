@@ -11,9 +11,11 @@ interface TripAttractionProps {
     setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
     selectedDay: SelectTripDay;
     deleteAttractionfromDate: (dayId: string, tripScheduleItemId: string) => void;
+    setEditTripScheduleItemId: React.Dispatch<React.SetStateAction<string | null>>;
 
 }
-export default function TripAttractionWrappwer({ tripDaySchedule, timestampToDateTime, setTripDaySchedule, selectedDay, deleteAttractionfromDate }: TripAttractionProps) {
+export default function TripAttractionWrappwer({ tripDaySchedule, timestampToDateTime, setTripDaySchedule,
+    selectedDay, deleteAttractionfromDate, setEditTripScheduleItemId }: TripAttractionProps) {
 
     return (
         <div className="w-full h-fit px-4 ">
@@ -22,7 +24,7 @@ export default function TripAttractionWrappwer({ tripDaySchedule, timestampToDat
                 tripDaySchedule.attractionData.map((tripScheduleItem, index) => {
                     return (
                         <TripAttractionCard key={tripScheduleItem.id} tripScheduleItem={tripScheduleItem} index={index} tripDaySchedule={tripDaySchedule} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                        selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate}/>
+                            selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId}/>
                     )
                 }
                 )
