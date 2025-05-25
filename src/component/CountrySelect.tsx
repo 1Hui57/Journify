@@ -5,11 +5,13 @@ import React, { useEffect, useState } from "react";
 interface Country {
     countryCode: string;
     countryName: string;
+    lat: number;
+    lng: number;
 }
-interface CountrySelect{
-    setTripCountry:React.Dispatch<React.SetStateAction<string>>;
+interface CountrySelect {
+    setTripCountry: React.Dispatch<React.SetStateAction<string>>;
 }
-export default function CountrySelect({setTripCountry}:CountrySelect) {
+export default function CountrySelect({ setTripCountry }: CountrySelect) {
 
     const [countries, setCountries] = useState<Country[]>([]);
     const [searchWord, setSearchWord] = useState<string>("");
@@ -17,7 +19,9 @@ export default function CountrySelect({setTripCountry}:CountrySelect) {
     const [resultCountries, setResultCountries] = useState<Country[]>(
         [{
             countryCode: "no",
-            countryName: "查無資料"
+            countryName: "查無資料",
+            lat: 0,
+            lng: 0,
         }]
     );
 
@@ -35,7 +39,9 @@ export default function CountrySelect({setTripCountry}:CountrySelect) {
             country.countryName.includes(searchWord)
         );
         if (filteredCountries.length < 1) {
-            setResultCountries([{ countryCode: "no", countryName: "查無資料" }]);
+            setResultCountries([{
+                countryCode: "no", countryName: "查無資料", lat: 0, lng: 0
+            }]);
             return;
         }
         setResultCountries(filteredCountries);
@@ -56,7 +62,7 @@ export default function CountrySelect({setTripCountry}:CountrySelect) {
             {isSelecting && searchWord.trim() !== "" && (
                 <ul className="absolute z-100 top-10 w-full h-fit bg-mywhite-100 border-1 border-myzinc-300 rounded-sm mt-0.5 shadow">
                     {resultCountries[0].countryCode === "no" ? (
-                        <li onClick={()=>{setIsSelecting(false);setSearchWord("");setTripCountry("");}}className="pl-2 h-10 border-b-1 border-myzinc-300 flex items-center hover:bg-myzinc-100 cursor-pointer">
+                        <li onClick={() => { setIsSelecting(false); setSearchWord(""); setTripCountry(""); }} className="pl-2 h-10 border-b-1 border-myzinc-300 flex items-center hover:bg-myzinc-100 cursor-pointer">
                             查無國家
                         </li>
                     )

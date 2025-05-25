@@ -22,17 +22,22 @@ export default function MyTrips() {
         person: Number;
         tripTime: TripTime;
         isPublic: boolean;
+        tripCountry: string;
+        createAt: Timestamp;
+        updateAt: Timestamp;
     }
     interface FirestoreTripTime {
         tripFrom: Timestamp;
         tripTo: Timestamp;
     }
-
     interface FirestoreTrip {
         tripName: string;
         person: number;
         tripTime: FirestoreTripTime;
         isPublic: boolean;
+        tripCountry: string;
+        createAt: Timestamp;
+        updateAt: Timestamp;
     }
     const router = useRouter();
     const [isLoading, setIsloading] = useState<boolean>(true);

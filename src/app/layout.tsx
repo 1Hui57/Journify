@@ -22,8 +22,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-        <Header />
-        <main className="w-full h-full pt-[60px] m-0">{children}</main>
+            <Header />
+            <main className="w-full h-full pt-[60px] m-0">{children}</main>
         </AuthProvider>
       </body>
     </html>
