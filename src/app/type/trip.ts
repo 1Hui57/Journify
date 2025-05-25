@@ -39,6 +39,18 @@ export interface TripScheduleItem {
   endTime?: Timestamp;
   note?: string;
 }
+export interface ReduxTripScheduleItem {
+  id: string;
+  place_id: string;
+  name: string;
+  formatted_address: string;
+  lat: number;
+  lng: number;
+  photo: string;
+  startTime?: number;
+  endTime?: number;
+  note?: string;
+}
 export interface TripTransport {
   id: string; //自動生成的流水號
   fromAttractionId: string; //上面景點的id(非place_id)

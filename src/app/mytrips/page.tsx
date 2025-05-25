@@ -1,3 +1,4 @@
+
 'use client'
 import TripPageCard from "@/component/TripPageCard";
 import { useEffect, useState } from "react";
@@ -81,6 +82,9 @@ export default function MyTrips() {
                     person: tripData.person,
                     tripTime,
                     isPublic: tripData.isPublic,
+                    tripCountry: tripData.tripCountry,
+                    createAt: tripData.createAt,
+                    updateAt: tripData.updateAt,
                 };
             });
             setTrips(data);
