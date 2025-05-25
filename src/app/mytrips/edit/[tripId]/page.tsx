@@ -8,7 +8,6 @@ import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import dynamic from 'next/dynamic';
-import TripAttractionItem from "@/component/TripAttractionWrapper";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
@@ -368,10 +367,10 @@ export default function TripEditPage() {
             {showEditTimePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
                 <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime}/>
             </div>}
-            <div className='h-96 md:w-[350px] flex-none md:h-full'>
+            <div className='h-70 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
-                    <div className='w-full h-16 px-5 text-myzinc-800 flex items-center justify-between'>
-                        <div className='w-fit text-2xl-700'>{trip?.tripName}</div>
+                    <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between'>
+                        <div className='w-fit text-lg-700 md:text-2xl-700'>{trip?.tripName}</div>
                         {trip && <div className='w-fit text-base-400'>{formatteDate(trip?.tripTime.tripFrom)}~{formatteDate(trip?.tripTime.tripTo)}</div>}
                     </div>
                     <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >

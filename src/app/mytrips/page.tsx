@@ -1,3 +1,4 @@
+
 'use client'
 import TripPageCard from "@/component/TripPageCard";
 import { useEffect, useState } from "react";
