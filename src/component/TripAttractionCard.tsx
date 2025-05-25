@@ -9,6 +9,9 @@ import TripTransportItem from "./TripTransportItem";
 import { useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import { IoChevronUp } from "react-icons/io5";
+// redux用
+import { useDispatch } from "react-redux";
+import { setShowNotePopup, setEditingItemId, setEditingTripItem, setShowEditTimePopup } from "@/store/tripSlice"
 
 
 interface TripAttractionCardProps {
@@ -25,9 +28,19 @@ interface TripAttractionCardProps {
 export default function TripAttractionCard({ tripScheduleItem, index, selectedDay, tripDaySchedule,
     timestampToDateTime, setTripDaySchedule, deleteAttractionfromDate, setEditTripScheduleItemId }: TripAttractionCardProps) {
 
+    // redux 使用Dispatch
+    const dispatch = useDispatch();
+
     const [isHover, setIsHover] = useState<boolean>(false);
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
-
+    // Redux無法儲存非序列化資料，因此將TimeStamp資料先轉為毫秒
+    function convertTripItem(item: any) {
+        return {
+            ...item,
+            startTime: item.startTime?.toMillis?.() ?? null, // 或用 .toDate().toISOString()
+            endTime: item.endTime?.toMillis?.() ?? null,
+        };
+    }
     return (
         <div className="w-full" key={tripScheduleItem.id}>
             <div
@@ -40,12 +53,12 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                 {isHover &&
                     <div className="absolute top-8 right-0 w-fit h-fit px-4 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10"
                         onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => { e.stopPropagation(); }}>
-                        <div onClick={(e) => { e.stopPropagation();setEditTripScheduleItemId(tripScheduleItem.id) }}
+                        <div onClick={(e) => { e.stopPropagation(); dispatch(setEditingTripItem(convertTripItem(tripScheduleItem))); dispatch(setShowEditTimePopup(true)); }}
                             className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <IoMdTime />
                             <p>時間</p>
                         </div>
-                        <div onClick={(e) => { e.stopPropagation();setEditTripScheduleItemId(tripScheduleItem.id) }}
+                        <div onClick={(e) => { e.stopPropagation(); dispatch(setEditingTripItem(convertTripItem(tripScheduleItem))); dispatch(setShowNotePopup(true)); }}
                             className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
                             <MdEditNote />
                             <p>筆記</p>
@@ -77,7 +90,7 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                     })()}
                     {isExpanded && <div className="w-full h-30  text-xs-400  border-t-2 border-myblue-200 border-dotted">
                         <p>筆記：</p>
-                        <p>超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多超級多多多限制76個字元</p>
+                        <p>{tripScheduleItem.note}</p>
                     </div>}
                 </div>
             </div>

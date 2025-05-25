@@ -1,21 +1,25 @@
 'use client'
 
-import { Place, SelectTripDay, TripScheduleItem } from '@/app/type/trip';
+import { Place, SelectTripDay, TripScheduleItem, TripTime } from '@/app/type/trip';
+import { TripEditRootState } from '@/store/tripEditStore';
+import { setShowEditTimePopup } from '@/store/tripSlice';
 import { Timestamp } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import { RxCross2 } from "react-icons/rx";
+import { useDispatch, useSelector } from 'react-redux';
 interface TimeComponentProps {
     selectedDay: SelectTripDay;
-    addAttractionToDate: (dayId: string, selectedPlace: TripScheduleItem) => void;
-    pendingPlace: TripScheduleItem | null;
-    setShowTimePop: React.Dispatch<React.SetStateAction<boolean>>;
-    setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
-    dateTimeToTimestamp: (date: Date, time: string) => Timestamp;
-    setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
+    editAttractionTime: (dayId: string, tripScheduleItemId: string, time: TripTime) => void;
+    timestampToDateTime: (ts: Timestamp) => any;
 }
 
-export default function TimeComponent({ addAttractionToDate, selectedDay, pendingPlace, setShowTimePop,
-    setPendingPlace, dateTimeToTimestamp, setSelectedPlace }: TimeComponentProps) {
+export default function EditTimeComponent({ selectedDay, editAttractionTime, timestampToDateTime }: TimeComponentProps) {
+
+    const dispatch = useDispatch();
+    const editingTripItem = useSelector(
+        (state: TripEditRootState) => state.tripEdit.editingTripItem
+    );
+
     const [startHour, setStartHour] = useState('10');
     const [startMinute, setStartMinute] = useState('00');
     const [endHour, setEndHour] = useState('10');
@@ -37,6 +41,26 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
             .map(m => ({ hour: h, minute: m }));
     });
 
+    let selectedDate;
+    if(!selectedDay||selectedDay.date===null)return;
+    selectedDate = new Date(selectedDay.date);
+
+    const startTimestamp = Timestamp.fromDate(new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        parseInt(startHour),
+        parseInt(startMinute)
+    ));
+
+    const endTimestamp = Timestamp.fromDate(new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        parseInt(endHour),
+        parseInt(endMinute)
+    ));
+
     // 🟣 檢查目前選擇的結束時間是否合法，不合法時自動調整
     useEffect(() => {
         const currentEndValue = parseInt(endHour + endMinute);
@@ -47,11 +71,29 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
         }
     }, [startHour, startMinute]);
 
+    useEffect(() => {
+        if (!editingTripItem || editingTripItem.startTime == null || editingTripItem.endTime == null) return;
+
+        const startTimestamp = Timestamp.fromMillis(editingTripItem.startTime);
+        const endTimestamp = Timestamp.fromMillis(editingTripItem.endTime);
+
+        const startTimeStr = timestampToDateTime(startTimestamp).time; // 例如 '09:30'
+        const endTimeStr = timestampToDateTime(endTimestamp).time;
+
+        const [sHour, sMin] = startTimeStr.split(':');
+        const [eHour, eMin] = endTimeStr.split(':');
+
+        setStartHour(sHour);
+        setStartMinute(sMin);
+        setEndHour(eHour);
+        setEndMinute(eMin);
+    }, [editingTripItem]);
+
     return (
         <div className='relative w-72 h-56 bg-mywhite-100 text-myblue-600 flex flex-col p-3 rounded-md shadow-2xl'>
-            <RxCross2 className='absolute top-2 right-2 w-5 h-5' onClick={() => setShowTimePop(false)} />
+            <RxCross2 className='absolute top-2 right-2 w-5 h-5' onClick={() => { dispatch(setShowEditTimePopup(false)) }} />
             <div className='w-fit text-lg-700 text-myblue-600 mb-5 mx-auto line-clamp-1'>
-                {pendingPlace?.name}
+                {editingTripItem?.name}
             </div>
             <div className='mb-4 w-[216px] mx-auto'>
                 <label>開始時間：</label>
@@ -88,20 +130,11 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
             </div>
             <button
                 onClick={() => {
-                    if (!selectedDay || selectedDay.date === null || pendingPlace === null) return;
-                    const timeStampStart = dateTimeToTimestamp(selectedDay.date, stringStartTime);
-                    const timeStampEnd = dateTimeToTimestamp(selectedDay.date, stringEndTime);
-                    const updatedPlace: TripScheduleItem = {
-                        ...pendingPlace,
-                        startTime: timeStampStart,
-                        endTime: timeStampEnd,
-                    };
-                    addAttractionToDate(selectedDay.id, updatedPlace);
-                    setPendingPlace(null);
-                    setSelectedPlace(null);
-                    setShowTimePop(false);
+                    if (!editingTripItem || !editingTripItem.id) return;
+                    editAttractionTime(selectedDay.id, editingTripItem.id,{tripFrom:startTimestamp,tripTo:endTimestamp});
+                    dispatch(setShowEditTimePopup(false));
                 }}
-                className=' p-2 text-base-500 text-primary-300 bg-myblue-400 rounded-md hover:text-primary-300 hover:bg-myblue-700'>確認加入</button>
+                className=' p-2 text-base-500 text-primary-300 bg-myblue-400 rounded-md hover:text-primary-300 hover:bg-myblue-700'>更新時間</button>
         </div>
     );
 }

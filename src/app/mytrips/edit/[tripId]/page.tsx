@@ -12,10 +12,15 @@ import TripAttractionItem from "@/component/TripAttractionWrapper";
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
-import { Country, SelectTripDay, TansportData, Trip, TripDaySchedule, TripScheduleItem, TripTransport } from '@/app/type/trip';
+import { Country, SelectTripDay, TansportData, Trip, TripDaySchedule, TripScheduleItem, TripTime, TripTransport } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
 import TripAttractionWrappwer from '@/component/TripAttractionWrapper';
 import NoteComponent from '@/component/NoteComponent';
+
+// redux
+import { useSelector } from "react-redux";
+import { TripEditRootState } from "@/store/tripEditStore";
+import EditTimeComponent from '@/component/EditTimeComponent';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
@@ -45,13 +50,15 @@ export default function TripEditPage() {
 
     // 顯示timePop、NotePop
     const [showTimePop, setShowTimePop] = useState<boolean>(false);
-    const [showNotePop, setShowNotePop] = useState<boolean>(true);
+    // 取的 Redux 狀態
+    const showNotePopup = useSelector((state: TripEditRootState) => state.tripEdit.showNotePopup);
+    const showEditTimePopup = useSelector((state:TripEditRootState)=>state.tripEdit.showEditTimePopup);
 
     // 準備加入的景點資料 & 時間
     const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
 
     // 準備修改的景點
-    const [EditTripScheduleItemId, setEditTripScheduleItemId] = useState<string|null>(null);
+    const [EditTripScheduleItemId, setEditTripScheduleItemId] = useState<string | null>(null);
 
 
     // 使用者是否為登入狀態
@@ -279,15 +286,55 @@ export default function TripEditPage() {
     }
 
     // 編輯景點筆記
-    const editAttractionNote = (tripDaySchedule: TripDaySchedule[], dayId: string, tripScheduleItemId: string, note: string) => {
-        const day = tripDaySchedule.find(item => item.id === dayId);
-        if (!day) return;
-        const tripAttractionsList = day.attractionData;
-        const tripScheduleItem = tripAttractionsList.find(item => item.id === tripScheduleItemId);
-        if (!tripScheduleItem) return;
-
+    const editAttractionNote = (dayId: string, tripScheduleItemId: string, note: string) => {
+        setTripDaySchedule((prevSchedule) => {
+            const newTripSchedule = prevSchedule.map((day) => {
+                if (day.id === dayId) {
+                    const newAttractions = day.attractionData.map((item) => {
+                        if (item.id === tripScheduleItemId) {
+                            return {
+                                ...item,
+                                note
+                            }
+                        }
+                        return item;
+                    })
+                    return {
+                        ...day,
+                        attractionData: newAttractions
+                    }
+                }
+                else return day; // 其他日期保持不變
+            });
+            return updateTripScheduleWithTransport(newTripSchedule);
+        });
     }
+
     // 編輯景點時間
+        const editAttractionTime = (dayId: string, tripScheduleItemId: string, time: TripTime) => {
+        setTripDaySchedule((prevSchedule) => {
+            const newTripSchedule = prevSchedule.map((day) => {
+                if (day.id === dayId) {
+                    const newAttractions = day.attractionData.map((item) => {
+                        if (item.id === tripScheduleItemId) {
+                            return {
+                                ...item,
+                                startTime:time.tripFrom,
+                                endTime:time.tripTo
+                            }
+                        }
+                        return item;
+                    })
+                    return {
+                        ...day,
+                        attractionData: newAttractions
+                    }
+                }
+                else return day; // 其他日期保持不變
+            });
+            return updateTripScheduleWithTransport(newTripSchedule);
+        });
+    }
 
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
@@ -315,8 +362,11 @@ export default function TripEditPage() {
                     setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp}
                     setSelectedPlace={setSelectedPlace} />
             </div>}
-            {showNotePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <NoteComponent EditTripScheduleItemId={EditTripScheduleItemId}/>
+            {showNotePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <NoteComponent editAttractionNote={editAttractionNote} selectedDay={selectedDay} />
+            </div>}
+            {showEditTimePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime}/>
             </div>}
             <div className='h-96 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
@@ -352,7 +402,7 @@ export default function TripEditPage() {
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
                                 <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId}/>
+                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId} />
                             ))}
                     </div>
                 </div>
