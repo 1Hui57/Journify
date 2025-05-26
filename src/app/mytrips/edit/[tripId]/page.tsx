@@ -102,7 +102,10 @@ export default function TripEditPage() {
         if (trip.tripDaySchedule && trip.tripDaySchedule.length > 0 && tripDaySchedule.length === 0) {
             const convertTripDaySchedule: TripDaySchedule[] = trip.tripDaySchedule.map((dayItem) => ({
                 ...dayItem,
-                rawDate: new Date(dayItem.rawDate),
+                rawDate:
+                    dayItem.rawDate instanceof Timestamp
+                        ? dayItem.rawDate.toDate()
+                        : new Date(dayItem.rawDate),
                 attractionData: dayItem.attractionData.map((item) => ({
                     ...item,
                 })),
