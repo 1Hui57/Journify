@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import { Timestamp } from 'firebase/firestore';
 // import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, SelectTripDay, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
+import { useSelector } from 'react-redux';
+import { TripEditRootState } from '@/store/tripEditStore';
 
 interface MapProps {
   countryData: Country | undefined;
@@ -43,6 +45,10 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   // 顯示路線
   const [directionsResult, setDirectionsResult] = useState<google.maps.DirectionsResult | null>(null);
   const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
+
+  // 取得Redux目前點擊的Card的place_id
+  const selectedAttractionId = useSelector((state:TripEditRootState)=>state.tripEdit.selectedAttractionId);
+
   useEffect(() => {
 
     if (!isLoaded || !inputRef.current) return;
@@ -231,6 +237,42 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
       }
     });
   };
+
+  // 取得Card現在點擊的place_id並在地圖顯示地點及資訊小卡
+  useEffect(()=>{
+    if (!placesServiceRef.current || !selectedAttractionId) return;
+
+    placesServiceRef.current.getDetails(
+      {
+        placeId: selectedAttractionId,
+        fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
+      },
+      (place, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
+          const location = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          };
+          setSelectedPlace({
+            id: uuidv4(), // 產生一個唯一的 ID
+            place_id: selectedAttractionId,
+            name: place.name,
+            address: place.formatted_address,
+            location,
+            rating: place.rating,
+            photos: place.photos,
+            opening_hours: place.opening_hours,
+          });
+          if (inputRef.current && place.name) {
+            inputRef.current.value = place.name;
+          }
+          setMapCenter(location); // 將地圖中心移到選定的景點
+        } else {
+          console.error("無法獲取景點詳細資訊:", status);
+        }
+      }
+    );
+  },[selectedAttractionId])
 
   function closeAttractionData() {
     console.log(selectedPlace);

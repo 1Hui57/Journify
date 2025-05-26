@@ -11,7 +11,7 @@ import { IoChevronDown } from "react-icons/io5";
 import { IoChevronUp } from "react-icons/io5";
 // redux用
 import { useDispatch } from "react-redux";
-import { setShowNotePopup, setEditingItemId, setEditingTripItem, setShowEditTimePopup } from "@/store/tripSlice"
+import { setShowNotePopup, setEditingItemId, setEditingTripItem, setShowEditTimePopup, setSelectedAttractionId } from "@/store/tripSlice"
 
 
 interface TripAttractionCardProps {
@@ -42,7 +42,7 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
         };
     }
     return (
-        <div className="w-full" key={tripScheduleItem.id}>
+        <div className="w-full" key={tripScheduleItem.id} onClick={()=>{dispatch(setSelectedAttractionId(tripScheduleItem.place_id))}}>
             <div
                 className={`relative w-full  mb-2 bg-primary-100  rounded-md shadow-md cursor-pointer flex ${isExpanded ? 'h-60' : 'h-26'}`}>
                 <AiOutlineMore className="absolute top-2 right-0 w-6 h-6 " onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => {
