@@ -7,8 +7,9 @@ import { Timestamp } from 'firebase/firestore';
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, SelectTripDay, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { TripEditRootState } from '@/store/tripEditStore';
+import { setSelectedAttractionId } from '@/store/tripSlice';
 
 interface MapProps {
   countryData: Country | undefined;
@@ -24,6 +25,10 @@ const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
 export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace, setShowTimePop, tripDaySchedule, setTripDaySchedule }: MapProps) {
+
+  // redux 使用Dispatch
+  const dispatch = useDispatch();
+  
   // 取得此行程countryData
   const defaultCenter = countryData
     ? { lat: countryData.lat, lng: countryData.lng }
@@ -52,8 +57,8 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   useEffect(() => {
     if (!tripDaySchedule) return;
-    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id)); 
-  }, [selectedDay, tripDaySchedule]) 
+    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id));
+  }, [selectedDay, tripDaySchedule])
 
   useEffect(() => {
 
@@ -188,7 +193,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         origin,
         destination,
         waypoints,
-        travelMode: google.maps.TravelMode.DRIVING, // 可改 WALKING、TRANSIT
+        travelMode: google.maps.TravelMode.WALKING, // 可改 WALKING、TRANSIT、DRIVING
         optimizeWaypoints: false, // 是否最佳化路線
       },
       (result, status) => {
@@ -283,6 +288,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   function closeAttractionData() {
     console.log(selectedPlace);
     setSelectedPlace(null);
+    dispatch(setSelectedAttractionId(null));
     if (inputRef.current) {
       inputRef.current.value = "";
     }
