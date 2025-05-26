@@ -262,3 +262,12 @@ button {
     }
 }
 
+/* 在你的 global.css 或 tailwind.css 中加入 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+

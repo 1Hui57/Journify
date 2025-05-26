@@ -12,34 +12,36 @@ import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
 import CreateTrip from "@/component/CreateTrip";
 
+interface TripTime {
+    tripFrom: Date;
+    tripTo: Date;
+}
+interface Trip {
+    id?: string;
+    tripName: string;
+    person: Number;
+    tripTime: TripTime;
+    isPublic: boolean;
+    tripCountry: string;
+    createAt: Timestamp;
+    updateAt: Timestamp;
+}
+interface FirestoreTripTime {
+    tripFrom: Timestamp;
+    tripTo: Timestamp;
+}
+interface FirestoreTrip {
+    tripName: string;
+    person: number;
+    tripTime: FirestoreTripTime;
+    isPublic: boolean;
+    tripCountry: string;
+    createAt: Timestamp;
+    updateAt: Timestamp;
+}
+
 export default function MyTrips() {
-    interface TripTime {
-        tripFrom: Date;
-        tripTo: Date;
-    }
-    interface Trip {
-        id?: string;
-        tripName: string;
-        person: Number;
-        tripTime: TripTime;
-        isPublic: boolean;
-        tripCountry: string;
-        createAt: Timestamp;
-        updateAt: Timestamp;
-    }
-    interface FirestoreTripTime {
-        tripFrom: Timestamp;
-        tripTo: Timestamp;
-    }
-    interface FirestoreTrip {
-        tripName: string;
-        person: number;
-        tripTime: FirestoreTripTime;
-        isPublic: boolean;
-        tripCountry: string;
-        createAt: Timestamp;
-        updateAt: Timestamp;
-    }
+
     const router = useRouter();
     const [isLoading, setIsloading] = useState<boolean>(true);
 

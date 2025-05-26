@@ -28,7 +28,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // redux 使用Dispatch
   const dispatch = useDispatch();
-  
+
   // 取得此行程countryData
   const defaultCenter = countryData
     ? { lat: countryData.lat, lng: countryData.lng }
@@ -110,6 +110,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
+    if (!isLoaded) return; // 新增這行
     const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
     if (!currentDay) return;
 
@@ -166,10 +167,14 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 縣市目前選擇天數的行程路線渲染
   useEffect(() => {
+    if (!isLoaded) return; // 新增這行
     if (!tripDaySchedule || tripDaySchedule.length < 2 || !selectedDay.id) return;
 
     const currentDay = tripDaySchedule.find(item => item.id === selectedDay.id);
-    if (!currentDay || currentDay.attractionData.length < 2) return;
+    if (!currentDay || currentDay.attractionData.length < 2) {
+      setDirectionsResult(null);
+      return;
+    }
 
     const directionsService = new google.maps.DirectionsService();
 

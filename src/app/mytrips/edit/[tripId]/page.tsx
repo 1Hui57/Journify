@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { getDoc, doc, Timestamp } from 'firebase/firestore';
+import { getDoc, doc, Timestamp, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 import { FaAngleLeft } from "react-icons/fa6";
 import { FaAngleRight } from "react-icons/fa6";
 import { IoMdAdd } from "react-icons/io"; //加號
-import { Country, SelectTripDay, TansportData, Trip, TripDaySchedule, TripScheduleItem, TripTime, TripTransport } from '@/app/type/trip';
+import { Country, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem, TripTime, TripTransport } from '@/app/type/trip';
 import TimeComponent from '@/component/TimeComponent';
 import TripAttractionWrappwer from '@/component/TripAttractionWrapper';
 import NoteComponent from '@/component/NoteComponent';
@@ -51,14 +51,13 @@ export default function TripEditPage() {
     const [showTimePop, setShowTimePop] = useState<boolean>(false);
     // 取的 Redux 狀態
     const showNotePopup = useSelector((state: TripEditRootState) => state.tripEdit.showNotePopup);
-    const showEditTimePopup = useSelector((state:TripEditRootState)=>state.tripEdit.showEditTimePopup);
+    const showEditTimePopup = useSelector((state: TripEditRootState) => state.tripEdit.showEditTimePopup);
 
     // 準備加入的景點資料 & 時間
     const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
 
-    // 準備修改的景點
-    const [EditTripScheduleItemId, setEditTripScheduleItemId] = useState<string | null>(null);
-
+    // 儲存旅程資料
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -91,7 +90,6 @@ export default function TripEditPage() {
 
             const tripData = tripSnap.data() as Trip;
             setTrip(tripData);
-
         };
 
         fetchTrip();
@@ -100,6 +98,12 @@ export default function TripEditPage() {
     // 轉換旅程天數
     useEffect(() => {
         if (!trip) return;
+        if (trip.tripDaySchedule && trip.tripDaySchedule.length > 0) {
+            console.log("從 trip 載入行程資料：", trip.tripDaySchedule);
+            setTripDaySchedule(trip.tripDaySchedule);
+            setSelectedDay({ id: trip.tripDaySchedule[0].id, date: new Date(trip.tripTime.tripFrom.toDate() )})
+            return;
+        }
         const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
         setTripDaySchedule([...days]);
         // 預設選擇第一天
@@ -310,7 +314,7 @@ export default function TripEditPage() {
     }
 
     // 編輯景點時間
-        const editAttractionTime = (dayId: string, tripScheduleItemId: string, time: TripTime) => {
+    const editAttractionTime = (dayId: string, tripScheduleItemId: string, time: TripTime) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((day) => {
                 if (day.id === dayId) {
@@ -318,8 +322,8 @@ export default function TripEditPage() {
                         if (item.id === tripScheduleItemId) {
                             return {
                                 ...item,
-                                startTime:time.tripFrom,
-                                endTime:time.tripTo
+                                startTime: time.tripFrom,
+                                endTime: time.tripTo
                             }
                         }
                         return item;
@@ -333,6 +337,32 @@ export default function TripEditPage() {
             });
             return updateTripScheduleWithTransport(newTripSchedule);
         });
+    }
+
+    // 儲存旅程，將目前旅程編輯資料寫入資料庫
+    async function saveTripDaySchedule(userId: string, tripId: string, trip: Trip, tripDaySchedule: TripDaySchedule[]) {
+        if (!userId || !tripId) {
+            alert("使用者或旅程 ID 不正確");
+            return;
+        }
+        setIsSaving(true);
+        try {
+            await setDoc(doc(db, "users", userId, "trips", tripId), {
+                ...trip,
+                tripDaySchedule: tripDaySchedule,
+            });
+            // 更新all_trips的updateTime
+            await updateDoc(doc(db, "all_trips", tripId), {
+                tripTime: trip.tripTime,
+                updateAt: Timestamp.now(),
+            });
+            console.log("寫入成功");
+            setIsSaving(false);
+        }
+        catch (error) {
+            console.error(" 寫入 Firestore 失敗：", error);
+            alert("新增資料時發生錯誤，請稍後再試！");
+        }
     }
 
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
@@ -356,6 +386,11 @@ export default function TripEditPage() {
 
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
+            {isSaving && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                <div className='w-fit h-fit px-5 py-3 bg-mywhite-100 text-primary-800 text-base-500 '>
+                    儲存成功!
+                </div>
+            </div>}
             {showTimePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
                 <TimeComponent addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace}
                     setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp}
@@ -365,17 +400,17 @@ export default function TripEditPage() {
                 <NoteComponent editAttractionNote={editAttractionNote} selectedDay={selectedDay} />
             </div>}
             {showEditTimePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime}/>
+                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime} />
             </div>}
             <div className='h-70 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
-                    <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between'>
-                        <div className='w-fit text-lg-700 md:text-2xl-700'>{trip?.tripName}</div>
+                    <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between shadow-[0_0_8px_rgba(0,0,0,0.1)]'>
+                        <div className='w-fit text-lg-700 md:text-2xl-700 line-clamp-1'>{trip?.tripName}</div>
                         {trip && <div className='w-fit text-base-400'>{formatteDate(trip?.tripTime.tripFrom)}~{formatteDate(trip?.tripTime.tripTo)}</div>}
                     </div>
                     <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollLeft}><FaAngleLeft /></div>
-                        <div className='w-full h-full flex overflow-hidden' id="dateChoose" ref={scrollRef}>
+                        <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
                             {tripDaySchedule.map((item: TripDaySchedule) => {
                                 return (
                                     <div key={item.id}
@@ -396,12 +431,12 @@ export default function TripEditPage() {
                         </div>
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
                     </div>
-                    <div id='dayContent' className='w-full flex-1 overflow-y-scroll'>
+                    <div id='dayContent' className='w-full flex-1 overflow-y-scroll pb-12'>
                         {tripDaySchedule
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
                                 <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId} />
+                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
                             ))}
                     </div>
                 </div>
@@ -411,6 +446,12 @@ export default function TripEditPage() {
                     selectedDay={selectedDay} setPendingPlace={setPendingPlace}
                     setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} />
             </div>
+            <div
+                onClick={() => {
+                    if (!userId || !tripId || typeof tripId !== "string" || !trip) return;
+                    saveTripDaySchedule(userId, tripId, trip, tripDaySchedule)
+                }}
+                className="absolute bottom-3 right-5 w-fit h-fit px-5 py-2 border-2 border-primary-800 text-primary-800 text-sm-500 bg-mywhite-80 hover:bg-primary-800 hover:text-mywhite-100 hover:border-mywhite-100 text-center rounded-full cursor-pointer">儲存旅程</div>
         </div>
     )
 

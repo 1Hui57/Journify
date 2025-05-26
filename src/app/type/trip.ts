@@ -12,6 +12,7 @@ export interface Trip {
   tripCountry: string;
   createAt: Timestamp;
   updateAt: Timestamp;
+  tripDaySchedule?: TripDaySchedule[] | null;
 }
 export interface Country {
   countryCode: string;

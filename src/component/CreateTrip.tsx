@@ -1,5 +1,5 @@
 'use client'
-import { Dispatch, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { serverTimestamp, setDoc, doc, FieldValue  } from "firebase/firestore";
