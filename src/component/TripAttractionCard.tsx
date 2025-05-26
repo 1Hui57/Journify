@@ -22,11 +22,10 @@ interface TripAttractionCardProps {
     setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
     selectedDay: SelectTripDay;
     deleteAttractionfromDate: (dayId: string, tripScheduleItemId: string) => void;
-    setEditTripScheduleItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function TripAttractionCard({ tripScheduleItem, index, selectedDay, tripDaySchedule,
-    timestampToDateTime, setTripDaySchedule, deleteAttractionfromDate, setEditTripScheduleItemId }: TripAttractionCardProps) {
+    timestampToDateTime, setTripDaySchedule, deleteAttractionfromDate }: TripAttractionCardProps) {
 
     // redux 使用Dispatch
     const dispatch = useDispatch();
@@ -42,16 +41,16 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
         };
     }
     return (
-        <div className="w-full" key={tripScheduleItem.id} onClick={()=>{dispatch(setSelectedAttractionId(tripScheduleItem.place_id))}}>
+        <div className="w-full" key={tripScheduleItem.id} onClick={() => dispatch(setSelectedAttractionId(tripScheduleItem.place_id))}>
             <div
-                className={`relative w-full  mb-2 bg-primary-100  rounded-md shadow-md cursor-pointer flex ${isExpanded ? 'h-60' : 'h-26'}`}>
+                className={`relative w-full  mb-2 bg-primary-100  rounded-md shadow-md cursor-pointer flex ${isExpanded ? 'h-fit' : 'h-26'}`}>
                 <AiOutlineMore className="absolute top-2 right-0 w-6 h-6 " onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => {
                     e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
                 }} />
-                {isExpanded ? <IoChevronUp onClick={() => setIsExpanded(prev => !prev)} className="absolute bottom-1 right-2 w-5 h-5" /> : <IoChevronDown onClick={() => setIsExpanded(prev => !prev)} className="absolute bottom-1 right-2 w-5 h-5" />
+                {isExpanded ? <IoChevronUp onClick={(e) => { e.stopPropagation();; setIsExpanded(prev => !prev) }} className="absolute bottom-1 right-2 w-5 h-5" /> : <IoChevronDown onClick={(e) => { e.stopPropagation();; setIsExpanded(prev => !prev) }} className="absolute bottom-1 right-2 w-5 h-5" />
                 }
                 {isHover &&
-                    <div className="absolute top-8 right-0 w-fit h-fit px-4 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10"
+                    <div className="absolute top-8 right-0 w-26 h-fit px-2 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10"
                         onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => { e.stopPropagation(); }}>
                         <div onClick={(e) => { e.stopPropagation(); dispatch(setEditingTripItem(convertTripItem(tripScheduleItem))); dispatch(setShowEditTimePopup(true)); }}
                             className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100 flex items-center justify-center gap-2 cursor-pointer">
@@ -70,9 +69,9 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                         </div>
                     </div>
                 }
-                <div className="relative w-14 h-full">
-                    <div className="absolute left-0 top-0 w-6 h-6  text-sm-400 text-mywhite-100 bg-myzinc900-80 rounded-tl-md rounded-br-md text-center">{index + 1}</div>
-                    <div className="w-full h-full rounded-l-md overflow-hidden">
+                <div className="absolute left-0 top-0 w-6 h-6  text-sm-400 text-mywhite-100 bg-myzinc900-80 rounded-tl-md rounded-br-md text-center z-20">{index + 1}</div>
+                <div className="w-14 flex-shrink-0 flex items-stretch">
+                    <div className="w-full h-auto rounded-l-md overflow-hidden">
                         <img src={tripScheduleItem.photo} referrerPolicy="no-referrer" alt="" className="w-full h-full object-cover" />
                     </div>
                 </div>
@@ -88,9 +87,9 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                             </div>
                         );
                     })()}
-                    {isExpanded && <div className="w-full h-30  text-xs-400  border-t-2 border-myblue-200 border-dotted">
+                    {isExpanded && <div className="w-full h-fit  text-xs-400  border-t-2 border-myblue-200 border-dotted">
                         <p>筆記：</p>
-                        <p>{tripScheduleItem.note}</p>
+                        <p>{!tripScheduleItem.note ? "尚無筆記" : tripScheduleItem.note}</p>
                     </div>}
                 </div>
             </div>

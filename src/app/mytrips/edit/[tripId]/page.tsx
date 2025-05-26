@@ -56,8 +56,7 @@ export default function TripEditPage() {
     // 準備加入的景點資料 & 時間
     const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
 
-    // 準備修改的景點
-    const [EditTripScheduleItemId, setEditTripScheduleItemId] = useState<string | null>(null);
+
 
 
     // 使用者是否為登入狀態
@@ -369,13 +368,13 @@ export default function TripEditPage() {
             </div>}
             <div className='h-70 md:w-[350px] flex-none md:h-full'>
                 <div className='w-full h-full bg-mywhite-100 flex flex-col'>
-                    <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between'>
+                    <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between shadow-[0_0_8px_rgba(0,0,0,0.1)]'>
                         <div className='w-fit text-lg-700 md:text-2xl-700'>{trip?.tripName}</div>
                         {trip && <div className='w-fit text-base-400'>{formatteDate(trip?.tripTime.tripFrom)}~{formatteDate(trip?.tripTime.tripTo)}</div>}
                     </div>
                     <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >
                         <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollLeft}><FaAngleLeft /></div>
-                        <div className='w-full h-full flex overflow-hidden' id="dateChoose" ref={scrollRef}>
+                        <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
                             {tripDaySchedule.map((item: TripDaySchedule) => {
                                 return (
                                     <div key={item.id}
@@ -401,7 +400,7 @@ export default function TripEditPage() {
                             .filter(item => item.id === selectedDay.id)
                             .map(item => (
                                 <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId} />
+                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
                             ))}
                     </div>
                 </div>
