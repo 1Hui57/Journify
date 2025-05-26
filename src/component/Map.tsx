@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import { Timestamp } from 'firebase/firestore';
-import { IoSearchSharp } from "react-icons/io5";
+// import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, SelectTripDay, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
@@ -40,6 +40,9 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
 
+  // 顯示路線
+  const [directionsResult, setDirectionsResult] = useState<google.maps.DirectionsResult | null>(null);
+  const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
   useEffect(() => {
 
     if (!isLoaded || !inputRef.current) return;
@@ -88,8 +91,9 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     });
   }, [isLoaded]);
 
+  // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
-    const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
+    // const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
     if (!currentDay) return;
 
     currentDay.transportData.forEach((item) => {
@@ -143,6 +147,49 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     });
   }, [selectedDay.id, tripDaySchedule]);
 
+  // 縣市目前選擇天數的行程路線渲染
+  useEffect(() => {
+    if (!tripDaySchedule || tripDaySchedule.length < 2 || !selectedDay.id) return;
+
+    // currentDay = tripDaySchedule.find(item => item.id === selectedDay.id);
+    if (!currentDay || currentDay.attractionData.length < 2) return;
+
+    const directionsService = new google.maps.DirectionsService();
+
+    const origin = {
+      lat: currentDay.attractionData[0].lat,
+      lng: currentDay.attractionData[0].lng,
+    };
+
+    const destination = {
+      lat: currentDay.attractionData[currentDay.attractionData.length - 1].lat,
+      lng: currentDay.attractionData[currentDay.attractionData.length - 1].lng,
+    };
+
+    const waypoints = currentDay.attractionData.slice(1, -1).map((attraction) => ({
+      location: { lat: attraction.lat, lng: attraction.lng },
+      stopover: true,
+    }));
+
+    directionsService.route(
+      {
+        origin,
+        destination,
+        waypoints,
+        travelMode: google.maps.TravelMode.DRIVING, // 可改 WALKING、TRANSIT
+        optimizeWaypoints: false, // 是否最佳化路線
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          setDirectionsResult(result);
+        } else {
+          console.error('Failed to fetch directions:', status);
+        }
+      }
+    );
+  }, [tripDaySchedule]);
+
+  // 點擊地圖景點出現景點資訊
   const handleMapLoad = (map: google.maps.Map) => {
     // 如果placesServiceRef尚未初始化，則在此綁訂在map上
     if (!placesServiceRef.current) {
@@ -284,6 +331,29 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }}
       >
         {selectedPlace && <Marker position={selectedPlace.location} />}
+        {directionsResult && (
+          <DirectionsRenderer
+            directions={directionsResult}
+            options={{ suppressMarkers: true }} // 如果你有自訂 marker
+          />
+        )}
+        {currentDay?.attractionData.map((attraction, index) => (
+          <Marker
+            key={attraction.id || index}
+            position={{ lat: attraction.lat, lng: attraction.lng }}
+            label={{
+              text: `${index + 1}`,
+              color: '#884924',
+              fontSize: '14px',
+              fontWeight: 'bold',
+            }} // 可以顯示編號 1, 2, 3...
+            icon={{
+              url: '/placeholder.png', // 這裡放你的 png 路徑，可以是相對或 CDN 絕對路徑
+              scaledSize: new google.maps.Size(32, 32), // 根據圖片大小調整
+              labelOrigin: new google.maps.Point(16, 12), // 調整 label 顯示在圖案正中央
+            }}
+          />
+        ))}
       </GoogleMap>
     </div>
   );
