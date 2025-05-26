@@ -52,8 +52,8 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   useEffect(() => {
     if (!tripDaySchedule) return;
-    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id));
-  }, [selectedDay, tripDaySchedule])
+    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id)); 
+  }, [selectedDay, tripDaySchedule]) 
 
   useEffect(() => {
 
