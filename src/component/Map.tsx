@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { GoogleMap, useJsApiLoader, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import { Timestamp } from 'firebase/firestore';
-import { IoSearchSharp } from "react-icons/io5";
+// import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, SelectTripDay, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
+import { useSelector } from 'react-redux';
+import { TripEditRootState } from '@/store/tripEditStore';
 
 interface MapProps {
   countryData: Country | undefined;
@@ -39,6 +41,19 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+
+  // 顯示路線
+  const [directionsResult, setDirectionsResult] = useState<google.maps.DirectionsResult | null>(null);
+  const [currentDay, serCurrentDay] = useState<TripDaySchedule | undefined>(undefined);
+
+
+  // 取得Redux目前點擊的Card的place_id
+  const selectedAttractionId = useSelector((state: TripEditRootState) => state.tripEdit.selectedAttractionId);
+
+  useEffect(() => {
+    if (!tripDaySchedule) return;
+    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id));
+  }, [selectedDay, tripDaySchedule])
 
   useEffect(() => {
 
@@ -88,6 +103,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     });
   }, [isLoaded]);
 
+  // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
     const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
     if (!currentDay) return;
@@ -143,6 +159,49 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     });
   }, [selectedDay.id, tripDaySchedule]);
 
+  // 縣市目前選擇天數的行程路線渲染
+  useEffect(() => {
+    if (!tripDaySchedule || tripDaySchedule.length < 2 || !selectedDay.id) return;
+
+    const currentDay = tripDaySchedule.find(item => item.id === selectedDay.id);
+    if (!currentDay || currentDay.attractionData.length < 2) return;
+
+    const directionsService = new google.maps.DirectionsService();
+
+    const origin = {
+      lat: currentDay.attractionData[0].lat,
+      lng: currentDay.attractionData[0].lng,
+    };
+
+    const destination = {
+      lat: currentDay.attractionData[currentDay.attractionData.length - 1].lat,
+      lng: currentDay.attractionData[currentDay.attractionData.length - 1].lng,
+    };
+
+    const waypoints = currentDay.attractionData.slice(1, -1).map((attraction) => ({
+      location: { lat: attraction.lat, lng: attraction.lng },
+      stopover: true,
+    }));
+
+    directionsService.route(
+      {
+        origin,
+        destination,
+        waypoints,
+        travelMode: google.maps.TravelMode.DRIVING, // 可改 WALKING、TRANSIT
+        optimizeWaypoints: false, // 是否最佳化路線
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          setDirectionsResult(result);
+        } else {
+          console.error('Failed to fetch directions:', status);
+        }
+      }
+    );
+  }, [tripDaySchedule, selectedDay]);
+
+  // 點擊地圖景點出現景點資訊
   const handleMapLoad = (map: google.maps.Map) => {
     // 如果placesServiceRef尚未初始化，則在此綁訂在map上
     if (!placesServiceRef.current) {
@@ -184,6 +243,42 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
       }
     });
   };
+
+  // 取得Card現在點擊的place_id並在地圖顯示地點及資訊小卡
+  useEffect(() => {
+    if (!placesServiceRef.current || !selectedAttractionId) return;
+
+    placesServiceRef.current.getDetails(
+      {
+        placeId: selectedAttractionId,
+        fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
+      },
+      (place, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
+          const location = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          };
+          setSelectedPlace({
+            id: uuidv4(), // 產生一個唯一的 ID
+            place_id: selectedAttractionId,
+            name: place.name,
+            address: place.formatted_address,
+            location,
+            rating: place.rating,
+            photos: place.photos,
+            opening_hours: place.opening_hours,
+          });
+          if (inputRef.current && place.name) {
+            inputRef.current.value = place.name;
+          }
+          setMapCenter(location); // 將地圖中心移到選定的景點
+        } else {
+          console.error("無法獲取景點詳細資訊:", status);
+        }
+      }
+    );
+  }, [selectedAttractionId])
 
   function closeAttractionData() {
     console.log(selectedPlace);
@@ -284,6 +379,29 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }}
       >
         {selectedPlace && <Marker position={selectedPlace.location} />}
+        {directionsResult && (
+          <DirectionsRenderer
+            directions={directionsResult}
+            options={{ suppressMarkers: true }} // 如果你有自訂 marker
+          />
+        )}
+        {currentDay?.attractionData.map((attraction, index) => (
+          <Marker
+            key={attraction.id || index}
+            position={{ lat: attraction.lat, lng: attraction.lng }}
+            label={{
+              text: `${index + 1}`,
+              color: '#884924',
+              fontSize: '14px',
+              fontWeight: 'bold',
+            }} // 可以顯示編號 1, 2, 3...
+            icon={{
+              url: '/placeholder.png', // 這裡放你的 png 路徑，可以是相對或 CDN 絕對路徑
+              scaledSize: new google.maps.Size(32, 32), // 根據圖片大小調整
+              labelOrigin: new google.maps.Point(16, 12), // 調整 label 顯示在圖案正中央
+            }}
+          />
+        ))}
       </GoogleMap>
     </div>
   );

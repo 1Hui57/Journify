@@ -24,7 +24,7 @@ export default function TripAttractionWrappwer({ tripDaySchedule, timestampToDat
                 tripDaySchedule.attractionData.map((tripScheduleItem, index) => {
                     return (
                         <TripAttractionCard key={tripScheduleItem.id} tripScheduleItem={tripScheduleItem} index={index} tripDaySchedule={tripDaySchedule} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                            selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId}/>
+                            selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} setEditTripScheduleItemId={setEditTripScheduleItemId} />
                     )
                 }
                 )

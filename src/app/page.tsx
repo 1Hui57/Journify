@@ -24,7 +24,7 @@ interface FirestoreTrip {
     isPublic: boolean;
     tripCountry: string;
     createAt: Timestamp;
-    updateAt: Timestamp; 
+    updateAt: Timestamp;
 }
 export default function Home() {
 
