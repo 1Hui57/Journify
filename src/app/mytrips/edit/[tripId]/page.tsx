@@ -98,19 +98,32 @@ export default function TripEditPage() {
     // 轉換旅程天數
     useEffect(() => {
         if (!trip) return;
-        if (trip.tripDaySchedule && trip.tripDaySchedule.length > 0) {
-            console.log("從 trip 載入行程資料：", trip.tripDaySchedule);
-            setTripDaySchedule(trip.tripDaySchedule);
-            setSelectedDay({ id: trip.tripDaySchedule[0].id, date: new Date(trip.tripTime.tripFrom.toDate() )})
-            return;
+
+        if (trip.tripDaySchedule && trip.tripDaySchedule.length > 0 && tripDaySchedule.length === 0) {
+            const convertTripDaySchedule: TripDaySchedule[] = trip.tripDaySchedule.map((dayItem) => ({
+                ...dayItem,
+                rawDate:
+                    dayItem.rawDate instanceof Timestamp
+                        ? dayItem.rawDate.toDate()
+                        : new Date(dayItem.rawDate),
+                attractionData: dayItem.attractionData.map((item) => ({
+                    ...item,
+                })),
+            }));
+            setTripDaySchedule(convertTripDaySchedule);
+            setSelectedDay({ id: convertTripDaySchedule[0].id, date: convertTripDaySchedule[0].rawDate, });
+        } else {
+            console.log("根據 tripTime 重新生成或更新行程天數");
+            const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
+            setTripDaySchedule([...days]);
+            if (
+                days.length > 0 &&
+                (selectedDay.id === "" || !days.some((day) => day.id === selectedDay.id))
+            ) {
+                setSelectedDay({ id: days[0].id, date: days[0].rawDate });
+            }
         }
-        const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
-        setTripDaySchedule([...days]);
-        // 預設選擇第一天
-        if (days.length > 0 && selectedDay.id === "") {
-            setSelectedDay({ id: days[0].id, date: days[0].rawDate });
-        }
-    }, [trip])
+    }, [trip]);
 
     // countries 與 trip 都準備好後，才找對應國家
     useEffect(() => {
@@ -187,8 +200,8 @@ export default function TripEditPage() {
 
     // 新增天數
     const addTripDate = () => {
-        if (!trip) return
-        const originEndDate = trip.tripTime.tripTo.toDate()
+        if (!trip) return;
+        const originEndDate = trip.tripTime.tripTo.toDate();
         // 加一天
         const nextDay = new Date(originEndDate.setDate(originEndDate.getDate() + 1));
         setTrip({
