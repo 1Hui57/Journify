@@ -44,10 +44,16 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 顯示路線
   const [directionsResult, setDirectionsResult] = useState<google.maps.DirectionsResult | null>(null);
-  const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
+  const [currentDay, serCurrentDay] = useState<TripDaySchedule | undefined>(undefined);
+
 
   // 取得Redux目前點擊的Card的place_id
-  const selectedAttractionId = useSelector((state:TripEditRootState)=>state.tripEdit.selectedAttractionId);
+  const selectedAttractionId = useSelector((state: TripEditRootState) => state.tripEdit.selectedAttractionId);
+
+  useEffect(() => {
+    if (!tripDaySchedule) return;
+    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id));
+  }, [selectedDay, tripDaySchedule])
 
   useEffect(() => {
 
@@ -99,7 +105,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
-    // const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
+    const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
     if (!currentDay) return;
 
     currentDay.transportData.forEach((item) => {
@@ -157,7 +163,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   useEffect(() => {
     if (!tripDaySchedule || tripDaySchedule.length < 2 || !selectedDay.id) return;
 
-    // currentDay = tripDaySchedule.find(item => item.id === selectedDay.id);
+    const currentDay = tripDaySchedule.find(item => item.id === selectedDay.id);
     if (!currentDay || currentDay.attractionData.length < 2) return;
 
     const directionsService = new google.maps.DirectionsService();
@@ -193,7 +199,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }
       }
     );
-  }, [tripDaySchedule]);
+  }, [tripDaySchedule, selectedDay]);
 
   // 點擊地圖景點出現景點資訊
   const handleMapLoad = (map: google.maps.Map) => {
@@ -239,7 +245,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   };
 
   // 取得Card現在點擊的place_id並在地圖顯示地點及資訊小卡
-  useEffect(()=>{
+  useEffect(() => {
     if (!placesServiceRef.current || !selectedAttractionId) return;
 
     placesServiceRef.current.getDetails(
@@ -272,7 +278,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }
       }
     );
-  },[selectedAttractionId])
+  }, [selectedAttractionId])
 
   function closeAttractionData() {
     console.log(selectedPlace);
