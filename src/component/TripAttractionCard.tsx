@@ -87,7 +87,7 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                             </div>
                         );
                     })()}
-                    {isExpanded && <div className="w-full h-fit  text-xs-400  border-t-2 border-myblue-200 border-dotted">
+                    {isExpanded && <div className="w-full h-fit  text-sm-400  border-t-2 border-myblue-200 border-dotted">
                         <p>筆記：</p>
                         <p>{!tripScheduleItem.note ? "尚無筆記" : tripScheduleItem.note}</p>
                     </div>}
