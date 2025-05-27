@@ -408,10 +408,11 @@ export default function TripEditPage() {
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
             {saveStatus !== "idle" && (
                 <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                    <div className='w-fit h-fit px-5 py-3 bg-mywhite-100 text-primary-800 text-base-500'>
-                        {saveStatus === "saving" && <span className="text-primary-800">儲存中...</span>}
-                        {saveStatus === "success" && <span className="text-primary-800">儲存成功！</span>}
-                        {saveStatus === "error" && <span className="text-primary-800">儲存失敗，請稍後再試</span>}
+                    <img src="/loading.gif" className="w-30 h-30 " />
+                    <div className='w-fit h-fit px-5 py-3  text-mywhite-100 text-base-500'>
+                        {saveStatus === "saving" && <span >儲存中...</span>}
+                        {saveStatus === "success" && <span >儲存成功！</span>}
+                        {saveStatus === "error" && <span >儲存失敗，請稍後再試</span>}
                     </div>
                 </div>)}
             {showTimePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
