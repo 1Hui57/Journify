@@ -465,6 +465,7 @@ export default function TripEditPage() {
             <div
                 onClick={() => {
                     if (!userId || !tripId || typeof tripId !== "string" || !trip) return;
+                    // console.log('tripDaySchedule to save:', tripDaySchedule);
                     saveTripDaySchedule(userId, tripId, trip, tripDaySchedule)
                 }}
                 className="absolute bottom-3 right-5 w-fit h-fit px-5 py-2 border-2 border-primary-800 text-primary-800 text-sm-500 bg-mywhite-80 hover:bg-primary-800 hover:text-mywhite-100 hover:border-mywhite-100 text-center rounded-full cursor-pointer">儲存旅程</div>
