@@ -395,7 +395,10 @@ export default function TripEditPage() {
         return { date, time };
     }
 
-    if (isLoading) return <div>載入中...</div>;
+    if (isLoading) return <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
+        <img src="/loading.gif" className="w-30 h-30 " />
+        <p className="text-mywhite-100">旅雀加載中...請稍後</p>
+    </div>;
 
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
