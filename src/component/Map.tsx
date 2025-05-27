@@ -65,11 +65,15 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   }, [selectedDay, tripDaySchedule])
 
   useEffect(() => {
-
     if (!isLoaded || !inputRef.current) return;
 
+    // 清除舊的 listener 避免重複綁定（如果有）
+    if (autocompleteRef.current) {
+      google.maps.event.clearInstanceListeners(autocompleteRef.current);
+    }
+
     autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-      fields: ['place_id'], // 僅取 place_id，詳細資訊之後用 getDetails()
+      fields: ['place_id'],
       componentRestrictions: { country: activeCountry.countryCode },
     });
 
@@ -82,7 +86,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
       if (!placeId || !placesServiceRef.current) return;
 
-      // 取得景點詳細資料
       placesServiceRef.current.getDetails(
         {
           placeId,
@@ -97,7 +100,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             setMapCenter(location);
             const id = uuidv4();
             setSelectedPlace({
-              id: id,
+              id,
               place_id: placeId,
               name: result.name,
               address: result.formatted_address,
@@ -110,7 +113,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }
       );
     });
-  }, [isLoaded]);
+  }, [isLoaded, activeCountry.countryCode]);
 
   // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
