@@ -65,8 +65,8 @@ export interface TripTransport {
 }
 export interface TransportMode {
   mode: "WALKING" | "DRIVING" | "TRANSIT";
-  duration: number | undefined; // 單位為秒
-  distance: number | undefined; // 單位為公尺
+  duration: number | null; // 單位為秒
+  distance: number | null; // 單位為公尺
 }
 export interface Location {
   lat: number;

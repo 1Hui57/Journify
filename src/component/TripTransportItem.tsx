@@ -11,8 +11,8 @@ interface TransportProps {
 export default function TripTransportItem({ tripTransport, setTripDaySchedule, selectedDay }: TransportProps) {
 
     const [transporation, setTransporation] = useState<string>(tripTransport.selectedMode);
-    const [duration, setDuration] = useState<number>();
-    const [distance, setDistance] = useState<number>();
+    const [duration, setDuration] = useState<number|null>();
+    const [distance, setDistance] = useState<number|null>();
 
     //更新選擇的交通方式
     useEffect(() => {
@@ -23,10 +23,10 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
         if (!tripTransport.modeOption) return;
         const selectTransportData = tripTransport.modeOption.find(item => item.mode === transporation);
         if (!selectTransportData) return;
-        const tripDuration = selectTransportData.duration === undefined ? undefined : selectTransportData.duration;
-        const tripDistance = selectTransportData.distance === undefined ? undefined : selectTransportData.distance;
-        setDuration(tripDuration === undefined ? undefined : tripDuration);
-        setDistance(tripDistance === undefined ? undefined : tripDistance);
+        const tripDuration = selectTransportData.duration === null ? null : selectTransportData.duration;
+        const tripDistance = selectTransportData.distance === null ? null : selectTransportData.distance;
+        setDuration(tripDuration);
+        setDistance(tripDistance);
     }, [transporation, tripTransport.modeOption])
 
     // 轉換顯示時間
@@ -79,10 +79,10 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
                 <option value="TRANSIT">大眾運輸</option>
                 <option value="CUSTOM">自訂</option>
             </select>
-            {tripTransport.modeOption &&
+            {tripTransport.modeOption && duration!==undefined && distance!==undefined &&
                 <div className="text-sm-400 text-sm-400 text-myblue-600 flex gap-2">
-                    <div>{duration === undefined ? '暫無資料' : formatDuration(duration)}</div>
-                    <div>{distance === undefined ? '暫無資料' : formatDistance(distance)}</div>
+                    <div>{duration === null ? '暫無資料' : formatDuration(duration)}</div>
+                    <div>{distance === null ? '暫無資料' : formatDistance(distance)}</div>
                 </div>
             }
         </div>

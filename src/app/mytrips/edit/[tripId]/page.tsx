@@ -57,7 +57,7 @@ export default function TripEditPage() {
     const [pendingPlace, setPendingPlace] = useState<TripScheduleItem | null>(null);
 
     // 儲存旅程資料
-    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -358,7 +358,7 @@ export default function TripEditPage() {
             alert("使用者或旅程 ID 不正確");
             return;
         }
-        setIsSaving(true);
+        setSaveStatus("saving");
         try {
             await setDoc(doc(db, "users", userId, "trips", tripId), {
                 ...trip,
@@ -370,11 +370,15 @@ export default function TripEditPage() {
                 updateAt: Timestamp.now(),
             });
             console.log("寫入成功");
-            setIsSaving(false);
+            setSaveStatus("success");
+            // 1.5 秒後自動隱藏提示
+            setTimeout(() => setSaveStatus("idle"), 1500);
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);
-            alert("新增資料時發生錯誤，請稍後再試！");
+            setSaveStatus("error");
+            // 2 秒後自動隱藏提示
+            setTimeout(() => setSaveStatus("idle"), 2000);
         }
     }
 
@@ -402,11 +406,14 @@ export default function TripEditPage() {
 
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>
-            {isSaving && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <div className='w-fit h-fit px-5 py-3 bg-mywhite-100 text-primary-800 text-base-500 '>
-                    儲存成功!
-                </div>
-            </div>}
+            {saveStatus !== "idle" && (
+                <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                    <div className='w-fit h-fit px-5 py-3 bg-mywhite-100 text-primary-800 text-base-500'>
+                        {saveStatus === "saving" && <span className="text-primary-800">儲存中...</span>}
+                        {saveStatus === "success" && <span className="text-primary-800">儲存成功！</span>}
+                        {saveStatus === "error" && <span className="text-primary-800">儲存失敗，請稍後再試</span>}
+                    </div>
+                </div>)}
             {showTimePop && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
                 <TimeComponent addAttractionToDate={addAttractionToDate} selectedDay={selectedDay} pendingPlace={pendingPlace}
                     setShowTimePop={setShowTimePop} setPendingPlace={setPendingPlace} dateTimeToTimestamp={dateTimeToTimestamp}

@@ -160,8 +160,8 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                       // 記錄無法查詢的交通資料（例如跨國）
                       updatedOptions.push({
                         mode,
-                        duration: undefined,
-                        distance: undefined,
+                        duration: null,
+                        distance: null,
                       });
                     }
 
@@ -332,24 +332,25 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         <div className='flex items-center gap-2'>
           {/* <IoSearchSharp className='w-6 h-10' /> */}
           <RxCross2 className='w-6 h-10 cursor-pointer' onClick={() => closeAttractionData()} />
+          <select
+            value={activeCountry.countryCode}
+            onChange={(e) => {
+              const selected = countryData.find((c) => c.countryCode === e.target.value);
+              if (selected) {
+                setActiveCountry(selected);
+                setMapCenter({ lat: selected.lat, lng: selected.lng });
+              }
+            }}
+            className=" h-full p-2 rounded"
+          >
+            {countryData.map((country) => (
+              <option key={country.countryCode} value={country.countryCode}>
+                {country.countryName}
+              </option>
+            ))}
+          </select>
         </div>
-        <select
-          value={activeCountry.countryCode}
-          onChange={(e) => {
-            const selected = countryData.find((c) => c.countryCode === e.target.value);
-            if (selected) {
-              setActiveCountry(selected);
-              setMapCenter({ lat: selected.lat, lng: selected.lng });
-            }
-          }}
-          className=" h-full p-2 rounded"
-        >
-          {countryData.map((country) => (
-            <option key={country.countryCode} value={country.countryCode}>
-              {country.countryName}
-            </option>
-          ))}
-        </select>
+
       </div>
       {/* 地點資訊卡（點選後才出現） */}
       {selectedPlace && (
