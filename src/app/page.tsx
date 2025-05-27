@@ -22,9 +22,15 @@ interface FirestoreTrip {
     person: number;
     tripTime: FirestoreTripTime;
     isPublic: boolean;
-    tripCountry: string;
+    tripCountry: Country[];
     createAt: Timestamp;
     updateAt: Timestamp;
+}
+interface Country {
+  countryCode: string;
+  countryName: string;
+  lat: number |null;
+  lng: number |null;
 }
 export default function Home() {
 

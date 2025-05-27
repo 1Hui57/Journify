@@ -72,7 +72,8 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                 <div className="absolute left-0 top-0 w-6 h-6  text-sm-400 text-mywhite-100 bg-myzinc900-80 rounded-tl-md rounded-br-md text-center z-20">{index + 1}</div>
                 <div className="w-14 flex-shrink-0 flex items-stretch">
                     <div className="w-full h-auto rounded-l-md overflow-hidden">
-                        <img src={tripScheduleItem.photo} referrerPolicy="no-referrer" alt="" className="w-full h-full object-cover" />
+                        <img src={tripScheduleItem.photo ? tripScheduleItem.photo : "/noPicture.png"}
+                            referrerPolicy="no-referrer" alt="/noPicture.png" className="w-full h-full object-cover" />
                     </div>
                 </div>
                 <div className="flex-1 py-2 px-2 flex flex-col gap-1 ">

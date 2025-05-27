@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { serverTimestamp, setDoc, doc, FieldValue  } from "firebase/firestore";
+import { serverTimestamp, setDoc, doc, FieldValue } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import CountrySelect from "./CountrySelect";
+import { Country } from "@/app/type/trip";
 
 interface CreateTripProps {
     userId: string | undefined;
@@ -21,10 +22,11 @@ interface Trip {
     person: number;
     tripTime: TripTime;
     isPublic: boolean;
-    tripCountry: string;
+    tripCountry: Country[];
     createAt: FieldValue;
     updateAt: FieldValue;
 }
+
 export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
     const [selected, setSelected] = useState<DateRange | undefined>();
@@ -34,7 +36,8 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
     const [tripName, setTripName] = useState<string>("");
     const [tripPerson, setTripPerson] = useState<number | undefined>();
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
-    const [tripCountry, setTripCountry] = useState<string>("");
+    // const [tripCountry, setTripCountry] = useState<string>("");
+    const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
 
     // 人數input規則
     const personInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +106,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
     // 建立旅程，寫入資料庫，進入旅程編輯頁
     async function handleClick() {
-        if (!tripName || !tripPerson || !tripTime) {
+        if (!tripName || !tripPerson || !tripTime || selectedCountries.length === 0) {
             alert("請輸入旅程資訊！");
             return;
         }
@@ -119,7 +122,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             person: Number(tripPerson),
             tripTime: tripTime,
             isPublic: false,
-            tripCountry: tripCountry,
+            tripCountry: selectedCountries,
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
         };
@@ -127,7 +130,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             ...newTrip,
             userId: userId,
             tripId: tripId,
-            tripCountry: tripCountry
+            tripCountry: selectedCountries
         }
 
         try {
@@ -155,8 +158,8 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
                 <input type="text" placeholder="輸入旅程名稱" value={tripName} onChange={(e) => { setTripName(e.target.value) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
-                <p className="text-myblue-600 font-light text-md">國家 ( 選填 ) </p>
-                <CountrySelect setTripCountry={setTripCountry} />
+                <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
+                <CountrySelect setSelectedCountries={setSelectedCountries} selectedCountries={selectedCountries}/>
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                 <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
                     value={deteText} />

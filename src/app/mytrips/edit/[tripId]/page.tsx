@@ -34,7 +34,7 @@ export default function TripEditPage() {
     const user = auth.currentUser;
     const userId = user?.uid;
     const [countries, setCountries] = useState<Country[]>([]);
-    const [countryData, setCountryData] = useState<Country>();
+    const [countryData, setCountryData] = useState<Country[]>();
 
     // 取得此筆旅程資料
     const { tripId } = useParams();
@@ -129,11 +129,11 @@ export default function TripEditPage() {
     useEffect(() => {
         if (!trip || countries.length === 0) return;
 
-        const matchedCountry = countries.find(
-            (item) => item.countryName === trip.tripCountry
-        );
+        // const matchedCountry = countries.map(
+        //     (item) => item.countryName === trip.tripCountry
+        // );
 
-        setCountryData(matchedCountry);
+        setCountryData(trip.tripCountry);
     }, [trip, countries]);
 
     // 當三樣關鍵資料都存在後才解除 loading
@@ -246,7 +246,7 @@ export default function TripEditPage() {
                         fromAttractionPlaceId: from.place_id,
                         toAttractionPlaceId: to.place_id,
                         customDuration: 0,
-                        selectedMode: "TRANSIT",
+                        selectedMode: "DRIVING",
                         note: ''
                     });
                 }
@@ -395,7 +395,10 @@ export default function TripEditPage() {
         return { date, time };
     }
 
-    if (isLoading) return <div>載入中...</div>;
+    if (isLoading) return <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
+        <img src="/loading.gif" className="w-30 h-30 " />
+        <p className="text-mywhite-100">旅雀加載中...請稍後</p>
+    </div>;
 
     return (
         <div className='w-full h-full flex flex-col-reverse md:flex-row'>

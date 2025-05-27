@@ -38,10 +38,10 @@ export default function TripPageCard({ tripPerson, deleteTrip, userId, item, upd
                     <div className="absolute top-6 right-0 w-24 h-fit px-2 py-3 flex flex-col gap-2 rounded-md justify-center text-myzinc-400 bg-mywhite-100" onMouseEnter={() => setIsMoreHover(true)} onMouseLeave={() => setIsMoreHover(false)}>
                         <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100">更新</div>
                         {isPublic ?
-                            <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={() => {updateTripPrivate(userId as string, item.id as string, isPublic);setIsPublic(false)}}>設為私人</div>
-                            : <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={() => {updateTripPrivate(userId as string, item.id as string, isPublic);setIsPublic(true)}}>公開</div>
+                            <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={(e) => {e.stopPropagation();updateTripPrivate(userId as string, item.id as string, isPublic);setIsPublic(false)}}>設為私人</div>
+                            : <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={(e) => {e.stopPropagation();updateTripPrivate(userId as string, item.id as string, isPublic);setIsPublic(true)}}>公開</div>
                         }
-                        <div onClick={() => deleteTrip(userId as string, item.id as string)} className="w-full text-center hover:text-myred-400 hover:font-700 hover:bg-myzinc-100">刪除</div>
+                        <div onClick={(e) => {e.stopPropagation();deleteTrip(userId as string, item.id as string)}} className="w-full text-center hover:text-myred-400 hover:font-700 hover:bg-myzinc-100">刪除</div>
                     </div>
                 }
             </div>

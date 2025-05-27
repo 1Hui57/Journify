@@ -12,7 +12,7 @@ import { TripEditRootState } from '@/store/tripEditStore';
 import { setSelectedAttractionId } from '@/store/tripSlice';
 
 interface MapProps {
-  countryData: Country | undefined;
+  countryData: Country[] | undefined;
   selectedPlace: Place | null;
   selectedDay: SelectTripDay;
   tripDaySchedule: TripDaySchedule[];
@@ -26,14 +26,18 @@ const libraries: ("places")[] = ["places"];
 
 export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace, setShowTimePop, tripDaySchedule, setTripDaySchedule }: MapProps) {
 
+  if (!countryData) return;
+
   // redux 使用Dispatch
   const dispatch = useDispatch();
 
+  const [activeCountry, setActiveCountry] = useState<Country>(countryData[0]);
+
   // 取得此行程countryData
-  const defaultCenter = countryData
-    ? { lat: countryData.lat, lng: countryData.lng }
+  const defaultCenter = activeCountry
+    ? { lat: countryData[0].lat, lng: countryData[0].lng }
     : { lat: 25.033964, lng: 121.564468 }; // 台北101
-  const countryCode = countryData !== undefined ? countryData.countryCode : "TW";
+  const countryCode = countryData !== undefined ? countryData[0].countryCode : "TW";
 
   // 初始化載入google map
   const { isLoaded, loadError } = useJsApiLoader({
@@ -61,12 +65,16 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   }, [selectedDay, tripDaySchedule])
 
   useEffect(() => {
-
     if (!isLoaded || !inputRef.current) return;
 
+    // 清除舊的 listener 避免重複綁定（如果有）
+    if (autocompleteRef.current) {
+      google.maps.event.clearInstanceListeners(autocompleteRef.current);
+    }
+
     autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-      fields: ['place_id'], // 僅取 place_id，詳細資訊之後用 getDetails()
-      componentRestrictions: { country: countryCode },
+      fields: ['place_id'],
+      componentRestrictions: { country: activeCountry.countryCode },
     });
 
     const dummyDiv = document.createElement('div');
@@ -78,7 +86,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
       if (!placeId || !placesServiceRef.current) return;
 
-      // 取得景點詳細資料
       placesServiceRef.current.getDetails(
         {
           placeId,
@@ -93,7 +100,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             setMapCenter(location);
             const id = uuidv4();
             setSelectedPlace({
-              id: id,
+              id,
               place_id: placeId,
               name: result.name,
               address: result.formatted_address,
@@ -106,11 +113,12 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }
       );
     });
-  }, [isLoaded]);
+  }, [isLoaded, activeCountry.countryCode]);
 
   // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
-    if (!isLoaded) return; // 新增這行
+    if (!isLoaded) return;
+
     const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
     if (!currentDay) return;
 
@@ -119,10 +127,6 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         const origin = [{ placeId: item.fromAttractionPlaceId }];
         const destination = [{ placeId: item.toAttractionPlaceId }];
         const modes = ["DRIVING", "WALKING", "TRANSIT"] as const;
-        // console.log("origin", origin);
-        // console.log("destination", destination);
-        // console.log("place_id from", item.fromAttractionPlaceId);
-        // console.log("place_id to", item.toAttractionPlaceId);
 
         modes.forEach((mode) => {
           const service = new google.maps.DistanceMatrixService();
@@ -133,37 +137,46 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               travelMode: mode as google.maps.TravelMode,
             },
             (response, status) => {
-              // console.log(response);
-              // console.log(status);
+              const element = response?.rows?.[0]?.elements?.[0];
 
-              if (status === 'OK' && response && response.rows[0].elements[0].status === 'OK') {
-                const element = response.rows[0].elements[0];
-                const duration = element.duration.value;
-                const distance = element.distance.value;
+              setTripDaySchedule((prev) =>
+                prev.map((day) => {
+                  if (day.id !== selectedDay.id) return day;
 
-                setTripDaySchedule((prev) =>
-                  prev.map((day) => {
-                    if (day.id !== selectedDay.id) return day;
+                  const updatedTransports = day.transportData.map((t) => {
+                    if (t.id !== item.id) return t;
 
-                    const updatedTransports = day.transportData.map((t) => {
-                      if (t.id !== item.id) return t;
-                      const updatedOptions = [...(t.modeOption || [])];
+                    const updatedOptions = [...(t.modeOption || [])];
+                    const alreadyExists = updatedOptions.some((opt) => opt.mode === mode);
+                    if (alreadyExists) return t;
 
-                      updatedOptions.push({ mode, duration, distance });
+                    if (status === "OK" && element && element.status === "OK") {
+                      updatedOptions.push({
+                        mode,
+                        duration: element.duration.value,
+                        distance: element.distance.value,
+                      });
+                    } else {
+                      // 記錄無法查詢的交通資料（例如跨國）
+                      updatedOptions.push({
+                        mode,
+                        duration: undefined,
+                        distance: undefined,
+                      });
+                    }
 
-                      return { ...t, modeOption: updatedOptions };
-                    });
+                    return { ...t, modeOption: updatedOptions };
+                  });
 
-                    return { ...day, transportData: updatedTransports };
-                  })
-                );
-              }
+                  return { ...day, transportData: updatedTransports };
+                })
+              );
             }
           );
         });
       }
     });
-  }, [selectedDay.id, tripDaySchedule]);
+  }, [selectedDay.id, tripDaySchedule, isLoaded]);
 
   // 縣市目前選擇天數的行程路線渲染
   useEffect(() => {
@@ -202,10 +215,13 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         optimizeWaypoints: false, // 是否最佳化路線
       },
       (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result) {
+        if (status === "OK" && result) {
           setDirectionsResult(result);
+        } else if (status === "ZERO_RESULTS") {
+          console.warn("無法取得路線（ZERO_RESULTS）：這兩點之間可能沒有可行的路線。");
+          setDirectionsResult(null); // 可選：清空既有結果
         } else {
-          console.error('Failed to fetch directions:', status);
+          console.error("Failed to fetch directions:", status);
         }
       }
     );
@@ -306,7 +322,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   return (
     <div className='relative w-full h-full'>
       {/* 搜尋列（固定在畫面上方） */}
-      <div className='flex justify-between absolute top-3 left-3 w-[90%] h-12 px-5 rounded-full z-100 bg-mywhite-100'>
+      <div className='flex justify-between absolute top-3 left-3 w-[90%] h-12 px-5 rounded-full z-100 bg-mywhite-100 items-center'>
         <input
           ref={inputRef}
           type="text"
@@ -317,64 +333,87 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
           {/* <IoSearchSharp className='w-6 h-10' /> */}
           <RxCross2 className='w-6 h-10 cursor-pointer' onClick={() => closeAttractionData()} />
         </div>
+        <select
+          value={activeCountry.countryCode}
+          onChange={(e) => {
+            const selected = countryData.find((c) => c.countryCode === e.target.value);
+            if (selected) {
+              setActiveCountry(selected);
+              setMapCenter({ lat: selected.lat, lng: selected.lng });
+            }
+          }}
+          className=" h-full p-2 rounded"
+        >
+          {countryData.map((country) => (
+            <option key={country.countryCode} value={country.countryCode}>
+              {country.countryName}
+            </option>
+          ))}
+        </select>
       </div>
       {/* 地點資訊卡（點選後才出現） */}
       {selectedPlace && (
         <div
           className='absolute bottom-3 left-3 w-60 md:w-80 h-fit flex flex-col bg-mywhite-100 rounded-[8px] z-10 shadow-[0_2px_6px_rgba(0,0,0,0.1)]'
         >
-          {selectedPlace?.photos && selectedPlace.photos.length > 0 && selectedPlace.photos[0] && (
-            <div className='relative w-full h-20 md:h-40 rounded-t-[8px] overflow-hidden'>
+          <div className='relative w-full h-full'>
+            <div className='absolute w-fit h-fit right-2 top-2 z-20 rounded-full bg-mywhite-50'>
               <RxCross2
                 onClick={closeAttractionData}
-                className='absolute right-2 top-2 z-20 w-6 h-6 rounded-full bg-mywhite-50'
-              />
-              <img
-                src={selectedPlace.photos[0].getUrl({ maxWidth: 1000, maxHeight: 350 })}
-                alt="地點照片"
-                className='w-full h-full object-cover'
-                referrerPolicy="no-referrer"
+                className=' w-6 h-6 '
               />
             </div>
-          )}
-          <div className='p-2 md:p-3'>
-            <div className='w-full h-fit text-lg-700 break-words'>{selectedPlace.name}</div>
-            <div className='w-full h-fit md:mb-2 text-sm-400 md:text-base-400 break-words'>{selectedPlace.address}</div>
-            {selectedPlace.rating && <div className='w-full h-fit mb-1 text-sm-400 md:text-base-400  break-words'>⭐ 評分：{selectedPlace.rating}</div>}
-            {selectedPlace.opening_hours?.weekday_text && selectedPlace.opening_hours?.weekday_text?.length > 0 && (
-              <div className='w-full'>
-                <div className='mb-1'>
-                  <p className='text-sm-400 md:text-base-400'>🕒 營業時間：</p>
-                </div>
-                <ul className='pl-6 h-10 md:h-30 m-0 overflow-y-scroll'>
-                  {selectedPlace.opening_hours.weekday_text.map((text: string, idx: number) => (
-                    <li key={idx} className='text-sm mb-1'>{text}</li>
-                  ))}
-                </ul>
+            {selectedPlace?.photos && selectedPlace.photos.length > 0 && selectedPlace.photos[0] && (
+              <div className='relative w-full h-20 md:h-40 rounded-t-[8px] overflow-hidden'>
+
+                <img
+                  src={selectedPlace.photos[0].getUrl() ? selectedPlace.photos[0].getUrl({ maxWidth: 1000, maxHeight: 350 }) : "/noPicture.png"}
+                  alt="/noPicture.png"
+                  className='w-full h-full object-cover'
+                  referrerPolicy="no-referrer"
+                />
               </div>
             )}
-            <button
-              className='mt-3 w-full px-5 py-2 bg-myblue-400 text-base-700 text-primary-300 rounded-md cursor-pointer'
-              onClick={() => {
-                if (!selectedDay || selectedDay.date === null) return;
+            <div className='p-2 md:p-3'>
+              <div className='w-full h-fit text-lg-700 break-words'>{selectedPlace.name}</div>
+              <div className='w-full h-fit md:mb-2 text-sm-400 md:text-base-400 break-words'>{selectedPlace.address}</div>
+              {selectedPlace.rating && <div className='w-full h-fit mb-1 text-sm-400 md:text-base-400  break-words'>⭐ 評分：{selectedPlace.rating}</div>}
+              {selectedPlace.opening_hours?.weekday_text && selectedPlace.opening_hours?.weekday_text?.length > 0 && (
+                <div className='w-full'>
+                  <div className='mb-1'>
+                    <p className='text-sm-400 md:text-base-400'>🕒 營業時間：</p>
+                  </div>
+                  <ul className='pl-6 h-10 md:h-30 m-0 overflow-y-scroll'>
+                    {selectedPlace.opening_hours.weekday_text.map((text: string, idx: number) => (
+                      <li key={idx} className='text-sm mb-1'>{text}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <button
+                className='mt-3 w-full px-5 py-2 bg-myblue-400 text-base-700 text-primary-300 rounded-md cursor-pointer'
+                onClick={() => {
+                  if (!selectedDay || selectedDay.date === null) return;
 
-                const newItem = {
-                  id: selectedPlace.id,
-                  place_id: selectedPlace.place_id,
-                  name: selectedPlace.name || '',
-                  formatted_address: selectedPlace.address || '',
-                  lat: selectedPlace.location.lat,
-                  lng: selectedPlace.location.lng,
-                  photo: selectedPlace.photos?.[0]?.getUrl() || '',
-                };
-                setPendingPlace(newItem);
-                // setSelectedPlace(null); // 清除選擇，避免重複加
-                setShowTimePop(true);
-              }}
-            >
-              加入旅程
-            </button>
+                  const newItem = {
+                    id: selectedPlace.id,
+                    place_id: selectedPlace.place_id,
+                    name: selectedPlace.name || '',
+                    formatted_address: selectedPlace.address || '',
+                    lat: selectedPlace.location.lat,
+                    lng: selectedPlace.location.lng,
+                    photo: selectedPlace.photos?.[0]?.getUrl() || '',
+                  };
+                  setPendingPlace(newItem);
+                  // setSelectedPlace(null); // 清除選擇，避免重複加
+                  setShowTimePop(true);
+                }}
+              >
+                加入旅程
+              </button>
+            </div>
           </div>
+
         </div>
       )}
       {/* 地圖本體 */}

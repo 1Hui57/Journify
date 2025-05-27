@@ -25,10 +25,16 @@ interface Trip {
     isPublic: boolean;
     createAt: Timestamp;
     updateAt: Timestamp;
-    tripCountry: string;
+    tripCountry: Country[];
 }
 interface HomeTripCardProps {
     item: Trip
+}
+interface Country {
+    countryCode: string;
+    countryName: string;
+    lat: number | null;
+    lng: number | null;
 }
 export default function HomeTripCard({ item }: HomeTripCardProps) {
     // 計算天數
@@ -55,12 +61,14 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
 
     return (
         <div className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
-            {item.tripCountry === "" ?
-                <></>
-                : <div className='absolute top-3 left-3 w-fit h-fit text-mywhite-100 flex items-end'>
-                    <IoLocationOutline className='w-7 h-6 mr-1' />
-                    <p className='text-base-500 line-clamp-1'>{item.tripCountry}</p>
-                </div>}
+            <div className='absolute top-3 left-3 w-fit h-fit text-mywhite-100 flex items-end'>
+                <IoLocationOutline className='w-7 h-6 mr-1' />
+                {Array.isArray(item.tripCountry) &&
+                    item.tripCountry.map((country, index) => (
+                        <div key={index} className='mr-2'><p className='text-base-500'>{country.countryName}</p></div>
+                        
+                    ))}
+            </div>
             <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-3xl object-cover" />
             <div className="w-full h-fit pl-2 pr-2 pt-1 flex flex-col gap-1">
                 <p className="text-myblue-800 text-base-700 font-bold line-clamp-1">{item.tripName}</p>
@@ -68,7 +76,7 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
                     <p className="text-base-400 text-myblue-300">{`${tripDays} 天`}</p>
                     <p className="text-base-400 text-myblue-300">最後更新:{formatted}</p>
                 </div>
-                
+
                 <div className="w-full h-fit flex justify-between items-center text-myblue-800">
                     <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由 匿名 建立</p>
                     <div className="relative flex-grow w-fit flex justify-end">
