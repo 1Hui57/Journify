@@ -1,12 +1,7 @@
 'use client'
+import { Country } from "@/app/type/trip";
 import React, { useEffect, useState } from "react";
 
-interface Country {
-  countryCode: string;
-  countryName: string;
-  lat: number |null;
-  lng: number |null;
-}
 
 interface CountrySelectProps {
   selectedCountries: Country[];

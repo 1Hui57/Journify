@@ -6,6 +6,7 @@ import { serverTimestamp, setDoc, doc, FieldValue } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import CountrySelect from "./CountrySelect";
+import { Country } from "@/app/type/trip";
 
 interface CreateTripProps {
     userId: string | undefined;
@@ -25,12 +26,7 @@ interface Trip {
     createAt: FieldValue;
     updateAt: FieldValue;
 }
-interface Country {
-    countryCode: string;
-    countryName: string;
-    lat: number| null;
-    lng: number|null;
-}
+
 export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
     const [selected, setSelected] = useState<DateRange | undefined>();

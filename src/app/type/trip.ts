@@ -9,7 +9,7 @@ export interface Trip {
   person: Number;
   tripTime: TripTime;
   isPublic: boolean;
-  tripCountry: string;
+  tripCountry: Country[];
   createAt: Timestamp;
   updateAt: Timestamp;
   tripDaySchedule?: TripDaySchedule[] | null;
@@ -58,7 +58,7 @@ export interface TripTransport {
   toAttractionId: string; //下面景點的id(非place_id)
   fromAttractionPlaceId: string; //上面景點的place_id
   toAttractionPlaceId: string; //上面景點的place_id
-  selectedMode: string; //預設為大眾運輸
+  selectedMode: string; //預設為開車
   modeOption?: TransportMode[];
   customDuration: number | null; // 使用者輸入的持續時間
   note?: string;

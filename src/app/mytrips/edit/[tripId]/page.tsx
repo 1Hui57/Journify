@@ -34,7 +34,7 @@ export default function TripEditPage() {
     const user = auth.currentUser;
     const userId = user?.uid;
     const [countries, setCountries] = useState<Country[]>([]);
-    const [countryData, setCountryData] = useState<Country>();
+    const [countryData, setCountryData] = useState<Country[]>();
 
     // 取得此筆旅程資料
     const { tripId } = useParams();
@@ -129,11 +129,11 @@ export default function TripEditPage() {
     useEffect(() => {
         if (!trip || countries.length === 0) return;
 
-        const matchedCountry = countries.find(
-            (item) => item.countryName === trip.tripCountry
-        );
+        // const matchedCountry = countries.map(
+        //     (item) => item.countryName === trip.tripCountry
+        // );
 
-        setCountryData(matchedCountry);
+        setCountryData(trip.tripCountry);
     }, [trip, countries]);
 
     // 當三樣關鍵資料都存在後才解除 loading
@@ -246,7 +246,7 @@ export default function TripEditPage() {
                         fromAttractionPlaceId: from.place_id,
                         toAttractionPlaceId: to.place_id,
                         customDuration: 0,
-                        selectedMode: "TRANSIT",
+                        selectedMode: "DRIVING",
                         note: ''
                     });
                 }
