@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { serverTimestamp, setDoc, doc, FieldValue  } from "firebase/firestore";
+import { serverTimestamp, setDoc, doc, FieldValue } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import CountrySelect from "./CountrySelect";
@@ -103,7 +103,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
     // 建立旅程，寫入資料庫，進入旅程編輯頁
     async function handleClick() {
-        if (!tripName || !tripPerson || !tripTime) {
+        if (!tripName || !tripPerson || !tripTime || !tripCountry) {
             alert("請輸入旅程資訊！");
             return;
         }
@@ -155,7 +155,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
                 <input type="text" placeholder="輸入旅程名稱" value={tripName} onChange={(e) => { setTripName(e.target.value) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
-                <p className="text-myblue-600 font-light text-md">國家 ( 選填 ) </p>
+                <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
                 <CountrySelect setTripCountry={setTripCountry} />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                 <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
