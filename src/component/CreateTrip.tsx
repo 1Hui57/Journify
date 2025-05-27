@@ -21,9 +21,15 @@ interface Trip {
     person: number;
     tripTime: TripTime;
     isPublic: boolean;
-    tripCountry: string;
+    tripCountry: Country[];
     createAt: FieldValue;
     updateAt: FieldValue;
+}
+interface Country {
+    countryCode: string;
+    countryName: string;
+    lat: number| null;
+    lng: number|null;
 }
 export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
@@ -34,7 +40,8 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
     const [tripName, setTripName] = useState<string>("");
     const [tripPerson, setTripPerson] = useState<number | undefined>();
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
-    const [tripCountry, setTripCountry] = useState<string>("");
+    // const [tripCountry, setTripCountry] = useState<string>("");
+    const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
 
     // 人數input規則
     const personInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +110,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
 
     // 建立旅程，寫入資料庫，進入旅程編輯頁
     async function handleClick() {
-        if (!tripName || !tripPerson || !tripTime || !tripCountry) {
+        if (!tripName || !tripPerson || !tripTime || selectedCountries.length === 0) {
             alert("請輸入旅程資訊！");
             return;
         }
@@ -119,7 +126,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             person: Number(tripPerson),
             tripTime: tripTime,
             isPublic: false,
-            tripCountry: tripCountry,
+            tripCountry: selectedCountries,
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
         };
@@ -127,7 +134,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             ...newTrip,
             userId: userId,
             tripId: tripId,
-            tripCountry: tripCountry
+            tripCountry: selectedCountries
         }
 
         try {
@@ -156,7 +163,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
-                <CountrySelect setTripCountry={setTripCountry} />
+                <CountrySelect setSelectedCountries={setSelectedCountries} selectedCountries={selectedCountries}/>
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                 <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
                     value={deteText} />
