@@ -114,7 +114,8 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 算景點的交通時間並新增至景點資訊中
   useEffect(() => {
-    if (!isLoaded) return; // 新增這行
+    if (!isLoaded) return;
+
     const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
     if (!currentDay) return;
 
@@ -133,35 +134,46 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               travelMode: mode as google.maps.TravelMode,
             },
             (response, status) => {
+              const element = response?.rows?.[0]?.elements?.[0];
 
-              if (status === 'OK' && response && response.rows[0].elements[0].status === 'OK') {
-                const element = response.rows[0].elements[0];
-                const duration = element.duration.value;
-                const distance = element.distance.value;
+              setTripDaySchedule((prev) =>
+                prev.map((day) => {
+                  if (day.id !== selectedDay.id) return day;
 
-                setTripDaySchedule((prev) =>
-                  prev.map((day) => {
-                    if (day.id !== selectedDay.id) return day;
+                  const updatedTransports = day.transportData.map((t) => {
+                    if (t.id !== item.id) return t;
 
-                    const updatedTransports = day.transportData.map((t) => {
-                      if (t.id !== item.id) return t;
-                      const updatedOptions = [...(t.modeOption || [])];
+                    const updatedOptions = [...(t.modeOption || [])];
+                    const alreadyExists = updatedOptions.some((opt) => opt.mode === mode);
+                    if (alreadyExists) return t;
 
-                      updatedOptions.push({ mode, duration, distance });
+                    if (status === "OK" && element && element.status === "OK") {
+                      updatedOptions.push({
+                        mode,
+                        duration: element.duration.value,
+                        distance: element.distance.value,
+                      });
+                    } else {
+                      // 記錄無法查詢的交通資料（例如跨國）
+                      updatedOptions.push({
+                        mode,
+                        duration: undefined,
+                        distance: undefined,
+                      });
+                    }
 
-                      return { ...t, modeOption: updatedOptions };
-                    });
+                    return { ...t, modeOption: updatedOptions };
+                  });
 
-                    return { ...day, transportData: updatedTransports };
-                  })
-                );
-              }
+                  return { ...day, transportData: updatedTransports };
+                })
+              );
             }
           );
         });
       }
     });
-  }, [selectedDay.id, tripDaySchedule]);
+  }, [selectedDay.id, tripDaySchedule, isLoaded]);
 
   // 縣市目前選擇天數的行程路線渲染
   useEffect(() => {
@@ -200,10 +212,13 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         optimizeWaypoints: false, // 是否最佳化路線
       },
       (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result) {
+        if (status === "OK" && result) {
           setDirectionsResult(result);
+        } else if (status === "ZERO_RESULTS") {
+          console.warn("無法取得路線（ZERO_RESULTS）：這兩點之間可能沒有可行的路線。");
+          setDirectionsResult(null); // 可選：清空既有結果
         } else {
-          console.error('Failed to fetch directions:', status);
+          console.error("Failed to fetch directions:", status);
         }
       }
     );
