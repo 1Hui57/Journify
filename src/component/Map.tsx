@@ -46,7 +46,9 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     language: 'zh-TW',
   });
 
-  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null); const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+  const mapRef = useRef<google.maps.Map | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
@@ -233,6 +235,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   // 點擊地圖景點出現景點資訊
   const handleMapLoad = (map: google.maps.Map) => {
     setMapInstance(map);
+    mapRef.current = map;
     // 如果placesServiceRef尚未初始化，則在此綁訂在map上
     if (!placesServiceRef.current) {
       placesServiceRef.current = new window.google.maps.places.PlacesService(map);
@@ -346,36 +349,48 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   };
 
   // 點擊渲染的圖標顯示資訊小卡
-  const clickKeywordSearchResult = (place_id:string) =>{
+  const clickKeywordSearchResult = (place_id: string) => {
     placesServiceRef.current?.getDetails(
-          {
-            placeId: place_id,
-            fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
-          },
-          (place, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-              const location = {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng(),
-              };
-              const id = uuidv4();
-              setSelectedPlace({
-                id: id,
-                place_id: place_id,
-                name: place.name,
-                address: place.formatted_address,
-                location,
-                rating: place.rating,
-                photos: place.photos,
-                opening_hours: place.opening_hours,
-              });
-              if (inputRef.current && place.name) {
-                inputRef.current.value = place.name;
-              }
-            }
+      {
+        placeId: place_id,
+        fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
+      },
+      (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
+          const location = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          };
+          const id = uuidv4();
+          setSelectedPlace({
+            id: id,
+            place_id: place_id,
+            name: place.name,
+            address: place.formatted_address,
+            location,
+            rating: place.rating,
+            photos: place.photos,
+            opening_hours: place.opening_hours,
+          });
+          if (inputRef.current && place.name) {
+            inputRef.current.value = place.name;
           }
-        );
+        }
+      }
+    );
   }
+
+  // 更新地圖中心點
+  const mapHandleIdle = () => {
+    if (mapRef.current) {
+      const center = mapRef.current.getCenter();
+      if (center) {
+        const lat = center.lat();
+        const lng = center.lng();
+        setMapCenter({ lat, lng });
+      }
+    }
+  };
 
   if (loadError) return <div>地圖載入錯誤</div>;
   if (!isLoaded) return <div>地圖載入中...</div>;
@@ -394,8 +409,8 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
           }}
         />
         <div className='flex items-center gap-2'>
-          <IoSearchSharp className='w-6 h-10 cursor-pointer' onClick={()=>handleKeywordSearch()}/>
-          <RxCross2 className='w-6 h-10 cursor-pointer' onClick={() => {closeAttractionData();setSearchResults(null);}} />
+          <IoSearchSharp className='w-6 h-10 cursor-pointer' onClick={() => handleKeywordSearch()} />
+          <RxCross2 className='w-6 h-10 cursor-pointer' onClick={() => { closeAttractionData(); setSearchResults(null); }} />
           <select
             value={activeCountry.countryCode}
             onChange={(e) => {
@@ -487,6 +502,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         center={mapCenter}
         zoom={14}
         onLoad={handleMapLoad}
+        onIdle={mapHandleIdle}
         options={{
           mapTypeControl: false,
           fullscreenControl: false,
@@ -501,7 +517,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               lat: place.geometry?.location?.lat() || 0,
               lng: place.geometry?.location?.lng() || 0,
             }}
-          onClick={() => {place.place_id && clickKeywordSearchResult(place.place_id)}}
+            onClick={() => { place.place_id && clickKeywordSearchResult(place.place_id) }}
           />
         ))}
         {directionsResult && (
