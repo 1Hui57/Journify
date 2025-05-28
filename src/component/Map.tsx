@@ -398,7 +398,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   return (
     <div className='relative w-full h-full'>
       {/* 搜尋列（固定在畫面上方） */}
-      <div className='flex justify-between absolute top-3 left-3 w-[90%] h-12 px-5 rounded-full z-100 bg-mywhite-100 items-center'>
+      <div className='flex justify-between absolute top-3 left-3 w-[90%] h-12 px-5 rounded-full z-100 bg-mywhite-100 items-center shadow-md'>
         <input
           ref={inputRef}
           type="text"
@@ -509,17 +509,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
           streetViewControl: false,
         }}
       >
-        {selectedPlace && <Marker position={selectedPlace.location}/>}
-        {searchResults && searchResults.map((place, index) => (
-          <Marker
-            key={place.place_id || index}
-            position={{
-              lat: place.geometry?.location?.lat() || 0,
-              lng: place.geometry?.location?.lng() || 0,
-            }}
-            onClick={() => { place.place_id && clickKeywordSearchResult(place.place_id) }}
-          />
-        ))}
+        {selectedPlace && <Marker position={selectedPlace.location} />}
         {directionsResult && (
           <DirectionsRenderer
             directions={directionsResult}
