@@ -271,3 +271,12 @@ button {
   scrollbar-width: none; /* Firefox */
 }
 
+@media (max-width: 768px) {
+  .panel-group > :first-child {
+    order: 2; /* 手機尺寸時，第一個 Panel (編輯區) 放後面 */
+  }
+  .panel-group > :nth-child(2) {
+    order: 1; /* 第二個 Panel (地圖) 放前面 */
+  }
+}
+

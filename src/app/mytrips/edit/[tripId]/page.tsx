@@ -16,6 +16,9 @@ import TimeComponent from '@/component/TimeComponent';
 import TripAttractionWrappwer from '@/component/TripAttractionWrapper';
 import NoteComponent from '@/component/NoteComponent';
 
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useMediaPredicate } from "react-media-hook";
+
 // redux
 import { useSelector } from "react-redux";
 import { TripEditRootState } from "@/store/tripEditStore";
@@ -58,6 +61,9 @@ export default function TripEditPage() {
 
     // 儲存旅程資料
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+
+    // 監聽是不是手機尺寸
+    const isMobile = useMediaPredicate('(max-width: 768px)')
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -426,50 +432,58 @@ export default function TripEditPage() {
             {showEditTimePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
                 <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime} />
             </div>}
-            <div className='h-70 md:w-[350px] flex-none md:h-full'>
-                <div className='w-full h-full bg-mywhite-100 flex flex-col'>
-                    <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between shadow-[0_0_8px_rgba(0,0,0,0.1)]'>
-                        <div className='w-fit text-lg-700 md:text-2xl-700 line-clamp-1'>{trip?.tripName}</div>
-                        {trip && <div className='w-fit text-base-400'>{formatteDate(trip?.tripTime.tripFrom)}~{formatteDate(trip?.tripTime.tripTo)}</div>}
-                    </div>
-                    <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >
-                        <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollLeft}><FaAngleLeft /></div>
-                        <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
-                            {tripDaySchedule.map((item: TripDaySchedule) => {
-                                return (
-                                    <div key={item.id}
-                                        onClick={() => selectDate(item.id, item.rawDate)}
-                                        className={item.id === selectedDay.id ?
-                                            'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
-                                            : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
-                                    >
-                                        <p>{item.date}</p>
-                                        <p>第{item.number}天</p>
-                                    </div>
-                                )
-                            })}
-                            <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>
-                                <IoMdAdd className='w-6 h-6 m-auto' />
-                                {/* <p >新增天數</p> */}
-                            </div>
+
+            {/* 主內容 PanelGroup */}
+            <PanelGroup direction={isMobile ? "vertical" : "horizontal"} className={`w-full h-full flex ${isMobile ? "flex-col-reverse" : "flex-row"}`}>
+                <Panel defaultSize={isMobile ? 50 : 35} minSize={35}>
+                    <div className='w-full h-full bg-mywhite-100 flex flex-col'>
+                        <div className='w-full h-12 md:h-16 px-5 text-myzinc-800 flex items-center justify-between shadow-[0_0_8px_rgba(0,0,0,0.1)]'>
+                            <div className='w-fit text-lg-700 md:text-2xl-700 line-clamp-1'>{trip?.tripName}</div>
+                            {trip && <div className='w-fit text-base-400'>{formatteDate(trip?.tripTime.tripFrom)}~{formatteDate(trip?.tripTime.tripTo)}</div>}
                         </div>
-                        <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
+                        <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >
+                            <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollLeft}><FaAngleLeft /></div>
+                            <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
+                                {tripDaySchedule.map((item: TripDaySchedule) => {
+                                    return (
+                                        <div key={item.id}
+                                            onClick={() => selectDate(item.id, item.rawDate)}
+                                            className={item.id === selectedDay.id ?
+                                                'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
+                                                : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
+                                        >
+                                            <p>{item.date}</p>
+                                            <p>第{item.number}天</p>
+                                        </div>
+                                    )
+                                })}
+                                <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>
+                                    <IoMdAdd className='w-6 h-6 m-auto' />
+                                    {/* <p >新增天數</p> */}
+                                </div>
+                            </div>
+                            <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
+                        </div>
+                        <div id='dayContent' className='w-full flex-1 overflow-y-scroll pb-12'>
+                            {tripDaySchedule
+                                .filter(item => item.id === selectedDay.id)
+                                .map(item => (
+                                    <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
+                                        selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
+                                ))}
+                        </div>
                     </div>
-                    <div id='dayContent' className='w-full flex-1 overflow-y-scroll pb-12'>
-                        {tripDaySchedule
-                            .filter(item => item.id === selectedDay.id)
-                            .map(item => (
-                                <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                                    selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
-                            ))}
-                    </div>
-                </div>
-            </div>
-            <div className='w-full h-full flex-1' >
-                <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
-                    selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                    setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} />
-            </div>
+                </Panel>
+                {/* 中間可拖拉分隔線 */}
+                <PanelResizeHandle className={
+                    isMobile? "h-[6px] w-full bg-gray-300 cursor-ns-resize": "w-[6px] bg-gray-300 cursor-ew-resize"} />
+
+                <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
+                    <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
+                        selectedDay={selectedDay} setPendingPlace={setPendingPlace}
+                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} />
+                </Panel>
+            </PanelGroup>
             <div
                 onClick={() => {
                     if (!userId || !tripId || typeof tripId !== "string" || !trip) return;
