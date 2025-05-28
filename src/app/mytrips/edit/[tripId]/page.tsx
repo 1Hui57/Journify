@@ -476,7 +476,7 @@ export default function TripEditPage() {
                 </Panel>
                 {/* 中間可拖拉分隔線 */}
                 <PanelResizeHandle className={
-                    isMobile? "h-[6px] w-full bg-gray-300 cursor-ns-resize": "w-[6px] bg-gray-300 cursor-ew-resize"} />
+                    isMobile? "h-[12px] w-full bg-gray-300 cursor-ns-resize active:bg-primary-600": "w-[6px] bg-gray-300 cursor-ew-resize hover:bg-primary-600"} />
 
                 <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
                     <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
