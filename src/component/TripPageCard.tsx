@@ -33,7 +33,7 @@ export default function TripPageCard({ tripPerson, deleteTrip, userId, item, upd
         <div onClick={()=>router.push(`/mytrips/edit/${item.id}`)} className="bg-mywhite-100 h-50 w-full rounded-md overflow-hidden shadow-md cursor-pointer transition-transform duration-200 hover:scale-105">
             <div className="relative w-full h-[70%] text-myzinc-900">
                 <img src="/Osaka.jpg" className="w-full h-full object-cover" />
-                <IoIosMore className="absolute top-0 right-1.5 w-6 h-7" onMouseEnter={() => setIsMoreHover(true)} onMouseLeave={() => setIsMoreHover(false)} />
+                <IoIosMore className="absolute top-0 right-1.5 w-6 h-7"onClick={(e)=>e.stopPropagation()} onMouseEnter={() => {setIsMoreHover(true)}} onMouseLeave={() => setIsMoreHover(false)} />
                 {isMoreHover &&
                     <div className="absolute top-6 right-0 w-24 h-fit px-2 py-3 flex flex-col gap-2 rounded-md justify-center text-myzinc-400 bg-mywhite-100" onMouseEnter={() => setIsMoreHover(true)} onMouseLeave={() => setIsMoreHover(false)}>
                         <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100">更新</div>
