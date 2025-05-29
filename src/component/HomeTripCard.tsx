@@ -1,4 +1,5 @@
 'use client'
+import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import SearchBar from "@/component/SearchBar";
 import { query, collection, onSnapshot, where, doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -19,6 +20,9 @@ interface HomeTripCardProps {
 }
 
 export default function HomeTripCard({ item }: HomeTripCardProps) {
+    
+    const router = useRouter();
+
     // 計算天數
     const tripStartDate = item.tripTime.tripFrom.toDate();
     const tripEndDate = item.tripTime.tripTo.toDate();
@@ -42,7 +46,8 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
     const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
 
     return (
-        <div className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
+        <div onClick={()=>{router.push(`/sharing/${item.tripId}`)}}
+        className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
             <div className='absolute top-3 left-3 w-fit h-fit text-mywhite-100 flex items-end'>
                 <IoLocationOutline className='w-7 h-6 mr-1' />
                 {Array.isArray(item.tripCountry) &&
