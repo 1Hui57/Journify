@@ -14,6 +14,17 @@ export interface Trip {
   updateAt: Timestamp;
   tripDaySchedule?: TripDaySchedule[] | null;
 }
+export interface PublicTrip {
+    userId: string
+    tripId: string;
+    tripName: string;
+    person: number;
+    tripTime: TripTime;
+    isPublic: boolean;
+    tripCountry: Country[];
+    createAt: Timestamp;
+    updateAt: Timestamp;
+}
 export interface Country {
   countryCode: string;
   countryName: string;

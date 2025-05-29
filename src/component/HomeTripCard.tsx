@@ -11,31 +11,13 @@ import { AiFillHeart } from "react-icons/ai"; //實心愛心
 import { BsBookmark } from "react-icons/bs"; //線條儲存
 import { BsBookmarkFill } from "react-icons/bs"; //實心儲存
 import { IoLocationOutline } from "react-icons/io5"; //地圖標示
-import { DiVim } from 'react-icons/di';
-interface TripTime {
-    tripFrom: Timestamp;
-    tripTo: Timestamp;
-}
-interface Trip {
-    userId: string
-    tripId: string;
-    tripName: string;
-    person: number;
-    tripTime: TripTime;
-    isPublic: boolean;
-    createAt: Timestamp;
-    updateAt: Timestamp;
-    tripCountry: Country[];
-}
+import { PublicTrip } from '@/app/type/trip';
+
+
 interface HomeTripCardProps {
-    item: Trip
+    item: PublicTrip;
 }
-interface Country {
-    countryCode: string;
-    countryName: string;
-    lat: number | null;
-    lng: number | null;
-}
+
 export default function HomeTripCard({ item }: HomeTripCardProps) {
     // 計算天數
     const tripStartDate = item.tripTime.tripFrom.toDate();
@@ -48,9 +30,9 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
+            // hour: "2-digit",
+            // minute: "2-digit",
+            // second: "2-digit",
             hour12: false
         });
     } else {
@@ -69,12 +51,12 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
                         
                     ))}
             </div>
-            <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-3xl object-cover" />
+            <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-xl object-cover" />
             <div className="w-full h-fit pl-2 pr-2 pt-1 flex flex-col gap-1">
                 <p className="text-myblue-800 text-base-700 font-bold line-clamp-1">{item.tripName}</p>
                 <div className='w-full h-fit flex justify-between'>
                     <p className="text-base-400 text-myblue-300">{`${tripDays} 天`}</p>
-                    <p className="text-base-400 text-myblue-300">最後更新:{formatted}</p>
+                    <p className="text-base-400 text-myblue-300">更新：{formatted}</p>
                 </div>
 
                 <div className="w-full h-fit flex justify-between items-center text-myblue-800">
