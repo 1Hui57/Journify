@@ -90,7 +90,7 @@ export interface Place {
   address?: string;
   location: Location;
   rating?: number;
-  photos?: google.maps.places.PlacePhoto[];
+  photos?: string|undefined;
   opening_hours?: google.maps.places.PlaceOpeningHours;
 }
 export interface SelectTripDay {
