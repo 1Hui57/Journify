@@ -392,6 +392,11 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     }
   };
 
+  //動態生成圖片url，防止token過期無法顯示圖片
+  const getPhotoUrl = (photo_reference: string) => {
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+  };
+
   if (loadError) return <div>地圖載入錯誤</div>;
   if (!isLoaded) return <div>地圖載入中...</div>;
 
@@ -518,6 +523,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         )}
         {currentDay?.attractionData.map((attraction, index) => (
           <Marker
+            onClick={() => { clickKeywordSearchResult(attraction.place_id) }}
             key={attraction.id || index}
             position={{ lat: attraction.lat, lng: attraction.lng }}
             label={{
