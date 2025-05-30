@@ -515,6 +515,16 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         }}
       >
         {selectedPlace && <Marker position={selectedPlace.location} />}
+        {searchResults && searchResults.map((place, index) => (
+          <Marker
+            key={place.place_id || index}
+            position={{
+              lat: place.geometry?.location?.lat() || 0,
+              lng: place.geometry?.location?.lng() || 0,
+            }}
+          onClick={() => {place.place_id && clickKeywordSearchResult(place.place_id)}}
+          />
+        ))}
         {directionsResult && (
           <DirectionsRenderer
             directions={directionsResult}
