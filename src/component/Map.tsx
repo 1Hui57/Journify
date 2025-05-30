@@ -111,7 +111,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               address: result.formatted_address,
               location,
               rating: result.rating,
-              photos: result.photos,
+              photos: result.photos?.[0]?.getUrl({ maxWidth: 500 }),
               opening_hours: result.opening_hours,
             });
           }
@@ -264,7 +264,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                 address: place.formatted_address,
                 location,
                 rating: place.rating,
-                photos: place.photos,
+                photos: place.photos?.[0]?.getUrl({ maxWidth: 500 }),
                 opening_hours: place.opening_hours,
               });
               if (inputRef.current && place.name) {
@@ -299,7 +299,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             address: place.formatted_address,
             location,
             rating: place.rating,
-            photos: place.photos,
+            photos: place.photos?.[0]?.getUrl({ maxWidth: 500 }),
             opening_hours: place.opening_hours,
           });
           if (inputRef.current && place.name) {
@@ -369,7 +369,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
             address: place.formatted_address,
             location,
             rating: place.rating,
-            photos: place.photos,
+            photos: place.photos?.[0]?.getUrl({ maxWidth: 500 }),
             opening_hours: place.opening_hours,
           });
           if (inputRef.current && place.name) {
@@ -390,6 +390,11 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         setMapCenter({ lat, lng });
       }
     }
+  };
+
+  //動態生成圖片url，防止token過期無法顯示圖片
+  const getPhotoUrl = (photo_reference: string) => {
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
 
   if (loadError) return <div>地圖載入錯誤</div>;
@@ -447,7 +452,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               <div className='relative w-full h-20 md:h-40 rounded-t-[8px] overflow-hidden'>
 
                 <img
-                  src={selectedPlace.photos[0].getUrl() ? selectedPlace.photos[0].getUrl({ maxWidth: 1000, maxHeight: 350 }) : "/noPicture.png"}
+                  src={selectedPlace.photos ? selectedPlace.photos : "/noPicture.png"}
                   alt="/noPicture.png"
                   className='w-full h-full object-cover'
                   referrerPolicy="no-referrer"
@@ -482,7 +487,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
                     formatted_address: selectedPlace.address || '',
                     lat: selectedPlace.location.lat,
                     lng: selectedPlace.location.lng,
-                    photo: selectedPlace.photos?.[0]?.getUrl() || '',
+                    photo: selectedPlace.photos || '',
                   };
                   setPendingPlace(newItem);
                   // setSelectedPlace(null); // 清除選擇，避免重複加
@@ -518,6 +523,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         )}
         {currentDay?.attractionData.map((attraction, index) => (
           <Marker
+            onClick={() => { clickKeywordSearchResult(attraction.place_id) }}
             key={attraction.id || index}
             position={{ lat: attraction.lat, lng: attraction.lng }}
             label={{

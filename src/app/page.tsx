@@ -9,33 +9,13 @@ import { query, collection, onSnapshot, where, doc, setDoc, serverTimestamp } fr
 import { db } from "@/lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import { DiVim } from "react-icons/di";
+import { PublicTrip } from "./type/trip";
 
-interface FirestoreTripTime {
-    tripFrom: Timestamp;
-    tripTo: Timestamp;
-}
 
-interface FirestoreTrip {
-    userId: string
-    tripId: string;
-    tripName: string;
-    person: number;
-    tripTime: FirestoreTripTime;
-    isPublic: boolean;
-    tripCountry: Country[];
-    createAt: Timestamp;
-    updateAt: Timestamp;
-}
-interface Country {
-  countryCode: string;
-  countryName: string;
-  lat: number |null;
-  lng: number |null;
-}
 export default function Home() {
 
     const router = useRouter();
-    const [publicTrips, setPublicTrips] = useState<FirestoreTrip[]>();
+    const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
     const [isLoading, setIsloading] = useState<boolean>(true);
     // 讀取公開的旅程並渲染
     useEffect(() => {
@@ -44,8 +24,8 @@ export default function Home() {
             where("isPublic", "==", true)
         );
         const unsubscribe = onSnapshot(publicTripRef, (snapshot) => {
-            const data: FirestoreTrip[] = snapshot.docs.map((doc) => {
-                const tripData = doc.data() as FirestoreTrip;
+            const data: PublicTrip[] = snapshot.docs.map((doc) => {
+                const tripData = doc.data() as PublicTrip;
                 return {
                     userId: tripData.userId,
                     tripId: tripData.tripId,

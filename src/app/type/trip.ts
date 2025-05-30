@@ -14,6 +14,17 @@ export interface Trip {
   updateAt: Timestamp;
   tripDaySchedule?: TripDaySchedule[] | null;
 }
+export interface PublicTrip {
+    userId: string
+    tripId: string;
+    tripName: string;
+    person: number;
+    tripTime: TripTime;
+    isPublic: boolean;
+    tripCountry: Country[];
+    createAt: Timestamp;
+    updateAt: Timestamp;
+}
 export interface Country {
   countryCode: string;
   countryName: string;
@@ -79,7 +90,7 @@ export interface Place {
   address?: string;
   location: Location;
   rating?: number;
-  photos?: google.maps.places.PlacePhoto[];
+  photos?: string|undefined;
   opening_hours?: google.maps.places.PlaceOpeningHours;
 }
 export interface SelectTripDay {

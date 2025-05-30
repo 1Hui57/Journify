@@ -143,7 +143,7 @@ export default function MyTrips() {
             }
             <div className="w-full h-fit flex flex-col p-10 mb-20">
                 <div className="w-fit h-fit mb-6">
-                    <p className="text-3xl font-bold text-myblue-800">我的旅程</p>
+                    <p className="text-2xl font-bold text-myblue-800">我的旅程</p>
                 </div>
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
