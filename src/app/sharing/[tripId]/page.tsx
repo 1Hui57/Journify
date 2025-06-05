@@ -1,5 +1,6 @@
 'use client'
 import { PublicTrip, SelectTripDay, Trip, TripDaySchedule } from '@/app/type/trip';
+import SharingAttractionWrappwer from '@/component/sharingPageComponent/SharingAttractionWrapper';
 import TripAttractionWrappwer from '@/component/TripAttractionWrapper';
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
@@ -60,6 +61,14 @@ export default function SharingTripPage() {
         fetchTrip();
         setIsloading(false);
     }, [tripId, userId]);
+
+    // 載入旅程資料後呈現第一天的排程
+    useEffect(() => {
+        if (!trip) return;
+        if(trip.tripDaySchedule && trip.tripDaySchedule.length>0){
+            setSelectedDay(trip.tripDaySchedule[0].id);
+        }
+    }, [trip])
 
     const formatteDate = (date: any) => {
         let realDate: Date;
@@ -137,12 +146,12 @@ export default function SharingTripPage() {
                     <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
                 </div>
                 <div id='dayContent' className='w-full flex-1 overflow-y-scroll pb-12'>
-                    {/* {trip&& trip.tripDaySchedule && trip.tripDaySchedule
-                        .filter(item => item.id === selectedDay.id)
+                    {trip && selectedDay && trip.tripDaySchedule && trip.tripDaySchedule
+                        .filter(item => item.id === selectedDay)
                         .map(item => (
-                            <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
-                                selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
-                        ))} */}
+                            <SharingAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} 
+                             />
+                        ))}
                 </div>
             </div>
         </div>
