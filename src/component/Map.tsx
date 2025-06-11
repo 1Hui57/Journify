@@ -18,19 +18,19 @@ interface MapProps {
   selectedPlace: Place | null;
   selectedDay: SelectTripDay;
   tripDaySchedule: TripDaySchedule[];
-  isPhotoAlready:boolean;
+  isPhotoLoading:boolean;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
   setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
   setShowTimePop: React.Dispatch<React.SetStateAction<boolean>>;
   setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
-  setIsPhotoAlready: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsPhotoLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setTrip: React.Dispatch<React.SetStateAction<Trip | undefined>>;
 }
 const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
 export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace,
-  setShowTimePop, tripDaySchedule, setTripDaySchedule, setIsPhotoAlready, trip, setTrip, isPhotoAlready }: MapProps) {
+  setShowTimePop, tripDaySchedule, setTripDaySchedule, setIsPhotoLoading, trip, setTrip, isPhotoLoading }: MapProps) {
 
   if (!countryData) return;
 
@@ -87,9 +87,12 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   };
 
   useEffect(() => {
-    if (!isLoaded || !trip || !trip.tripDaySchedule || !placesServiceRef.current) return;
-    // if (isPhotoAlready) return;
+    // 等到 trip 有值，才開始檢查是否需要跑圖片更新
+  if (!isLoaded || !trip || !placesServiceRef.current) return;
+  if (!isPhotoLoading) return;
+
     const updatePhotos = async () => {
+      console.log("開始更新圖片");
       // 處理每一天的行程
       const tripDaySchedule = trip?.tripDaySchedule;
       if (!tripDaySchedule) return; // 再次防呆
@@ -134,16 +137,17 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         })
       );
 
-      // 更新 trip 內容（你可能需要一個 setTrip 或 setTripDaySchedule）
+      // 更新 trip 內容
       setTrip((prev) => ({
         ...prev!,
         tripDaySchedule: updatedTripDaySchedule,
       }));
-      // setIsPhotoAlready(true);
+      setIsPhotoLoading(false);//圖片更新完成
+      console.log("圖片更新完成");
     };
 
     updatePhotos();
-  }, [isLoaded, trip?.tripDaySchedule, placesServiceRef]);
+  }, [isLoaded, trip, placesServiceRef, isPhotoLoading]);
 
 
 

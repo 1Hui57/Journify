@@ -44,7 +44,7 @@ export default function TripEditPage() {
     const [trip, setTrip] = useState<Trip>();
 
     // 確認所有旅程景點圖片皆未過期
-    const [isPhotoAlready, setIsPhotoAlready] = useState<boolean>(false);
+    const [isPhotoLoading, setIsPhotoLoading] = useState<boolean>(true);
 
     // 旅程的每一天跟目前選擇哪一天
     const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
@@ -67,6 +67,7 @@ export default function TripEditPage() {
 
     // 監聽是不是手機尺寸
     const isMobile = useMediaPredicate('(max-width: 768px)')
+    
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -100,6 +101,7 @@ export default function TripEditPage() {
             const tripData = tripSnap.data() as Trip;
             
             setTrip(tripData);
+            setIsPhotoLoading(true);
         };
 
         fetchTrip();
@@ -150,8 +152,9 @@ export default function TripEditPage() {
 
     // 當三樣關鍵資料都存在後才解除 loading
     useEffect(() => {
-        if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData) {
+        if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData ) {
             setIsloading(false);
+            console.log(tripDaySchedule);
         }
     }, [trip, tripDaySchedule, countries, countryData]);
 
@@ -487,7 +490,7 @@ export default function TripEditPage() {
                 <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
                     <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                         selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoAlready={isPhotoAlready} setIsPhotoAlready={setIsPhotoAlready} trip={trip} setTrip={setTrip}/>
+                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoLoading={isPhotoLoading} setIsPhotoLoading={setIsPhotoLoading} trip={trip} setTrip={setTrip}/>
                 </Panel>
             </PanelGroup>
             <div
