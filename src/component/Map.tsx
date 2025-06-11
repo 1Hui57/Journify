@@ -18,7 +18,7 @@ interface MapProps {
   selectedPlace: Place | null;
   selectedDay: SelectTripDay;
   tripDaySchedule: TripDaySchedule[];
-  isPhotoLoading:boolean;
+  isPhotoLoading: boolean;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
   setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
   setShowTimePop: React.Dispatch<React.SetStateAction<boolean>>;
@@ -88,8 +88,8 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   useEffect(() => {
     // 等到 trip 有值，才開始檢查是否需要跑圖片更新
-  if (!isLoaded || !trip || !placesServiceRef.current) return;
-  if (!isPhotoLoading) return;
+    if (!isLoaded || !trip || !placesServiceRef.current) return;
+    if (!isPhotoLoading) return;
 
     const updatePhotos = async () => {
       console.log("開始更新圖片");
@@ -147,7 +147,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     };
 
     updatePhotos();
-  }, [isLoaded, trip, placesServiceRef, isPhotoLoading]);
+  }, [isLoaded, trip, placesServiceRef.current, isPhotoLoading]);
 
 
 

@@ -67,7 +67,7 @@ export default function TripEditPage() {
 
     // 監聽是不是手機尺寸
     const isMobile = useMediaPredicate('(max-width: 768px)')
-    
+
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -99,7 +99,9 @@ export default function TripEditPage() {
             }
 
             const tripData = tripSnap.data() as Trip;
-            
+            (tripData.tripDaySchedule)?.forEach(day => {
+                day.rawDate = (day.rawDate as unknown as Timestamp).toDate()
+            })
             setTrip(tripData);
             setIsPhotoLoading(true);
         };
@@ -128,7 +130,7 @@ export default function TripEditPage() {
             setSelectedDay({ id: convertTripDaySchedule[0].id, date: convertTripDaySchedule[0].rawDate, });
         } else {
             console.log("根據 tripTime 重新生成或更新行程天數");
-            const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
+            const days = generateTripDays(trip);
             setTripDaySchedule([...days]);
             if (
                 days.length > 0 &&
@@ -152,7 +154,7 @@ export default function TripEditPage() {
 
     // 當三樣關鍵資料都存在後才解除 loading
     useEffect(() => {
-        if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData ) {
+        if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData) {
             setIsloading(false);
             console.log(tripDaySchedule);
         }
@@ -183,13 +185,13 @@ export default function TripEditPage() {
     };
 
     // 計算旅程開始日期至結束日期的每日日期
-    const generateTripDays = (_start: Timestamp, _end: Timestamp): TripDaySchedule[] => {
-        const days: TripDaySchedule[] = tripDaySchedule;
-        const currentDate = _start.toDate();
-        const endDate = _end.toDate();
+    const generateTripDays = (trip: Trip): TripDaySchedule[] => {
+        const days = trip.tripDaySchedule || [];
+        const currentDate = trip.tripTime.tripFrom.toDate();
+        const endDate = trip.tripTime.tripTo.toDate();
         let dayCount = 1;
         while (currentDate <= endDate) {
-            const exists = tripDaySchedule.find((item) => {
+            const exists = days.find((item) => {
                 return item.rawDate.getMonth() === currentDate.getMonth()
                     && item.rawDate.getDate() === currentDate.getDate()
             })
@@ -490,7 +492,7 @@ export default function TripEditPage() {
                 <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
                     <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                         selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoLoading={isPhotoLoading} setIsPhotoLoading={setIsPhotoLoading} trip={trip} setTrip={setTrip}/>
+                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoLoading={isPhotoLoading} setIsPhotoLoading={setIsPhotoLoading} trip={trip} setTrip={setTrip} />
                 </Panel>
             </PanelGroup>
             <div
