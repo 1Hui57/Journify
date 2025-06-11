@@ -6,25 +6,31 @@ import { Timestamp } from 'firebase/firestore';
 import { IoSearchSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
-import { Country, Place, SelectTripDay, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
+import { Country, Place, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
 import { useDispatch, useSelector } from 'react-redux';
 import { TripEditRootState } from '@/store/tripEditStore';
 import { setSelectedAttractionId } from '@/store/tripSlice';
+import { timeStamp } from 'console';
 
 interface MapProps {
+  trip: Trip | undefined;
   countryData: Country[] | undefined;
   selectedPlace: Place | null;
   selectedDay: SelectTripDay;
   tripDaySchedule: TripDaySchedule[];
+  isPhotoAlready:boolean;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
   setPendingPlace: React.Dispatch<React.SetStateAction<TripScheduleItem | null>>;
   setShowTimePop: React.Dispatch<React.SetStateAction<boolean>>;
   setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
+  setIsPhotoAlready: React.Dispatch<React.SetStateAction<boolean>>;
+  setTrip: React.Dispatch<React.SetStateAction<Trip | undefined>>;
 }
 const containerStyle = { width: '100%', height: '100%' };
 const libraries: ("places")[] = ["places"];
 
-export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace, setShowTimePop, tripDaySchedule, setTripDaySchedule }: MapProps) {
+export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace,
+  setShowTimePop, tripDaySchedule, setTripDaySchedule, setIsPhotoAlready, trip, setTrip, isPhotoAlready }: MapProps) {
 
   if (!countryData) return;
 
@@ -55,7 +61,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 顯示路線
   const [directionsResult, setDirectionsResult] = useState<google.maps.DirectionsResult | null>(null);
-  const [currentDay, serCurrentDay] = useState<TripDaySchedule | undefined>(undefined);
+  const [currentDay, setCurrentDay] = useState<TripDaySchedule | undefined>(undefined);
 
 
   // 取得Redux目前點擊的Card的place_id
@@ -66,8 +72,81 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   useEffect(() => {
     if (!tripDaySchedule) return;
-    serCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id));
+    setCurrentDay(tripDaySchedule.find((item) => item.id === selectedDay.id));
   }, [selectedDay, tripDaySchedule])
+
+  // 檢查圖片是否過期
+  const isPhotoExpired = (timeStamp: Timestamp) => {
+    const now = Date.now(); // 當前時間的毫秒數 (number)
+    const twoDays = 2 * 24 * 60 * 60 * 1000; // 兩天的毫秒數
+
+    // 將 Timestamp 轉換為毫秒數
+    const timestampInMs = timeStamp.toMillis();
+
+    return now - timestampInMs > twoDays;
+  };
+
+  useEffect(() => {
+    if (!isLoaded || !trip || !trip.tripDaySchedule || !placesServiceRef.current) return;
+    // if (isPhotoAlready) return;
+    const updatePhotos = async () => {
+      // 處理每一天的行程
+      const tripDaySchedule = trip?.tripDaySchedule;
+      if (!tripDaySchedule) return; // 再次防呆
+      const updatedTripDaySchedule = await Promise.all(
+        tripDaySchedule.map(async (day) => {
+          const updatedAttractions = await Promise.all(
+            day.attractionData.map(async (item) => {
+              const shouldUpdate = !item.timeStamp || isPhotoExpired(item.timeStamp);
+              if (!shouldUpdate) return item;
+
+              // 非同步取得圖片
+              return new Promise<TripScheduleItem>((resolve) => {
+                placesServiceRef.current!.getDetails(
+                  {
+                    placeId: item.place_id,
+                    fields: ['photos'],
+                  },
+                  (result, status) => {
+                    if (
+                      status === google.maps.places.PlacesServiceStatus.OK &&
+                      result?.photos?.length
+                    ) {
+                      const updated = {
+                        ...item,
+                        photo: result.photos[0].getUrl({ maxWidth: 500 }),
+                        timeStamp: Timestamp.now(), // Firestore timestamp
+                      };
+                      resolve(updated);
+                    } else {
+                      resolve(item); // 保留原本資料
+                    }
+                  }
+                );
+              });
+            })
+          );
+
+          return {
+            ...day,
+            attractionData: updatedAttractions,
+          };
+        })
+      );
+
+      // 更新 trip 內容（你可能需要一個 setTrip 或 setTripDaySchedule）
+      setTrip((prev) => ({
+        ...prev!,
+        tripDaySchedule: updatedTripDaySchedule,
+      }));
+      // setIsPhotoAlready(true);
+    };
+
+    updatePhotos();
+  }, [isLoaded, trip?.tripDaySchedule, placesServiceRef]);
+
+
+
 
   useEffect(() => {
     if (!isLoaded || !inputRef.current) return;
@@ -522,7 +601,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
               lat: place.geometry?.location?.lat() || 0,
               lng: place.geometry?.location?.lng() || 0,
             }}
-          onClick={() => {place.place_id && clickKeywordSearchResult(place.place_id)}}
+            onClick={() => { place.place_id && clickKeywordSearchResult(place.place_id) }}
           />
         ))}
         {directionsResult && (

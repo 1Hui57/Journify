@@ -43,6 +43,9 @@ export default function TripEditPage() {
     const { tripId } = useParams();
     const [trip, setTrip] = useState<Trip>();
 
+    // 確認所有旅程景點圖片皆未過期
+    const [isPhotoAlready, setIsPhotoAlready] = useState<boolean>(false);
+
     // 旅程的每一天跟目前選擇哪一天
     const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
     const [selectedDay, setSelectedDay] = useState<SelectTripDay>({ id: "", date: null });
@@ -95,11 +98,14 @@ export default function TripEditPage() {
             }
 
             const tripData = tripSnap.data() as Trip;
+            
             setTrip(tripData);
         };
 
         fetchTrip();
     }, [tripId, user]);
+
+
 
     // 轉換旅程天數
     useEffect(() => {
@@ -476,12 +482,12 @@ export default function TripEditPage() {
                 </Panel>
                 {/* 中間可拖拉分隔線 */}
                 <PanelResizeHandle className={
-                    isMobile? "h-[12px] w-full bg-gray-300 cursor-ns-resize active:bg-primary-600": "w-[6px] bg-gray-300 cursor-ew-resize hover:bg-primary-600"} />
+                    isMobile ? "h-[12px] w-full bg-gray-300 cursor-ns-resize active:bg-primary-600" : "w-[6px] bg-gray-300 cursor-ew-resize hover:bg-primary-600"} />
 
                 <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
                     <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                         selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} />
+                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoAlready={isPhotoAlready} setIsPhotoAlready={setIsPhotoAlready} trip={trip} setTrip={setTrip}/>
                 </Panel>
             </PanelGroup>
             <div

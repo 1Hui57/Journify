@@ -15,15 +15,15 @@ export interface Trip {
   tripDaySchedule?: TripDaySchedule[] | null;
 }
 export interface PublicTrip {
-    userId: string
-    tripId: string;
-    tripName: string;
-    person: number;
-    tripTime: TripTime;
-    isPublic: boolean;
-    tripCountry: Country[];
-    createAt: Timestamp;
-    updateAt: Timestamp;
+  userId: string;
+  tripId: string;
+  tripName: string;
+  person: number;
+  tripTime: TripTime;
+  isPublic: boolean;
+  tripCountry: Country[];
+  createAt: Timestamp;
+  updateAt: Timestamp;
 }
 export interface Country {
   countryCode: string;
@@ -46,9 +46,10 @@ export interface TripScheduleItem {
   formatted_address: string;
   lat: number;
   lng: number;
-  photo: string;
+  photo: string|null;
   startTime?: Timestamp;
   endTime?: Timestamp;
+  timeStamp?:Timestamp; //用以檢查圖片是否過期，超過兩天需重打API取得新圖片
   note?: string;
 }
 export interface ReduxTripScheduleItem {
@@ -90,7 +91,7 @@ export interface Place {
   address?: string;
   location: Location;
   rating?: number;
-  photos?: string|undefined;
+  photos?: string | undefined;
   opening_hours?: google.maps.places.PlaceOpeningHours;
 }
 export interface SelectTripDay {
