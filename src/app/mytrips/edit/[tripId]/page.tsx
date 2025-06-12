@@ -388,6 +388,77 @@ export default function TripEditPage() {
     }
 
     /**
+    * 刪除旅程天數
+    * @param {string} deleteDayId - 要刪除的當天 ID
+    */
+    const deleteTripDate = (deleteDayId: string) => {
+        const deleteDay = trip?.tripDaySchedule?.find(item => item.id === deleteDayId);
+        if (!deleteDay) return;
+
+        const deletedDate = deleteDay.rawDate;
+
+        const updatedTripDaySchedule = tripDaySchedule.filter(day => day.id !== deleteDayId).map(day => {
+            // 如果刪除6/2，6/3會進到這個部分的程式碼，6/3比6/2大
+            if (day.rawDate > deletedDate) {
+                const newDate = new Date(day.rawDate);
+                newDate.setDate(newDate.getDate() - 1);
+
+                const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                const date = String(newDate.getDate()).padStart(2, '0');
+
+                // 更新景點時間
+                const updatedAttractions = day.attractionData.map(item => {
+                    const updatedStart = item.startTime
+                        ? Timestamp.fromDate(new Date(item.startTime.toDate().setDate(item.startTime.toDate().getDate() - 1)))
+                        : undefined;
+
+                    const updatedEnd = item.endTime
+                        ? Timestamp.fromDate(new Date(item.endTime.toDate().setDate(item.endTime.toDate().getDate() - 1)))
+                        : undefined;
+
+                    return {
+                        ...item,
+                        startTime: updatedStart,
+                        endTime: updatedEnd
+                    };
+                });
+
+                return {
+                    ...day,
+                    rawDate: newDate,
+                    date: `${month}月${date}日`,
+                    number: day.number - 1,
+                    attractionData: updatedAttractions
+                };
+            } else {
+                return day;
+            }
+        });
+        // 如果刪除的是正在選擇的那一天，要讓 selectedDay 改到新的第一天
+        if (selectedDay.id === deleteDayId) {
+            if (updatedTripDaySchedule.length > 0) {
+                setSelectedDay({ id: updatedTripDaySchedule[0].id, date: updatedTripDaySchedule[0].rawDate });
+            }
+        }
+
+        // 如果你有 tripTime 的 tripTo，要記得往前一天
+        if (trip) {
+            const newTripTo = new Date(trip.tripTime.tripTo.toDate());
+            newTripTo.setDate(newTripTo.getDate() - 1);
+
+            setTrip({
+                ...trip,
+                tripTime: {
+                    ...trip.tripTime,
+                    tripTo: Timestamp.fromDate(newTripTo)
+                },
+                tripDaySchedule:updatedTripDaySchedule,
+            });
+        }
+
+    }
+
+    /**
     * 儲存旅程，將目前旅程編輯資料寫入資料庫
     * @param {string} userId - 使用者 ID
     * @param {string} tripId - 此旅程 ID
@@ -413,16 +484,21 @@ export default function TripEditPage() {
             console.log("寫入成功");
             setSaveStatus("success");
             // 1.5 秒後自動隱藏提示
-            setTimeout(() => setSaveStatus("idle"), 1500);
+            setTimeout(() => setSaveStatus("idle"), 1000);
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
-            setTimeout(() => setSaveStatus("idle"), 2000);
+            setTimeout(() => setSaveStatus("idle"), 1500);
         }
     }
 
+    /**
+    * 將Date與時間字串轉為TimeStamp資料格式
+    * @param {Date} date - 當天的Date
+    * @param {string} time - 時間 ex.1030
+    */
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
         const minutes = parseInt(time.slice(2), 10);
@@ -434,8 +510,12 @@ export default function TripEditPage() {
         return Timestamp.fromDate(combined); // ✅ timestamp (毫秒)
     }
 
-    function timestampToDateTime(ts: Timestamp) {
-        const date = ts.toDate();
+    /**
+    * 將TimeStamp資料格式轉為Date與時間字串
+    * @param {Timestamp} timeStamp - 待轉換的TimeStamp
+    */
+    function timeStampToDateTime(timeStamp: Timestamp) {
+        const date = timeStamp.toDate();
         const time = date.toTimeString().slice(0, 5);
         return { date, time };
     }
@@ -465,7 +545,7 @@ export default function TripEditPage() {
                 <NoteComponent editAttractionNote={editAttractionNote} selectedDay={selectedDay} />
             </div>}
             {showEditTimePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime} />
+                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timeStampToDateTime={timeStampToDateTime} />
             </div>}
 
             {/* 主內容 PanelGroup */}
@@ -481,7 +561,7 @@ export default function TripEditPage() {
                             <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
                                 {tripDaySchedule.map((item: TripDaySchedule) => {
                                     return (
-                                        <TripDaySelect key={item.id}  item={item} selectedDay={selectedDay} selectDate={selectDate}/> 
+                                        <TripDaySelect key={item.id} item={item} selectedDay={selectedDay} selectDate={selectDate} deleteTripDate={deleteTripDate}/>
                                     )
                                 })}
                                 <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>
@@ -495,7 +575,7 @@ export default function TripEditPage() {
                             {tripDaySchedule
                                 .filter(item => item.id === selectedDay.id)
                                 .map(item => (
-                                    <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
+                                    <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timeStampToDateTime={timeStampToDateTime} setTripDaySchedule={setTripDaySchedule}
                                         selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
                                 ))}
                         </div>

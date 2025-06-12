@@ -18,14 +18,14 @@ interface TripAttractionCardProps {
     tripScheduleItem: TripScheduleItem;
     index: number;
     tripDaySchedule: TripDaySchedule;
-    timestampToDateTime: (ts: Timestamp) => { date: Date, time: string };
+    timeStampToDateTime: (ts: Timestamp) => { date: Date, time: string };
     setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
     selectedDay: SelectTripDay;
     deleteAttractionfromDate: (dayId: string, tripScheduleItemId: string) => void;
 }
 
 export default function TripAttractionCard({ tripScheduleItem, index, selectedDay, tripDaySchedule,
-    timestampToDateTime, setTripDaySchedule, deleteAttractionfromDate }: TripAttractionCardProps) {
+    timeStampToDateTime, setTripDaySchedule, deleteAttractionfromDate }: TripAttractionCardProps) {
 
     // redux 使用Dispatch
     const dispatch = useDispatch();
@@ -83,8 +83,8 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                     <div className="text-sm-500 line-clamp-1">{tripScheduleItem.name}</div>
                     <div className="text-sm-400 line-clamp-2 h-10">{tripScheduleItem.formatted_address}</div>
                     {tripScheduleItem.startTime && tripScheduleItem.endTime && (() => {
-                        const start = timestampToDateTime(tripScheduleItem.startTime);
-                        const end = timestampToDateTime(tripScheduleItem.endTime);
+                        const start = timeStampToDateTime(tripScheduleItem.startTime);
+                        const end = timeStampToDateTime(tripScheduleItem.endTime);
                         return (
                             <div className="text-sm-400 text-myzinc-700">
                                 時間：{start.time}~{end.time}
