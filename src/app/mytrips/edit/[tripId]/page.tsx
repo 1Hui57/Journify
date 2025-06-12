@@ -23,6 +23,7 @@ import { useMediaPredicate } from "react-media-hook";
 import { useSelector } from "react-redux";
 import { TripEditRootState } from "@/store/tripEditStore";
 import EditTimeComponent from '@/component/EditTimeComponent';
+import TripDaySelect from '@/component/TripDaySelect';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
@@ -55,7 +56,8 @@ export default function TripEditPage() {
 
     // 顯示timePop、NotePop
     const [showTimePop, setShowTimePop] = useState<boolean>(false);
-    // 取的 Redux 狀態
+
+    // 取得 Redux 狀態
     const showNotePopup = useSelector((state: TripEditRootState) => state.tripEdit.showNotePopup);
     const showEditTimePopup = useSelector((state: TripEditRootState) => state.tripEdit.showEditTimePopup);
 
@@ -66,8 +68,7 @@ export default function TripEditPage() {
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
     // 監聽是不是手機尺寸
-    const isMobile = useMediaPredicate('(max-width: 768px)')
-
+    const isMobile = useMediaPredicate('(max-width: 768px)');
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -480,15 +481,7 @@ export default function TripEditPage() {
                             <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
                                 {tripDaySchedule.map((item: TripDaySchedule) => {
                                     return (
-                                        <div key={item.id}
-                                            onClick={() => selectDate(item.id, item.rawDate)}
-                                            className={item.id === selectedDay.id ?
-                                                'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
-                                                : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
-                                        >
-                                            <p>{item.date}</p>
-                                            <p>第{item.number}天</p>
-                                        </div>
+                                        <TripDaySelect key={item.id}  item={item} selectedDay={selectedDay} selectDate={selectDate}/> 
                                     )
                                 })}
                                 <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>
