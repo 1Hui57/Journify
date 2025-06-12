@@ -59,9 +59,10 @@ export interface ReduxTripScheduleItem {
   formatted_address: string;
   lat: number;
   lng: number;
-  photo: string;
+  photo: string|null;
   startTime?: number;
   endTime?: number;
+  timeStamp?:number;
   note?: string;
 }
 export interface TripTransport {

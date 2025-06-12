@@ -13,8 +13,8 @@ interface TransportProps {
 export default function TripTransportItem({ tripTransport, setTripDaySchedule, selectedDay }: TransportProps) {
 
     const [transporation, setTransporation] = useState<string>(tripTransport.selectedMode);
-    const [duration, setDuration] = useState<number|null>();
-    const [distance, setDistance] = useState<number|null>();
+    const [duration, setDuration] = useState<number | null>();
+    const [distance, setDistance] = useState<number | null>();
 
     const [isEditing, setIsEditing] = useState(false); // 是否進入編輯模式
     const [customDurationInput, setCustomDurationInput] = useState<string>(""); // 使用者輸入的分鐘數
@@ -27,7 +27,7 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
         }
     }, [tripTransport]);
 
-    
+
     useEffect(() => {
         if (transporation === "CUSTOM") {
             setDuration(tripTransport.customDuration ?? null);
@@ -43,7 +43,7 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
         setDistance(selectTransportData.distance ?? null);
     }, [transporation, tripTransport]);
 
-   
+
 
     // 轉換顯示時間
     function formatDuration(durationInSeconds: number): string {
@@ -113,14 +113,17 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
     return (
         <div className="w-fit h-12 border-l-4 border-dashed border-myblue-300  ml-6  mb-2 flex items-center">
             <select value={transporation}
-                onChange={(e) => { updateTransport(e.target.value, selectedDay.id, tripTransport.id) }}
+                onChange={(e) => {
+                    e.stopPropagation(); // 防止事件冒泡
+                    updateTransport(e.target.value, selectedDay.id, tripTransport.id);
+                }}
                 className="ml-2 mr-4 w-20 text-sm-400 text-myblue-600">
                 <option value="DRIVING">開車</option>
                 <option value="WALKING">步行</option>
                 <option value="TRANSIT">大眾運輸</option>
                 <option value="CUSTOM">自訂</option>
             </select>
-            {tripTransport.modeOption && duration!==undefined && distance!==undefined && tripTransport.selectedMode!=="CUSTOM" &&
+            {tripTransport.modeOption && duration !== undefined && distance !== undefined && tripTransport.selectedMode !== "CUSTOM" &&
                 <div className="text-sm-400 text-sm-400 text-myblue-600 flex gap-2">
                     <div>{duration === null ? '暫無資料' : formatDuration(duration)}</div>
                     <div>{distance === null ? '暫無資料' : formatDistance(distance)}</div>
@@ -131,7 +134,7 @@ export default function TripTransportItem({ tripTransport, setTripDaySchedule, s
                 <div className="text-sm-400 text-myblue-600 flex items-center gap-2">
                     {!isEditing ? (
                         <>
-                            <div>{duration === undefined? "未設定": duration === null? "未設定": formatDuration(duration)}</div>
+                            <div>{duration === undefined ? "未設定" : duration === null ? "未設定" : formatDuration(duration)}</div>
                             <MdEdit
                                 className="w-4 h-4 cursor-pointer text-myblue-600 hover:text-myblue-800"
                                 onClick={() => setIsEditing(true)}
