@@ -34,7 +34,7 @@ export interface Country {
 export interface TripDaySchedule {
   id: string;
   rawDate: Date;
-  date: string; // 格式：2025.05.12
+  date: string; // 格式：06月02日
   number: number; // 例如：1
   attractionData: TripScheduleItem[];
   transportData: TripTransport[];
