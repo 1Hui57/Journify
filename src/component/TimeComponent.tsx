@@ -95,6 +95,7 @@ export default function TimeComponent({ addAttractionToDate, selectedDay, pendin
                         ...pendingPlace,
                         startTime: timeStampStart,
                         endTime: timeStampEnd,
+                        timeStamp:Timestamp.now()
                     };
                     addAttractionToDate(selectedDay.id, updatedPlace);
                     setPendingPlace(null);

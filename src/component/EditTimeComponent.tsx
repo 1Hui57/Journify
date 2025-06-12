@@ -10,10 +10,10 @@ import { useDispatch, useSelector } from 'react-redux';
 interface TimeComponentProps {
     selectedDay: SelectTripDay;
     editAttractionTime: (dayId: string, tripScheduleItemId: string, time: TripTime) => void;
-    timestampToDateTime: (ts: Timestamp) => any;
+    timeStampToDateTime: (ts: Timestamp) => any;
 }
 
-export default function EditTimeComponent({ selectedDay, editAttractionTime, timestampToDateTime }: TimeComponentProps) {
+export default function EditTimeComponent({ selectedDay, editAttractionTime, timeStampToDateTime }: TimeComponentProps) {
 
     const dispatch = useDispatch();
     const editingTripItem = useSelector(
@@ -77,8 +77,8 @@ export default function EditTimeComponent({ selectedDay, editAttractionTime, tim
         const startTimestamp = Timestamp.fromMillis(editingTripItem.startTime);
         const endTimestamp = Timestamp.fromMillis(editingTripItem.endTime);
 
-        const startTimeStr = timestampToDateTime(startTimestamp).time; // 例如 '09:30'
-        const endTimeStr = timestampToDateTime(endTimestamp).time;
+        const startTimeStr = timeStampToDateTime(startTimestamp).time; // 例如 '09:30'
+        const endTimeStr = timeStampToDateTime(endTimestamp).time;
 
         const [sHour, sMin] = startTimeStr.split(':');
         const [eHour, eMin] = endTimeStr.split(':');

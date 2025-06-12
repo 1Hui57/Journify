@@ -15,15 +15,15 @@ export interface Trip {
   tripDaySchedule?: TripDaySchedule[] | null;
 }
 export interface PublicTrip {
-    userId: string
-    tripId: string;
-    tripName: string;
-    person: number;
-    tripTime: TripTime;
-    isPublic: boolean;
-    tripCountry: Country[];
-    createAt: Timestamp;
-    updateAt: Timestamp;
+  userId: string;
+  tripId: string;
+  tripName: string;
+  person: number;
+  tripTime: TripTime;
+  isPublic: boolean;
+  tripCountry: Country[];
+  createAt: Timestamp;
+  updateAt: Timestamp;
 }
 export interface Country {
   countryCode: string;
@@ -34,7 +34,7 @@ export interface Country {
 export interface TripDaySchedule {
   id: string;
   rawDate: Date;
-  date: string; // 格式：2025.05.12
+  date: string; // 格式：06月02日
   number: number; // 例如：1
   attractionData: TripScheduleItem[];
   transportData: TripTransport[];
@@ -46,9 +46,10 @@ export interface TripScheduleItem {
   formatted_address: string;
   lat: number;
   lng: number;
-  photo: string;
+  photo: string|null;
   startTime?: Timestamp;
   endTime?: Timestamp;
+  timeStamp?:Timestamp; //用以檢查圖片是否過期，超過兩天需重打API取得新圖片
   note?: string;
 }
 export interface ReduxTripScheduleItem {
@@ -58,9 +59,10 @@ export interface ReduxTripScheduleItem {
   formatted_address: string;
   lat: number;
   lng: number;
-  photo: string;
+  photo: string|null;
   startTime?: number;
   endTime?: number;
+  timeStamp?:number;
   note?: string;
 }
 export interface TripTransport {
@@ -90,7 +92,7 @@ export interface Place {
   address?: string;
   location: Location;
   rating?: number;
-  photos?: string|undefined;
+  photos?: string | undefined;
   opening_hours?: google.maps.places.PlaceOpeningHours;
 }
 export interface SelectTripDay {

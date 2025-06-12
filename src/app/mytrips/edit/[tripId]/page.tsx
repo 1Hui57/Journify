@@ -23,6 +23,7 @@ import { useMediaPredicate } from "react-media-hook";
 import { useSelector } from "react-redux";
 import { TripEditRootState } from "@/store/tripEditStore";
 import EditTimeComponent from '@/component/EditTimeComponent';
+import TripDaySelect from '@/component/TripDaySelect';
 
 const MapComponent = dynamic(() => import('@/component/Map'), {
     ssr: false,
@@ -43,6 +44,9 @@ export default function TripEditPage() {
     const { tripId } = useParams();
     const [trip, setTrip] = useState<Trip>();
 
+    // 確認所有旅程景點圖片皆未過期
+    const [isPhotoLoading, setIsPhotoLoading] = useState<boolean>(true);
+
     // 旅程的每一天跟目前選擇哪一天
     const [tripDaySchedule, setTripDaySchedule] = useState<TripDaySchedule[]>([]);
     const [selectedDay, setSelectedDay] = useState<SelectTripDay>({ id: "", date: null });
@@ -52,7 +56,8 @@ export default function TripEditPage() {
 
     // 顯示timePop、NotePop
     const [showTimePop, setShowTimePop] = useState<boolean>(false);
-    // 取的 Redux 狀態
+
+    // 取得 Redux 狀態
     const showNotePopup = useSelector((state: TripEditRootState) => state.tripEdit.showNotePopup);
     const showEditTimePopup = useSelector((state: TripEditRootState) => state.tripEdit.showEditTimePopup);
 
@@ -63,7 +68,7 @@ export default function TripEditPage() {
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
     // 監聽是不是手機尺寸
-    const isMobile = useMediaPredicate('(max-width: 768px)')
+    const isMobile = useMediaPredicate('(max-width: 768px)');
 
     // 使用者是否為登入狀態
     useEffect(() => {
@@ -95,11 +100,17 @@ export default function TripEditPage() {
             }
 
             const tripData = tripSnap.data() as Trip;
+            (tripData.tripDaySchedule)?.forEach(day => {
+                day.rawDate = (day.rawDate as unknown as Timestamp).toDate()
+            })
             setTrip(tripData);
+            setIsPhotoLoading(true);
         };
 
         fetchTrip();
     }, [tripId, user]);
+
+
 
     // 轉換旅程天數
     useEffect(() => {
@@ -120,7 +131,7 @@ export default function TripEditPage() {
             setSelectedDay({ id: convertTripDaySchedule[0].id, date: convertTripDaySchedule[0].rawDate, });
         } else {
             console.log("根據 tripTime 重新生成或更新行程天數");
-            const days = generateTripDays(trip.tripTime.tripFrom, trip.tripTime.tripTo);
+            const days = generateTripDays(trip);
             setTripDaySchedule([...days]);
             if (
                 days.length > 0 &&
@@ -134,11 +145,6 @@ export default function TripEditPage() {
     // countries 與 trip 都準備好後，才找對應國家
     useEffect(() => {
         if (!trip || countries.length === 0) return;
-
-        // const matchedCountry = countries.map(
-        //     (item) => item.countryName === trip.tripCountry
-        // );
-
         setCountryData(trip.tripCountry);
     }, [trip, countries]);
 
@@ -146,6 +152,7 @@ export default function TripEditPage() {
     useEffect(() => {
         if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData) {
             setIsloading(false);
+            console.log(tripDaySchedule);
         }
     }, [trip, tripDaySchedule, countries, countryData]);
 
@@ -158,7 +165,11 @@ export default function TripEditPage() {
         scrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' });
     };
 
-    const formatteDate = (date: any) => {
+    /**
+    * 將 TimeStamp 時間格式轉成字串2025/06/12
+    * @param {Timestamp} date - 需要轉換的時間
+    */
+    const formatteDate = (date: Timestamp) => {
         let realDate: Date;
         if (typeof date === 'object' && date?.seconds) {
             // Firestore Timestamp 格式（轉成毫秒）
@@ -173,14 +184,17 @@ export default function TripEditPage() {
         }
     };
 
-    // 計算旅程開始日期至結束日期的每日日期
-    const generateTripDays = (_start: Timestamp, _end: Timestamp): TripDaySchedule[] => {
-        const days: TripDaySchedule[] = tripDaySchedule;
-        const currentDate = _start.toDate();
-        const endDate = _end.toDate();
+    /**
+    * 將整筆旅程資料轉換為 TripDaySchedule[]
+    * @param {Trip} trip - 整筆旅程資料
+    */
+    const generateTripDays = (trip: Trip): TripDaySchedule[] => {
+        const days = trip.tripDaySchedule || [];
+        const currentDate = trip.tripTime.tripFrom.toDate();
+        const endDate = trip.tripTime.tripTo.toDate();
         let dayCount = 1;
         while (currentDate <= endDate) {
-            const exists = tripDaySchedule.find((item) => {
+            const exists = days.find((item) => {
                 return item.rawDate.getMonth() === currentDate.getMonth()
                     && item.rawDate.getDate() === currentDate.getDate()
             })
@@ -204,7 +218,9 @@ export default function TripEditPage() {
         return days;
     };
 
-    // 新增天數
+    /**
+    * 新增天數
+    */
     const addTripDate = () => {
         if (!trip) return;
         const originEndDate = trip.tripTime.tripTo.toDate();
@@ -222,7 +238,10 @@ export default function TripEditPage() {
         setSelectedDay({ id: id, date: date });
     }
 
-    // 更新tripDaySchedul的atttaction的排序跟transport
+    /**
+    * 更新 tripDaySchedul的 attractionData 的排序跟 transportData
+    * @param {TripDaySchedule[]} tripDaySchedule - 每天的旅程資訊陣列
+    */
     const updateTripScheduleWithTransport = (tripDaySchedule: TripDaySchedule[]): TripDaySchedule[] => {
         return tripDaySchedule.map((day) => {
             // attraction 按照時間排序
@@ -307,7 +326,12 @@ export default function TripEditPage() {
         });
     }
 
-    // 編輯景點筆記
+    /**
+    * 編輯景點筆記
+    * @param {string} dayId - 正在編輯的當天 ID
+    * @param {string} tripScheduleItemId - 正在編輯的景點 ID
+    * @param {string} note - 筆記內容
+    */
     const editAttractionNote = (dayId: string, tripScheduleItemId: string, note: string) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((day) => {
@@ -332,7 +356,12 @@ export default function TripEditPage() {
         });
     }
 
-    // 編輯景點時間
+    /**
+    * 編輯景點時間
+    * @param {string} dayId - 正在編輯的當天 ID
+    * @param {string} tripScheduleItemId - 正在編輯的景點 ID
+    * @param {TripTime} time - 更新的景點時間
+    */
     const editAttractionTime = (dayId: string, tripScheduleItemId: string, time: TripTime) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((day) => {
@@ -358,7 +387,85 @@ export default function TripEditPage() {
         });
     }
 
-    // 儲存旅程，將目前旅程編輯資料寫入資料庫
+    /**
+    * 刪除旅程天數
+    * @param {string} deleteDayId - 要刪除的當天 ID
+    */
+    const deleteTripDate = (deleteDayId: string) => {
+        if (!window.confirm("確定要刪除這一天的行程嗎？後面的天數會往前遞補。")) return;
+        const deleteDay = trip?.tripDaySchedule?.find(item => item.id === deleteDayId);
+        if (!deleteDay) return;
+
+        const deletedDate = deleteDay.rawDate;
+
+        const updatedTripDaySchedule = tripDaySchedule.filter(day => day.id !== deleteDayId).map(day => {
+            // 如果刪除6/2，6/3會進到這個部分的程式碼，6/3比6/2大
+            if (day.rawDate > deletedDate) {
+                const newDate = new Date(day.rawDate);
+                newDate.setDate(newDate.getDate() - 1);
+
+                const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                const date = String(newDate.getDate()).padStart(2, '0');
+
+                // 更新景點時間
+                const updatedAttractions = day.attractionData.map(item => {
+                    const updatedStart = item.startTime
+                        ? Timestamp.fromDate(new Date(item.startTime.toDate().setDate(item.startTime.toDate().getDate() - 1)))
+                        : undefined;
+
+                    const updatedEnd = item.endTime
+                        ? Timestamp.fromDate(new Date(item.endTime.toDate().setDate(item.endTime.toDate().getDate() - 1)))
+                        : undefined;
+
+                    return {
+                        ...item,
+                        startTime: updatedStart,
+                        endTime: updatedEnd
+                    };
+                });
+
+                return {
+                    ...day,
+                    rawDate: newDate,
+                    date: `${month}月${date}日`,
+                    number: day.number - 1,
+                    attractionData: updatedAttractions
+                };
+            } else {
+                return day;
+            }
+        });
+        // 如果刪除的是正在選擇的那一天，要讓 selectedDay 改到新的第一天
+        if (selectedDay.id === deleteDayId) {
+            if (updatedTripDaySchedule.length > 0) {
+                setSelectedDay({ id: updatedTripDaySchedule[0].id, date: updatedTripDaySchedule[0].rawDate });
+            }
+        }
+
+        // 如果你有 tripTime 的 tripTo，要記得往前一天
+        if (trip) {
+            const newTripTo = new Date(trip.tripTime.tripTo.toDate());
+            newTripTo.setDate(newTripTo.getDate() - 1);
+
+            setTrip({
+                ...trip,
+                tripTime: {
+                    ...trip.tripTime,
+                    tripTo: Timestamp.fromDate(newTripTo)
+                },
+                tripDaySchedule:updatedTripDaySchedule,
+            });
+        }
+
+    }
+
+    /**
+    * 儲存旅程，將目前旅程編輯資料寫入資料庫
+    * @param {string} userId - 使用者 ID
+    * @param {string} tripId - 此旅程 ID
+    * @param {Trip} trip - 此旅程的概要資料
+    * @param {TripDaySchedule[]} tripDaySchedule -此旅程的詳細排程
+    */
     async function saveTripDaySchedule(userId: string, tripId: string, trip: Trip, tripDaySchedule: TripDaySchedule[]) {
         if (!userId || !tripId) {
             alert("使用者或旅程 ID 不正確");
@@ -378,16 +485,21 @@ export default function TripEditPage() {
             console.log("寫入成功");
             setSaveStatus("success");
             // 1.5 秒後自動隱藏提示
-            setTimeout(() => setSaveStatus("idle"), 1500);
+            setTimeout(() => setSaveStatus("idle"), 1000);
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
-            setTimeout(() => setSaveStatus("idle"), 2000);
+            setTimeout(() => setSaveStatus("idle"), 1500);
         }
     }
 
+    /**
+    * 將Date與時間字串轉為TimeStamp資料格式
+    * @param {Date} date - 當天的Date
+    * @param {string} time - 時間 ex.1030
+    */
     function dateTimeToTimestamp(date: Date, time: string): Timestamp {
         const hours = parseInt(time.slice(0, 2), 10);
         const minutes = parseInt(time.slice(2), 10);
@@ -399,8 +511,12 @@ export default function TripEditPage() {
         return Timestamp.fromDate(combined); // ✅ timestamp (毫秒)
     }
 
-    function timestampToDateTime(ts: Timestamp) {
-        const date = ts.toDate();
+    /**
+    * 將TimeStamp資料格式轉為Date與時間字串
+    * @param {Timestamp} timeStamp - 待轉換的TimeStamp
+    */
+    function timeStampToDateTime(timeStamp: Timestamp) {
+        const date = timeStamp.toDate();
         const time = date.toTimeString().slice(0, 5);
         return { date, time };
     }
@@ -430,7 +546,7 @@ export default function TripEditPage() {
                 <NoteComponent editAttractionNote={editAttractionNote} selectedDay={selectedDay} />
             </div>}
             {showEditTimePopup && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
-                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timestampToDateTime={timestampToDateTime} />
+                <EditTimeComponent editAttractionTime={editAttractionTime} selectedDay={selectedDay} timeStampToDateTime={timeStampToDateTime} />
             </div>}
 
             {/* 主內容 PanelGroup */}
@@ -446,15 +562,7 @@ export default function TripEditPage() {
                             <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
                                 {tripDaySchedule.map((item: TripDaySchedule) => {
                                     return (
-                                        <div key={item.id}
-                                            onClick={() => selectDate(item.id, item.rawDate)}
-                                            className={item.id === selectedDay.id ?
-                                                'w-30 flex-shrink-0 text-sm-700 text-center border-b-5 border-primary-600 cursor-pointer '
-                                                : 'w-30 flex-shrink-0 text-sm-400 text-center border-x-1 border-myzinc-200 cursor-pointer'}
-                                        >
-                                            <p>{item.date}</p>
-                                            <p>第{item.number}天</p>
-                                        </div>
+                                        <TripDaySelect key={item.id} item={item} selectedDay={selectedDay} selectDate={selectDate} deleteTripDate={deleteTripDate}/>
                                     )
                                 })}
                                 <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>
@@ -468,7 +576,7 @@ export default function TripEditPage() {
                             {tripDaySchedule
                                 .filter(item => item.id === selectedDay.id)
                                 .map(item => (
-                                    <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
+                                    <TripAttractionWrappwer key={item.id} tripDaySchedule={item} timeStampToDateTime={timeStampToDateTime} setTripDaySchedule={setTripDaySchedule}
                                         selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate} />
                                 ))}
                         </div>
@@ -476,12 +584,12 @@ export default function TripEditPage() {
                 </Panel>
                 {/* 中間可拖拉分隔線 */}
                 <PanelResizeHandle className={
-                    isMobile? "h-[12px] w-full bg-gray-300 cursor-ns-resize active:bg-primary-600": "w-[6px] bg-gray-300 cursor-ew-resize hover:bg-primary-600"} />
+                    isMobile ? "h-[12px] w-full bg-gray-300 cursor-ns-resize active:bg-primary-600" : "w-[6px] bg-gray-300 cursor-ew-resize hover:bg-primary-600"} />
 
                 <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
                     <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                         selectedDay={selectedDay} setPendingPlace={setPendingPlace}
-                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} />
+                        setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoLoading={isPhotoLoading} setIsPhotoLoading={setIsPhotoLoading} trip={trip} setTrip={setTrip} />
                 </Panel>
             </PanelGroup>
             <div

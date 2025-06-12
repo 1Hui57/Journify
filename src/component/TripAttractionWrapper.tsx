@@ -7,12 +7,12 @@ import TripAttractionCard from "./TripAttractionCard";
 
 interface TripAttractionProps {
     tripDaySchedule: TripDaySchedule;
-    timestampToDateTime: (ts: Timestamp) => { date: Date, time: string };
+    timeStampToDateTime: (ts: Timestamp) => { date: Date, time: string };
     setTripDaySchedule: React.Dispatch<React.SetStateAction<TripDaySchedule[]>>;
     selectedDay: SelectTripDay;
     deleteAttractionfromDate: (dayId: string, tripScheduleItemId: string) => void;
 }
-export default function TripAttractionWrappwer({ tripDaySchedule, timestampToDateTime, setTripDaySchedule,
+export default function TripAttractionWrappwer({ tripDaySchedule, timeStampToDateTime, setTripDaySchedule,
     selectedDay, deleteAttractionfromDate }: TripAttractionProps) {
 
     return (
@@ -21,7 +21,7 @@ export default function TripAttractionWrappwer({ tripDaySchedule, timestampToDat
             {tripDaySchedule.attractionData && tripDaySchedule.attractionData.length > 0 &&
                 tripDaySchedule.attractionData.map((tripScheduleItem, index) => {
                     return (
-                        <TripAttractionCard key={tripScheduleItem.id} tripScheduleItem={tripScheduleItem} index={index} tripDaySchedule={tripDaySchedule} timestampToDateTime={timestampToDateTime} setTripDaySchedule={setTripDaySchedule}
+                        <TripAttractionCard key={tripScheduleItem.id} tripScheduleItem={tripScheduleItem} index={index} tripDaySchedule={tripDaySchedule} timeStampToDateTime={timeStampToDateTime} setTripDaySchedule={setTripDaySchedule}
                             selectedDay={selectedDay} deleteAttractionfromDate={deleteAttractionfromDate}  />
                     )
                 }
