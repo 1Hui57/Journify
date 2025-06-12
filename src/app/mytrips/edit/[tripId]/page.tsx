@@ -144,11 +144,6 @@ export default function TripEditPage() {
     // countries 與 trip 都準備好後，才找對應國家
     useEffect(() => {
         if (!trip || countries.length === 0) return;
-
-        // const matchedCountry = countries.map(
-        //     (item) => item.countryName === trip.tripCountry
-        // );
-
         setCountryData(trip.tripCountry);
     }, [trip, countries]);
 
@@ -169,7 +164,11 @@ export default function TripEditPage() {
         scrollRef.current?.scrollBy({ left: 150, behavior: 'smooth' });
     };
 
-    const formatteDate = (date: any) => {
+    /**
+    * 將 TimeStamp 時間格式轉成字串2025/06/12
+    * @param {Timestamp} date - 需要轉換的時間
+    */
+    const formatteDate = (date: Timestamp) => {
         let realDate: Date;
         if (typeof date === 'object' && date?.seconds) {
             // Firestore Timestamp 格式（轉成毫秒）
@@ -184,7 +183,10 @@ export default function TripEditPage() {
         }
     };
 
-    // 計算旅程開始日期至結束日期的每日日期
+    /**
+    * 將整筆旅程資料轉換為 TripDaySchedule[]
+    * @param {Trip} trip - 整筆旅程資料
+    */
     const generateTripDays = (trip: Trip): TripDaySchedule[] => {
         const days = trip.tripDaySchedule || [];
         const currentDate = trip.tripTime.tripFrom.toDate();
@@ -215,7 +217,9 @@ export default function TripEditPage() {
         return days;
     };
 
-    // 新增天數
+    /**
+    * 新增天數
+    */
     const addTripDate = () => {
         if (!trip) return;
         const originEndDate = trip.tripTime.tripTo.toDate();
@@ -233,7 +237,10 @@ export default function TripEditPage() {
         setSelectedDay({ id: id, date: date });
     }
 
-    // 更新tripDaySchedul的atttaction的排序跟transport
+    /**
+    * 更新 tripDaySchedul的 attractionData 的排序跟 transportData
+    * @param {TripDaySchedule[]} tripDaySchedule - 每天的旅程資訊陣列
+    */
     const updateTripScheduleWithTransport = (tripDaySchedule: TripDaySchedule[]): TripDaySchedule[] => {
         return tripDaySchedule.map((day) => {
             // attraction 按照時間排序
@@ -318,7 +325,12 @@ export default function TripEditPage() {
         });
     }
 
-    // 編輯景點筆記
+    /**
+    * 編輯景點筆記
+    * @param {string} dayId - 正在編輯的當天 ID
+    * @param {string} tripScheduleItemId - 正在編輯的景點 ID
+    * @param {string} note - 筆記內容
+    */
     const editAttractionNote = (dayId: string, tripScheduleItemId: string, note: string) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((day) => {
@@ -343,7 +355,12 @@ export default function TripEditPage() {
         });
     }
 
-    // 編輯景點時間
+    /**
+    * 編輯景點時間
+    * @param {string} dayId - 正在編輯的當天 ID
+    * @param {string} tripScheduleItemId - 正在編輯的景點 ID
+    * @param {TripTime} time - 更新的景點時間
+    */
     const editAttractionTime = (dayId: string, tripScheduleItemId: string, time: TripTime) => {
         setTripDaySchedule((prevSchedule) => {
             const newTripSchedule = prevSchedule.map((day) => {
@@ -369,7 +386,13 @@ export default function TripEditPage() {
         });
     }
 
-    // 儲存旅程，將目前旅程編輯資料寫入資料庫
+    /**
+    * 儲存旅程，將目前旅程編輯資料寫入資料庫
+    * @param {string} userId - 使用者 ID
+    * @param {string} tripId - 此旅程 ID
+    * @param {Trip} trip - 此旅程的概要資料
+    * @param {TripDaySchedule[]} tripDaySchedule -此旅程的詳細排程
+    */
     async function saveTripDaySchedule(userId: string, tripId: string, trip: Trip, tripDaySchedule: TripDaySchedule[]) {
         if (!userId || !tripId) {
             alert("使用者或旅程 ID 不正確");
