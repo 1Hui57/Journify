@@ -1,7 +1,7 @@
 
 'use client'
 import TripPageCard from "@/component/TripPageCard";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import { IoMdAdd } from "react-icons/io";
 import "react-day-picker/style.css";
@@ -11,6 +11,8 @@ import { db } from "@/lib/firebase";
 import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
 import CreateTrip from "@/component/CreateTrip";
+import UpdateTrip from "@/component/UpdateTrip";
+import { Country } from "../type/trip";
 
 interface TripTime {
     tripFrom: Date;
@@ -19,10 +21,10 @@ interface TripTime {
 interface Trip {
     id?: string;
     tripName: string;
-    person: Number;
+    person: number;
     tripTime: TripTime;
     isPublic: boolean;
-    tripCountry: string;
+    tripCountry: Country[];
     createAt: Timestamp;
     updateAt: Timestamp;
 }
@@ -35,7 +37,7 @@ interface FirestoreTrip {
     person: number;
     tripTime: FirestoreTripTime;
     isPublic: boolean;
-    tripCountry: string;
+    tripCountry: Country[];
     createAt: Timestamp;
     updateAt: Timestamp;
 }
@@ -52,6 +54,10 @@ export default function MyTrips() {
 
     // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);
+
+    // 更新旅程狀態
+    const [isEditingTrip, setIsEditingTrip] = useState<boolean>(false);
+    const [editTripData, setEditTripData] = useState<Trip | null>(null);
 
     // 使用者資料庫的旅程資料
     const [trips, setTrips] = useState<Trip[]>([]);
@@ -132,6 +138,26 @@ export default function MyTrips() {
         }
     }
 
+    // 更新旅程資訊，例如名稱、人數、日期、國家
+    async function updateTripData(userId: string, tripId: string, trip: Trip) {
+        try {
+            const tripsRef = doc(db, "users", userId, "trips", tripId);
+            const publicRef = doc(db, "all_trips", tripId)
+            await updateDoc(tripsRef, {
+                ...trip
+            });
+            await updateDoc(publicRef, {
+                ...trip
+            });
+            console.log("旅程的公開狀態已更新");
+        }
+
+        catch (error) {
+            console.error("更新旅程公開狀態失敗:", error);
+            alert("新增資料時發生錯誤，請稍後再試！");
+        }
+    }
+
 
     return (
         <div className="w-full h-full ">
@@ -141,13 +167,15 @@ export default function MyTrips() {
                     <p className="text-mywhite-100">旅雀加載中...請稍後</p>
                 </div>
             }
+
             <div className="w-full h-fit flex flex-col p-10 mb-20">
                 <div className="w-fit h-fit mb-6">
                     <p className="text-2xl font-bold text-myblue-800">我的旅程</p>
                 </div>
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
-                    {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate} />))}
+                    {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
+                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData}/>))}
                 </div>
                 <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
@@ -158,6 +186,7 @@ export default function MyTrips() {
                 </button>
             </div>
             {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} />}
+            {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData}/>}
         </div>
     )
 }
