@@ -12,34 +12,22 @@ import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
 import CreateTrip from "@/component/CreateTrip";
 import UpdateTrip from "@/component/UpdateTrip";
-import { Country } from "../type/trip";
+import { Country, TripDaySchedule } from "../type/trip";
 
-interface TripTime {
-    tripFrom: Date;
-    tripTo: Date;
-}
+
 interface Trip {
     id?: string;
     tripName: string;
     person: number;
-    tripTime: TripTime;
+    tripTime: {
+        tripFrom: Timestamp;
+        tripTo: Timestamp;
+    };
     isPublic: boolean;
     tripCountry: Country[];
     createAt: Timestamp;
     updateAt: Timestamp;
-}
-interface FirestoreTripTime {
-    tripFrom: Timestamp;
-    tripTo: Timestamp;
-}
-interface FirestoreTrip {
-    tripName: string;
-    person: number;
-    tripTime: FirestoreTripTime;
-    isPublic: boolean;
-    tripCountry: Country[];
-    createAt: Timestamp;
-    updateAt: Timestamp;
+    tripDaySchedule?: TripDaySchedule[] | null;
 }
 
 export default function MyTrips() {
@@ -62,6 +50,9 @@ export default function MyTrips() {
     // 使用者資料庫的旅程資料
     const [trips, setTrips] = useState<Trip[]>([]);
 
+    // 儲存旅程資料
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+
     // 使用者是否為登入狀態
     useEffect(() => {
         if (!isUserSignIn && !loading) {
@@ -79,16 +70,16 @@ export default function MyTrips() {
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const data: Trip[] = snapshot.docs.map((doc) => {
-                const tripData = doc.data() as FirestoreTrip;
-                const tripTime = {
-                    tripFrom: tripData.tripTime.tripFrom.toDate(),
-                    tripTo: tripData.tripTime.tripTo.toDate(),
-                };
+                const tripData = doc.data() as Trip;
+                // const tripTime = {
+                //     tripFrom: tripData.tripTime.tripFrom.toDate(),
+                //     tripTo: tripData.tripTime.tripTo.toDate(),
+                // };
                 return {
                     id: doc.id,
                     tripName: tripData.tripName,
                     person: tripData.person,
-                    tripTime,
+                    tripTime: tripData.tripTime,
                     isPublic: tripData.isPublic,
                     tripCountry: tripData.tripCountry,
                     createAt: tripData.createAt,
@@ -97,7 +88,7 @@ export default function MyTrips() {
             });
             setTrips(data);
             setIsloading(false);
-
+            console.log(data);
         });
         return () => unsubscribe();
     }, [user?.uid]);
@@ -138,25 +129,25 @@ export default function MyTrips() {
         }
     }
 
-    // 更新旅程資訊，例如名稱、人數、日期、國家
-    async function updateTripData(userId: string, tripId: string, trip: Trip) {
-        try {
-            const tripsRef = doc(db, "users", userId, "trips", tripId);
-            const publicRef = doc(db, "all_trips", tripId)
-            await updateDoc(tripsRef, {
-                ...trip
-            });
-            await updateDoc(publicRef, {
-                ...trip
-            });
-            console.log("旅程的公開狀態已更新");
-        }
+    // // 更新旅程資訊，例如名稱、人數、日期、國家
+    // async function updateTripData(userId: string, tripId: string, trip: Trip) {
+    //     try {
+    //         const tripsRef = doc(db, "users", userId, "trips", tripId);
+    //         const publicRef = doc(db, "all_trips", tripId)
+    //         await updateDoc(tripsRef, {
+    //             ...trip
+    //         });
+    //         await updateDoc(publicRef, {
+    //             ...trip
+    //         });
+    //         console.log("旅程的公開狀態已更新");
+    //     }
 
-        catch (error) {
-            console.error("更新旅程公開狀態失敗:", error);
-            alert("新增資料時發生錯誤，請稍後再試！");
-        }
-    }
+    //     catch (error) {
+    //         console.error("更新旅程公開狀態失敗:", error);
+    //         alert("新增資料時發生錯誤，請稍後再試！");
+    //     }
+    // }
 
 
     return (
@@ -167,6 +158,15 @@ export default function MyTrips() {
                     <p className="text-mywhite-100">旅雀加載中...請稍後</p>
                 </div>
             }
+            {saveStatus !== "idle" && (
+                <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                    <img src="/loading.gif" className="w-30 h-30 " />
+                    <div className='w-fit h-fit px-5 py-3  text-mywhite-100 text-base-500'>
+                        {saveStatus === "saving" && <span >儲存中...</span>}
+                        {saveStatus === "success" && <span >儲存成功！</span>}
+                        {saveStatus === "error" && <span >儲存失敗，請稍後再試</span>}
+                    </div>
+                </div>)}
 
             <div className="w-full h-fit flex flex-col p-10 mb-20">
                 <div className="w-fit h-fit mb-6">
@@ -175,7 +175,7 @@ export default function MyTrips() {
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
                     {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
-                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData}/>))}
+                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} />))}
                 </div>
                 <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
@@ -186,7 +186,7 @@ export default function MyTrips() {
                 </button>
             </div>
             {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} />}
-            {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData}/>}
+            {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData} setSaveStatus={setSaveStatus} />}
         </div>
     )
 }

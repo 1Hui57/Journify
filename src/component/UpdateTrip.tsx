@@ -2,43 +2,35 @@
 import { useEffect, useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { serverTimestamp, setDoc, doc, FieldValue, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { serverTimestamp, setDoc, doc, FieldValue, Timestamp, Firestore, getDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import CountrySelect from "./CountrySelect";
-import { Country } from "@/app/type/trip";
+import { Country, PublicTrip, TripDaySchedule, TripTime } from "@/app/type/trip";
+import { useAuth } from "@/context/AuthContext";
 
 interface UpdateTripProps {
     userId: string | undefined;
     setIsEditingTrip: React.Dispatch<React.SetStateAction<boolean>>;
     editTripData: Trip | null;
-}
-interface TripTime {
-    tripFrom: Date;
-    tripTo: Date;
+    setSaveStatus: React.Dispatch<React.SetStateAction<"idle" | "saving" | "success" | "error">>;
 }
 interface Trip {
     id?: string;
     tripName: string;
     person: number;
-    tripTime: TripTime;
+    tripTime: {
+        tripFrom: Timestamp;
+        tripTo: Timestamp;
+    };
     isPublic: boolean;
     tripCountry: Country[];
     createAt: Timestamp;
     updateAt: Timestamp;
-}
-interface UpdateTrip {
-    id?: string;
-    tripName: string;
-    person: number;
-    tripTime: TripTime;
-    isPublic: boolean;
-    tripCountry: Country[];
-    createAt: FieldValue;
-    updateAt: FieldValue;
+    tripDaySchedule?: TripDaySchedule[] | null;
 }
 
-export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: UpdateTripProps) {
+export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, setSaveStatus }: UpdateTripProps) {
 
     const [selected, setSelected] = useState<DateRange | undefined>();
     const [deteText, setDateText] = useState<string>("");
@@ -49,6 +41,14 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
     const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
 
+    // 原本旅程的天數
+    const tripId = editTripData?.id;
+    const [trip, setTrip] = useState<Trip | null>(null);
+    const [tripDays, setTripDays] = useState<number | null>(null);
+
+    // useContext取得使用者登入狀態
+    const { isUserSignIn, loading } = useAuth();
+    const user = auth.currentUser;
     // 人數input規則
     const personInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value;
@@ -65,36 +65,75 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
 
     // 選取日期
     function handleOnSelect(range: DateRange | undefined, triggerDate: Date) {
-        // 如果還沒選開始日期
+        // 還沒選開始日期
         if (!selected?.from) {
             setSelected({
                 from: triggerDate,
                 to: undefined,
             });
+            return;
         }
-        // 如果還沒選結束日期
-        else if (!selected?.to) {
-            // 如果to的日期早於from，現在選擇日期的改成from
+
+        // 已選開始但還沒選結束
+        if (!selected?.to) {
             if (triggerDate < selected.from) {
                 setSelected({
                     from: triggerDate,
                     to: undefined,
-                })
+                });
                 return;
             }
+
+            // 計算選取的天數
+            const timeDiff = triggerDate.getTime() - selected.from.getTime();
+            const selectedDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+            // 如果選擇的天數不等於原本旅程天數，重新選起始日
+            if (selectedDays !== tripDays) {
+                alert(`請選擇剛好 ${tripDays} 天的範圍`);
+                setSelected({
+                    from: triggerDate,
+                    to: undefined,
+                });
+                return;
+            }
+
+            // 成功選取正確天數
             setSelected({
                 from: selected.from,
                 to: triggerDate,
             });
+            return;
         }
-        // 如果開始與結束日期都已選，則重新選取範圍
-        else {
-            setSelected({
-                from: triggerDate,
-                to: undefined,
-            });
-        }
+
+        // 如果 from 和 to 都已選，重新選新的 from
+        setSelected({
+            from: triggerDate,
+            to: undefined,
+        });
     }
+
+    // 取得使用者資料庫的旅程資料
+    useEffect(() => {
+        if (!user || !editTripData?.id || !userId) return;
+
+        const tripId = editTripData?.id;
+
+        const fetchTrip = async () => {
+            const tripRef = doc(db, "users", userId, "trips", tripId);
+            const tripSnap = await getDoc(tripRef);
+
+            if (!tripSnap.exists()) return;
+
+            const tripData = tripSnap.data() as Trip;
+            (tripData.tripDaySchedule)?.forEach(day => {
+                day.rawDate = (day.rawDate as unknown as Timestamp).toDate()
+            });
+            setTrip(tripData);
+        };
+
+        fetchTrip();
+    }, [user?.uid, editTripData, userId]);
 
     // 取得目前旅程的概覽資訊
     useEffect(() => {
@@ -102,12 +141,19 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
         setTripName(editTripData?.tripName);
         setTripPerson(editTripData.person);
         if (editTripData?.tripTime.tripFrom && editTripData?.tripTime.tripTo) {
-            const formattedFrom = editTripData.tripTime.tripFrom.toLocaleDateString("zh-TW", {
+
+            const from = new Date(editTripData.tripTime.tripFrom.toDate());
+            const to = new Date(editTripData.tripTime.tripTo.toDate());
+            const diffTime = to.getTime() - from.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // 加 1 是因為從 6/1 到 6/5 是 5 天
+            setTripDays(diffDays);
+
+            const formattedFrom = editTripData.tripTime.tripFrom.toDate().toLocaleDateString("zh-TW", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit"
             });
-            const formattedTo = editTripData.tripTime.tripTo.toLocaleDateString("zh-TW", {
+            const formattedTo = editTripData.tripTime.tripTo.toDate().toLocaleDateString("zh-TW", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit"
@@ -120,6 +166,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
 
     // 日期input顯示
     useEffect(() => {
+        if (!trip) return;
         if (selected?.from && selected?.to) {
             const formattedFrom = selected.from.toLocaleDateString("zh-TW", {
                 year: "numeric",
@@ -132,12 +179,72 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
                 day: "2-digit"
             });
             setDateText(`${formattedFrom} ~ ${formattedTo}`);
-            setTripTime({ tripFrom: selected.from, tripTo: selected.to })
+            setTripTime({ tripFrom: Timestamp.fromDate(selected.from), tripTo: Timestamp.fromDate(selected.to) });
+            const timeUpdatedTrip = updateTripTime({ tripFrom: Timestamp.fromDate(selected.from), tripTo: Timestamp.fromDate(selected.to) }, trip);
+            setTrip(timeUpdatedTrip);
         }
     }, [selected])
 
-    // 建立旅程，寫入資料庫，進入旅程編輯頁
-    async function handleClick() {
+    // 更新旅程的所有時間
+    const updateTripTime = (newTripTime: TripTime, trip: Trip): Trip => {
+        if (!trip.tripDaySchedule) {
+            return ({
+                ...trip,
+                tripTime: newTripTime
+            })
+        };
+
+        const fromDate = newTripTime.tripFrom.toDate();
+
+        const updatedTripDays = trip.tripDaySchedule.map((day, index) => {
+            const newRawDate = new Date(fromDate);
+            newRawDate.setDate(fromDate.getDate() + index);
+
+            const month = (newRawDate.getMonth() + 1).toString().padStart(2, '0');
+            const dayNum = newRawDate.getDate().toString().padStart(2, '0');
+            const formattedDate = `${month}月${dayNum}日`;
+
+            const updatedAttractions = day.attractionData.map(attraction => {
+                const updatedAttraction = { ...attraction };
+
+                // 更新 startTime
+                if (attraction.startTime) {
+                    const original = attraction.startTime.toDate();
+                    const newStart = new Date(newRawDate);
+                    newStart.setHours(original.getHours(), original.getMinutes(), original.getSeconds(), 0);
+                    updatedAttraction.startTime = Timestamp.fromDate(newStart);
+                }
+
+                // 更新 endTime
+                if (attraction.endTime) {
+                    const original = attraction.endTime.toDate();
+                    const newEnd = new Date(newRawDate);
+                    newEnd.setHours(original.getHours(), original.getMinutes(), original.getSeconds(), 0);
+                    updatedAttraction.endTime = Timestamp.fromDate(newEnd);
+                }
+
+                return updatedAttraction;
+            });
+
+            return {
+                ...day,
+                rawDate: newRawDate,
+                date: formattedDate,
+                number: index + 1,
+                attractionData: updatedAttractions
+            };
+        });
+
+        return {
+            ...trip,
+            tripTime: newTripTime,
+            tripDaySchedule: updatedTripDays,
+            updateAt: Timestamp.now(),
+        };
+    };
+
+    // 更新旅程，寫入資料庫
+    async function updateTrip(userId: string, tripId: string, trip: Trip) {
         if (!tripName || !tripPerson || !tripTime || selectedCountries.length === 0) {
             alert("請輸入旅程資訊！");
             return;
@@ -147,38 +254,44 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
             return;
         }
 
-        const tripId = uuidv4();
-
-        const newTrip: UpdateTrip = {
+        if (!trip) return;
+        const newTrip: Trip = {
+            ...trip,
             tripName: tripName,
-            person: Number(tripPerson),
+            person: tripPerson,
             tripTime: tripTime,
-            isPublic: false,
             tripCountry: selectedCountries,
-            createAt: serverTimestamp(),
-            updateAt: serverTimestamp(),
+            updateAt: Timestamp.now(),
         };
-        const newAlltrip = {
-            ...newTrip,
+        const newAlltrip: PublicTrip = {
             userId: userId,
-            tripId: tripId,
-            tripCountry: selectedCountries
+            tripId,
+            tripName: tripName,
+            person: tripPerson,
+            tripTime: tripTime,
+            isPublic: trip.isPublic,
+            tripCountry: selectedCountries,
+            createAt: trip.createAt,
+            updateAt: Timestamp.now(),
         }
-
         try {
-            // 寫入使用者自己的旅程
-            await setDoc(doc(db, "users", userId, "trips", tripId), newTrip);
-            // 寫入all_trips，便於首頁查詢
-            await setDoc(doc(db, "all_trips", tripId), newAlltrip);
-            setTripName("");
-            setTripPerson(1);
-            setTripTime(undefined);
-            // setIsAddTrip(false);
+            await setDoc(doc(db, "users", userId, "trips", tripId), { ...newTrip });
+            // 更新all_trips的updateTime
+            await updateDoc(doc(db, "all_trips", tripId), { ...newAlltrip });
             console.log("寫入成功");
+            setSaveStatus("success");
+            // 1.5 秒後隱藏 loading 並關閉視窗
+            setTimeout(() => {
+                setSaveStatus("idle");
+                setIsEditingTrip(false);
+            }, 1500);
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);
-            alert("新增資料時發生錯誤，請稍後再試！");
+            setSaveStatus("error");
+            // 2 秒後自動隱藏提示
+            setTimeout(() => setSaveStatus("idle"), 1500);
+
         }
     }
 
@@ -191,7 +304,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
-                <CountrySelect setSelectedCountries={setSelectedCountries} selectedCountries={selectedCountries}/>
+                <CountrySelect setSelectedCountries={setSelectedCountries} selectedCountries={selectedCountries} />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                 <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
                     value={deteText} />
@@ -205,7 +318,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
                         取消
                     </button>
                     <button className="mt-4 px-4 py-2  text-myblue-600 bg-primary-300 text-base-500 rounded-full hover:text-primary-300 hover:bg-myblue-700"
-                        onClick={handleClick}>
+                        onClick={() => { if (!userId || !tripId || !trip) return; updateTrip(userId, tripId, trip)}}>
                         更新
                     </button>
                 </div>
@@ -213,3 +326,4 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData }: U
         </div>
     )
 }
+

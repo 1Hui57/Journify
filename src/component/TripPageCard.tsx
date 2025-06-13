@@ -4,21 +4,21 @@ import { MdOutlinePeopleAlt } from "react-icons/md";
 import { IoIosMore } from "react-icons/io";
 import { useState } from "react";
 import { Timestamp } from 'firebase/firestore';
-import { Country } from '@/app/type/trip';
+import { Country, TripDaySchedule } from '@/app/type/trip';
 
-interface TripTime {
-    tripFrom: Date;
-    tripTo: Date;
-}
 interface Trip {
     id?: string;
     tripName: string;
     person: number;
-    tripTime: TripTime;
+    tripTime: {
+        tripFrom: Timestamp;
+        tripTo: Timestamp;
+    };
     isPublic: boolean;
     tripCountry: Country[];
     createAt: Timestamp;
     updateAt: Timestamp;
+    tripDaySchedule?: TripDaySchedule[] | null;
 }
 interface TripPageCardProps {
     tripPerson: Number;
@@ -35,6 +35,7 @@ export default function TripPageCard({ tripPerson, deleteTrip, userId, item, upd
     const [ isPublic, setIsPublic] = useState<boolean>(item.isPublic);
     const [isMoreHover, setIsMoreHover] = useState<boolean>(false);
     const router = useRouter();
+    
 
     return (
         <div onClick={()=>router.push(`/mytrips/edit/${item.id}`)} className="bg-mywhite-100 h-50 w-full rounded-md overflow-hidden shadow-md cursor-pointer transition-transform duration-200 hover:scale-105">
@@ -58,7 +59,7 @@ export default function TripPageCard({ tripPerson, deleteTrip, userId, item, upd
                 <div className="w-full flex ">
                     {item.tripTime && (
                         <p className="text-myzinc-400 text-sm line-clamp-1">
-                            {item.tripTime.tripFrom.toLocaleDateString()} ~ {item.tripTime.tripTo.toLocaleDateString()}
+                            {item.tripTime.tripFrom.toDate().toLocaleDateString()} ~ {item.tripTime.tripTo.toDate().toLocaleDateString()}
                         </p>
                     )}
                     <div className="w-fit flex ml-auto items-end gap-1 text-myzinc-400">
