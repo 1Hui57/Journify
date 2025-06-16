@@ -18,12 +18,22 @@ interface HotCounty {
 export default function Home() {
 
     const router = useRouter();
-    const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
+
+    // 資訊載入中
     const [isLoading, setIsloading] = useState<boolean>(true);
+
+    // 公開行程
+    const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
+
+    // 熱門國家
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null)
 
     // 取得熱門國家
+
+
+    // 讀取公開的旅程
     useEffect(() => {
+
         const fetchHotCounties = async () => {
             const q = query(collection(db, "countryStats"), orderBy("count", "desc"), limit(4));
             const snapshot = await getDocs(q);
@@ -32,36 +42,36 @@ export default function Home() {
             console.log(topCountries);
             setHotCountries(topCountries);
         }
-        fetchHotCounties();
-    }, [])
 
-    // 讀取公開的旅程並渲染
-    useEffect(() => {
-        const publicTripRef = query(
-            collection(db, "all_trips"),
-            where("isPublic", "==", true)
-        );
-        const unsubscribe = onSnapshot(publicTripRef, (snapshot) => {
-            const data: PublicTrip[] = snapshot.docs.map((doc) => {
-                const tripData = doc.data() as PublicTrip;
-                return {
-                    userId: tripData.userId,
-                    tripId: tripData.tripId,
-                    tripName: tripData.tripName,
-                    person: tripData.person,
-                    tripTime: tripData.tripTime,
-                    isPublic: tripData.isPublic,
-                    createAt: tripData.createAt,
-                    updateAt: tripData.updateAt,
-                    tripCountry: tripData.tripCountry,
-                    countryCodes: tripData.countryCodes
-                };
-            });
-            setPublicTrips(data);
-            setIsloading(false);
-        });
-        return () => unsubscribe();
+        const fetchPublicTrips = async () => {
+            try {
+                const q = query(
+                    collection(db, "all_trips"),
+                    where("isPublic", "==", true),
+                    orderBy("updateAt", "desc"),
+                    limit(12)
+                );
+
+                const snapshot = await getDocs(q);
+                const data: PublicTrip[] = snapshot.docs.map((doc) => {
+                    const tripData = doc.data() as PublicTrip;
+                    return {
+                        ...tripData,
+                    };
+                });
+
+                setPublicTrips(data);
+            } catch (e) {
+                console.error("載入旅程失敗", e);
+            } 
+        };
+
+        fetchPublicTrips();
+        fetchHotCounties();
+        setIsloading(false);
     }, []);
+
+
 
     // 使用者按愛心
 
@@ -92,7 +102,7 @@ export default function Home() {
                         </div>
                         <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
                             {hotCountries && hotCountries.map(hotCountry =>
-                                <HotCountry key={hotCountry.code} hotCountry={hotCountry}/>
+                                <HotCountry key={hotCountry.code} hotCountry={hotCountry} />
                             )}
                         </div>
                     </div>
