@@ -64,11 +64,11 @@ export default function CountryPage() {
 
     return (
         <div className="w-full h-full px-5">
-            <div className="w-full h-100 flex mt-10 rounded-md overflow-hidden">
-                <div className="w-[40%] h-full px-10 bg-black flex flex-col items-center justify-center">
-                    <p className="w-fit  text-primary-200 text-4xl font-extrabold">旅遊國家。{countryName}</p>
+            <div className="w-full h-50 md:h-100 flex mt-10 rounded-md overflow-hidden">
+                <div className="w-[50%] md:w-[40%] h-full  bg-black flex flex-col items-center justify-center">
+                    <p className="w-fit  text-primary-200 text-lg md:text-4xl font-extrabold">旅遊國家。{countryName}</p>
                 </div>
-                <div className="w-[60%] h-100"
+                <div className="w-[50%] md:w-[60%] h-full"
                     style={{
                         backgroundImage: `linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.8) 20%, rgba(0,0,0,0) 50%), url('${countryPhotoUrl || "/hotCountry.jpg"}')`,
                         backgroundRepeat: "no-repeat",     // ✅ 不重複

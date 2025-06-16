@@ -97,7 +97,7 @@ export default function Home() {
                             <div className="w-1 h-[40px] bg-primary-400"></div>
                             <p className="w-full text-myblue-700 text-2xl-700">熱門國家</p>
                         </div>
-                        <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
+                        <div id="hotCounty" className="w-full h-32 flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
                             {hotCountries && hotCountries.map(hotCountry =>
                                 <HotCountry key={hotCountry.code} hotCountry={hotCountry} />
                             )}

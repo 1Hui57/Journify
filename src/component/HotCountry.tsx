@@ -27,10 +27,10 @@ export default function HotCountry({ hotCountry }: HotCountryProps) {
     }, []);
 
     const countryURL = countries.find(item => item.countryCode === hotCountry.code)?.photoURL;
-    
+
     return (
-        <div onClick={()=>{router.push(`/Country/${hotCountry.code}`)}}
-        className="relative w-1/4 min-w-35 h-full rounded-xl overflow-hidden flex justify-center items-center before:absolute before:inset-0 before:bg-black before:opacity-20 cursor-pointer">
+        <div onClick={() => { router.push(`/Country/${hotCountry.code}`) }}
+            className="relative w-1/4 min-w-35 h-full rounded-xl overflow-hidden flex justify-center items-center before:absolute before:inset-0 before:bg-black before:opacity-20 cursor-pointer">
             <p className="absolute text-white text-xl font-bold">{hotCountry.name}</p>
             <img src={countryURL || "/hotCountry.jpg"} className="w-full h-full object-cover" />
         </div>
