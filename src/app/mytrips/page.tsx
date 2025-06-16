@@ -71,10 +71,6 @@ export default function MyTrips() {
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const data: Trip[] = snapshot.docs.map((doc) => {
                 const tripData = doc.data() as Trip;
-                // const tripTime = {
-                //     tripFrom: tripData.tripTime.tripFrom.toDate(),
-                //     tripTo: tripData.tripTime.tripTo.toDate(),
-                // };
                 return {
                     id: doc.id,
                     tripName: tripData.tripName,

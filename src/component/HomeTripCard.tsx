@@ -17,11 +17,25 @@ import { PublicTrip } from '@/app/type/trip';
 
 interface HomeTripCardProps {
     item: PublicTrip;
+    likeTrips: string[];
+    isUserSignIn: boolean;
+    toggleLike: (tripId: string) => void;
+    showLoginAlert: () => void;
 }
 
-export default function HomeTripCard({ item }: HomeTripCardProps) {
-    
+export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike, showLoginAlert }: HomeTripCardProps) {
+
     const router = useRouter();
+    const [isLike, setIsLike] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(likeTrips.length===0){
+            setIsLike(false);
+            return;
+        }
+        const isLiked = likeTrips.includes(item.tripId);
+        setIsLike(isLiked);
+    }, [likeTrips])
 
     // 計算天數
     const tripStartDate = item.tripTime.tripFrom.toDate();
@@ -43,17 +57,30 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
         tripUpdateTime = "未設定";
     }
 
+
     const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
 
+    // 點擊愛心 icon 時
+    const handleLikeClick = (e: React.MouseEvent) => {
+        e.stopPropagation(); // 防止跳轉到詳細頁
+
+        if (!isUserSignIn) {
+            showLoginAlert();
+            return;
+        }
+
+        toggleLike(item.tripId);
+    };
+
     return (
-        <div onClick={()=>{router.push(`/sharing/${item.tripId}`)}}
-        className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
+        <div onClick={() => { router.push(`/sharing/${item.tripId}`) }}
+            className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
             <div className='absolute top-3 left-3 w-fit h-fit text-mywhite-100 flex items-end'>
                 <IoLocationOutline className='w-7 h-6 mr-1' />
                 {Array.isArray(item.tripCountry) &&
                     item.tripCountry.map((country, index) => (
                         <div key={index} className='mr-2'><p className='text-base-500'>{country.countryName}</p></div>
-                        
+
                     ))}
             </div>
             <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-xl object-cover" />
@@ -67,7 +94,10 @@ export default function HomeTripCard({ item }: HomeTripCardProps) {
                 <div className="w-full h-fit flex justify-between items-center text-myblue-800">
                     <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由 匿名 建立</p>
                     <div className="relative flex-grow w-fit flex justify-end">
-                        <AiOutlineHeart className='w-6 h-6 mr-1' />
+                        {isLike ?
+                            <AiFillHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />
+                            : <AiOutlineHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />}
+
                         <p>150</p>
                         <BsBookmark className='w-5 h-6 ml-2' />
                     </div>
