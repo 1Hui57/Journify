@@ -31,6 +31,7 @@ export interface Country {
   countryName: string;
   lat: number;
   lng: number;
+  photoURL?:string;
 }
 export interface TripDaySchedule {
   id: string;
