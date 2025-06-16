@@ -28,9 +28,6 @@ export default function Home() {
     // 熱門國家
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null)
 
-    // 取得熱門國家
-
-
     // 讀取公開的旅程
     useEffect(() => {
 
