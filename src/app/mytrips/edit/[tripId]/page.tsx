@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { getDoc, doc, Timestamp, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, Timestamp, serverTimestamp, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
@@ -453,7 +453,7 @@ export default function TripEditPage() {
                     ...trip.tripTime,
                     tripTo: Timestamp.fromDate(newTripTo)
                 },
-                tripDaySchedule:updatedTripDaySchedule,
+                tripDaySchedule: updatedTripDaySchedule,
             });
         }
 
@@ -562,7 +562,7 @@ export default function TripEditPage() {
                             <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
                                 {tripDaySchedule.map((item: TripDaySchedule) => {
                                     return (
-                                        <TripDaySelect key={item.id} item={item} selectedDay={selectedDay} selectDate={selectDate} deleteTripDate={deleteTripDate}/>
+                                        <TripDaySelect key={item.id} item={item} selectedDay={selectedDay} selectDate={selectDate} deleteTripDate={deleteTripDate} />
                                     )
                                 })}
                                 <div onClick={() => addTripDate()} className='w-26 flex flex-col flex-shrink-0 text-sm-700 text-myzinc-600 text-center border-x-1 border-myzinc-200 items-center cursor-pointer'>

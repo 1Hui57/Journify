@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
 import SearchBar from "@/component/SearchBar";
 import HomeTripCard from "@/component/HomeTripCard";
-import { query, collection, onSnapshot, where, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { query, collection, onSnapshot, where, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Timestamp } from "firebase/firestore";
-import { DiVim } from "react-icons/di";
 import { PublicTrip } from "./type/trip";
 
 
@@ -35,7 +34,8 @@ export default function Home() {
                     isPublic: tripData.isPublic,
                     createAt: tripData.createAt,
                     updateAt:tripData.updateAt,
-                    tripCountry: tripData.tripCountry
+                    tripCountry: tripData.tripCountry,
+                    countryCodes:tripData.countryCodes
                 };
             });
             setPublicTrips(data);

@@ -14,6 +14,7 @@ interface UpdateTripProps {
     setIsEditingTrip: React.Dispatch<React.SetStateAction<boolean>>;
     editTripData: Trip | null;
     setSaveStatus: React.Dispatch<React.SetStateAction<"idle" | "saving" | "success" | "error">>;
+    updateCountryStatsOnEdit: (oldCountries: Country[], newCountries: Country[]) => void;
 }
 interface Trip {
     id?: string;
@@ -30,7 +31,7 @@ interface Trip {
     tripDaySchedule?: TripDaySchedule[] | null;
 }
 
-export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, setSaveStatus }: UpdateTripProps) {
+export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, setSaveStatus, updateCountryStatsOnEdit }: UpdateTripProps) {
 
     const [selected, setSelected] = useState<DateRange | undefined>();
     const [deteText, setDateText] = useState<string>("");
@@ -40,10 +41,10 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
     const [tripPerson, setTripPerson] = useState<number | undefined>();
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
     const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
-
-    // 原本旅程的天數
     const tripId = editTripData?.id;
     const [trip, setTrip] = useState<Trip | null>(null);
+    const oldCountries = editTripData?.tripCountry;
+    // 原本旅程的天數
     const [tripDays, setTripDays] = useState<number | null>(null);
 
     // useContext取得使用者登入狀態
@@ -245,7 +246,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
 
     // 更新旅程，寫入資料庫
     async function updateTrip(userId: string, tripId: string, trip: Trip) {
-        if (!tripName || !tripPerson || !tripTime || selectedCountries.length === 0) {
+        if (!tripName || !tripPerson || !tripTime || selectedCountries.length === 0 || !oldCountries) {
             alert("請輸入旅程資訊！");
             return;
         }
@@ -263,6 +264,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
             tripCountry: selectedCountries,
             updateAt: Timestamp.now(),
         };
+        const countryCodes = selectedCountries.map((item) => item.countryCode);
         const newAlltrip: PublicTrip = {
             userId: userId,
             tripId,
@@ -272,12 +274,15 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
             isPublic: trip.isPublic,
             tripCountry: selectedCountries,
             createAt: trip.createAt,
+            countryCodes,
             updateAt: Timestamp.now(),
         }
         try {
             await setDoc(doc(db, "users", userId, "trips", tripId), { ...newTrip });
             // 更新all_trips的updateTime
             await updateDoc(doc(db, "all_trips", tripId), { ...newAlltrip });
+            // 更新熱門國家統計表
+            updateCountryStatsOnEdit(oldCountries,selectedCountries);
             console.log("寫入成功");
             setSaveStatus("success");
             // 1.5 秒後隱藏 loading 並關閉視窗
@@ -318,7 +323,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
                         取消
                     </button>
                     <button className="mt-4 px-4 py-2  text-myblue-600 bg-primary-300 text-base-500 rounded-full hover:text-primary-300 hover:bg-myblue-700"
-                        onClick={() => { if (!userId || !tripId || !trip) return; updateTrip(userId, tripId, trip)}}>
+                        onClick={() => { if (!userId || !tripId || !trip) return; updateTrip(userId, tripId, trip) }}>
                         更新
                     </button>
                 </div>

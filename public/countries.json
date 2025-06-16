@@ -183,7 +183,8 @@
     "countryCode": "CA",
     "countryName": "加拿大",
     "lat": 45.27,
-    "lng": -75.42
+    "lng": -75.42,
+    "photoURL":"https://img.soundofhope.org/2022-07/gettyimages-525508231-1656883032645.jpg"
   },
   {
     "countryCode": "CV",
@@ -358,7 +359,8 @@
     "countryCode": "FR",
     "countryName": "法國",
     "lat": 48.864716,
-    "lng": 2.349014
+    "lng": 2.349014,
+    "photoURL":"https://www.hi-lite.com.tw/uploads/edit/fy3hib081828.jpg"
   },
   {
     "countryCode": "GF",
@@ -532,7 +534,8 @@
     "countryCode": "IT",
     "countryName": "義大利",
     "lat": 43.095,
-    "lng": 12.50
+    "lng": 12.50,
+    "photoURL":"https://blog-static.kkday.com/zh-tw/blog/wp-content/uploads/2023/05/Italy_Venice_Ashutterstock_179810423.jpg"
   },
   {
     "countryCode": "JM",
@@ -544,7 +547,8 @@
     "countryCode": "JP",
     "countryName": "日本",
     "lat": 35.68,
-    "lng": 139.69
+    "lng": 139.69,
+    "photoURL":"Osaka.jpg"
   },
   {
     "countryCode": "JO",
@@ -580,7 +584,8 @@
     "countryCode": "KR",
     "countryName": "韓國",
     "lat": 37.56,
-    "lng": 126.97
+    "lng": 126.97,
+    "photoURL":"https://www.galilee.com.tw/Page/Skittles_Pic/hash_83e6f7af2c60ca18b530ed5d7f8e40cc_1920_10000.jpg"
   },
   {
     "countryCode": "KW",
@@ -808,7 +813,8 @@
     "countryCode": "NO",
     "countryName": "挪威",
     "lat": 59.55,
-    "lng": 10.45
+    "lng": 10.45,
+    "photoURL":"https://cdn-cw1.cw.com.tw/images/article/201702/article-589835895e7f0.jpg"
   },
   {
     "countryCode": "OM",
@@ -850,7 +856,8 @@
     "countryCode": "PH",
     "countryName": "菲律賓",
     "lat": 14.4,
-    "lng": 121.03
+    "lng": 121.03,
+    "photoURL":"https://www.fetnet.net/content/dam/fetnet/user_resource/cbu/images/life-circle/on-the-road/2025/01/philippine_ig/Philippine_ig.jpg"
   },
   {
     "countryCode": "PL",
@@ -970,7 +977,8 @@
     "countryCode": "SG",
     "countryName": "新加坡",
     "lat": 1.283,
-    "lng": 103.85
+    "lng": 103.85,
+    "photoURL":"https://cdn-cw1.cw.com.tw/images/article/C1434519389216.jpg"
   },
   {
     "countryCode": "SK",
@@ -1054,7 +1062,8 @@
     "countryCode": "TW",
     "countryName": "台灣",
     "lat": 25.03,
-    "lng": 121.56
+    "lng": 121.56,
+    "photoURL":"https://s.yimg.com/ny/api/res/1.2/v0uatGIE0F4cZ9vo9E_aTw--/YXBwaWQ9aGlnaGxhbmRlcjt3PTY0MDtoPTQyNg--/https://s.yimg.com/os/creatr-uploaded-images/2023-02/5196a170-addc-11ed-9faf-406176ba304d"
   },
   {
     "countryCode": "TJ",
@@ -1072,7 +1081,8 @@
     "countryCode": "TH",
     "countryName": "泰國",
     "lat": 13.45,
-    "lng": 100.35
+    "lng": 100.35,
+    "photoURL":"https://blog-static.kkday.com/zh-hk/blog/wp-content/uploads/Thailand_Bangkok_City-view_AShutterstock_362127659-3.jpg"
   },
   {
     "countryCode": "TL",
@@ -1144,7 +1154,8 @@
     "countryCode": "US",
     "countryName": "美國",
     "lat": 39.91,
-    "lng": -77.02
+    "lng": -77.02,
+    "photoURL":"https://tluxe-aws.hmgcdn.com/public/article/2017/atl_20180824120843_142.jpg"
   },
   {
     "countryCode": "UZ",

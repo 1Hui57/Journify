@@ -2,15 +2,16 @@
 import { useEffect, useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { serverTimestamp, setDoc, doc, FieldValue } from "firebase/firestore";
+import { serverTimestamp, setDoc, doc, FieldValue, getDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import CountrySelect from "./CountrySelect";
-import { Country } from "@/app/type/trip";
+import { Country, PublicTrip } from "@/app/type/trip";
 
 interface CreateTripProps {
     userId: string | undefined;
     setIsAddTrip: React.Dispatch<React.SetStateAction<boolean>>;
+    updateCountryStatsOnCreate: (tripCountry: Country[]) => void;
 }
 interface TripTime {
     tripFrom: Date;
@@ -27,7 +28,7 @@ interface Trip {
     updateAt: FieldValue;
 }
 
-export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
+export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnCreate }: CreateTripProps) {
 
     const [selected, setSelected] = useState<DateRange | undefined>();
     const [deteText, setDateText] = useState<string>("");
@@ -104,6 +105,8 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
         }
     }, [selected])
 
+
+
     // 建立旅程，寫入資料庫，進入旅程編輯頁
     async function handleClick() {
         if (!tripName || !tripPerson || !tripTime || selectedCountries.length === 0) {
@@ -126,11 +129,12 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
         };
+        const countryCodes = selectedCountries.map((item) => item.countryCode);
         const newAlltrip = {
             ...newTrip,
-            userId: userId,
-            tripId: tripId,
-            tripCountry: selectedCountries
+            userId,
+            tripId,
+            countryCodes
         }
 
         try {
@@ -138,6 +142,8 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
             await setDoc(doc(db, "users", userId, "trips", tripId), newTrip);
             // 寫入all_trips，便於首頁查詢
             await setDoc(doc(db, "all_trips", tripId), newAlltrip);
+            // 更新熱門國家統計表
+            updateCountryStatsOnCreate(selectedCountries);
             setTripName("");
             setTripPerson(1);
             setTripTime(undefined);
@@ -159,7 +165,7 @@ export default function CreateTrip({ userId, setIsAddTrip }: CreateTripProps) {
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>人數</p>
                 <input type="number" placeholder="輸入旅程人數" value={tripPerson !== undefined ? tripPerson : ""} onChange={(e) => { personInputOnChange(e) }} className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1 mb-2" />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>國家</p>
-                <CountrySelect setSelectedCountries={setSelectedCountries} selectedCountries={selectedCountries}/>
+                <CountrySelect setSelectedCountries={setSelectedCountries} selectedCountries={selectedCountries} />
                 <p className="text-myblue-600 font-light text-md"><span className="text-myred-400">* </span>日期</p>
                 <input type="text" placeholder="請選擇日期" readOnly className="w-full h-10 pl-2 border-1 border-myzinc-500 focus:border-myblue-300 focus:border-2 mt-1"
                     value={deteText} />

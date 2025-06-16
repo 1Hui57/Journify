@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { IoMdAdd } from "react-icons/io";
 import "react-day-picker/style.css";
 import { auth } from '@/lib/firebase';
-import { addDoc, collection, query, onSnapshot, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, query, onSnapshot, doc, deleteDoc, updateDoc, getDoc, increment, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
@@ -96,11 +96,14 @@ export default function MyTrips() {
     // 刪除旅程
     async function deleteTrip(userId: string | undefined, tripId: string) {
         if (userId && tripId) {
+            const tripCountries = trips.find(item => item.id === tripId)?.tripCountry;
+            if (!tripCountries) return;
             try {
                 const tripRef = doc(db, "users", userId, "trips", tripId);
                 const allTripRef = doc(db, "all_trips", tripId);
                 await deleteDoc(tripRef);
                 await deleteDoc(allTripRef);
+                updateCountryStatsOnDelete(tripCountries);
                 console.log("Trip deleted successfully");
             } catch (error) {
                 console.error("Failed to delete trip:", error);
@@ -129,25 +132,82 @@ export default function MyTrips() {
         }
     }
 
-    // // 更新旅程資訊，例如名稱、人數、日期、國家
-    // async function updateTripData(userId: string, tripId: string, trip: Trip) {
-    //     try {
-    //         const tripsRef = doc(db, "users", userId, "trips", tripId);
-    //         const publicRef = doc(db, "all_trips", tripId)
-    //         await updateDoc(tripsRef, {
-    //             ...trip
-    //         });
-    //         await updateDoc(publicRef, {
-    //             ...trip
-    //         });
-    //         console.log("旅程的公開狀態已更新");
-    //     }
+    /**
+    * 建立旅程時，旅遊國家的統計資料表內該國家數字+1
+    * @param {Country[]} tripCountry - 要建立的國家list
+    */
+    async function updateCountryStatsOnCreate(tripCountry: Country[]) {
+        const promises = tripCountry.map(async (country) => {
+            const countryRef = doc(db, "countryStats", country.countryCode);
+            const countrySnap = await getDoc(countryRef);
 
-    //     catch (error) {
-    //         console.error("更新旅程公開狀態失敗:", error);
-    //         alert("新增資料時發生錯誤，請稍後再試！");
-    //     }
-    // }
+            if (countrySnap.exists()) {
+                // 已存在，count +1
+                await updateDoc(countryRef, {
+                    count: increment(1)
+                });
+            } else {
+                // 不存在，新增該國家統計資料
+                await setDoc(countryRef, {
+                    code: country.countryCode,
+                    name: country.countryName,
+                    count: 1
+                });
+            }
+        });
+
+        await Promise.all(promises);
+    }
+
+    /**
+    * 刪除旅程時，旅遊國家的統計資料表內該國家數字-1
+    * @param {Country[]} tripCountry - 要建立的國家list
+    */
+    async function updateCountryStatsOnDelete(tripCountry: Country[]) {
+        const promises = tripCountry.map(async (country) => {
+            const countryRef = doc(db, "countryStats", country.countryCode);
+            const countrySnap = await getDoc(countryRef);
+
+            if (countrySnap.exists()) {
+                const currentCount = countrySnap.data().count || 0;
+
+                if (currentCount > 1) {
+                    //  不是最後一筆，直接扣 1
+                    await updateDoc(countryRef, {
+                        count: increment(-1)
+                    });
+                } else {
+                    //  如果是最後一筆就直接刪掉這筆統計
+                    await setDoc(countryRef, {
+                        code: country.countryCode,
+                        name: country.countryName,
+                        count: 0
+                    });
+                }
+            }
+        });
+
+        await Promise.all(promises);
+    }
+
+    /**
+    * 更新旅程時，旅遊國家的統計資料表內，移除的國家數字-1，新增的國家數字+1
+    * @param {Country[]} oldCountries - 舊的國家list
+    * @param {Country[]} newCountries - 更新的國家list
+    */
+    async function updateCountryStatsOnEdit(
+        oldCountries: Country[],
+        newCountries: Country[]
+    ) {
+        const oldSet = new Set(oldCountries.map(c => c.countryCode));
+        const newSet = new Set(newCountries.map(c => c.countryCode));
+
+        const toAdd = newCountries.filter(c => !oldSet.has(c.countryCode));
+        const toRemove = oldCountries.filter(c => !newSet.has(c.countryCode));
+
+        await updateCountryStatsOnCreate(toAdd);   // 新增的加一
+        await updateCountryStatsOnDelete(toRemove); // 移除的減一
+    }
 
 
     return (
@@ -185,8 +245,8 @@ export default function MyTrips() {
                     建立旅程
                 </button>
             </div>
-            {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} />}
-            {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData} setSaveStatus={setSaveStatus} />}
+            {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} updateCountryStatsOnCreate={updateCountryStatsOnCreate} />}
+            {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData} setSaveStatus={setSaveStatus} updateCountryStatsOnEdit={updateCountryStatsOnEdit} />}
         </div>
     )
 }

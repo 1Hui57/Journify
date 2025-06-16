@@ -22,6 +22,7 @@ export interface PublicTrip {
   tripTime: TripTime;
   isPublic: boolean;
   tripCountry: Country[];
+  countryCodes:string[]; //["JP","TW"]
   createAt: Timestamp;
   updateAt: Timestamp;
 }
