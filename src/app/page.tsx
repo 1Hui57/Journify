@@ -1,21 +1,40 @@
 'use client'
-import HotCounty from "@/component/HotCounty";
 import "../style.css"
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
 import SearchBar from "@/component/SearchBar";
 import HomeTripCard from "@/component/HomeTripCard";
-import { query, collection, onSnapshot, where, serverTimestamp } from "firebase/firestore";
+import { query, collection, onSnapshot, where, serverTimestamp, orderBy, getDocs, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import { PublicTrip } from "./type/trip";
+import HotCountry from "@/component/HotCountry";
 
-
+interface HotCounty {
+    code: string;
+    name: string;
+    count: number;
+}
 export default function Home() {
 
     const router = useRouter();
     const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
     const [isLoading, setIsloading] = useState<boolean>(true);
+    const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null)
+
+    // 取得熱門國家
+    useEffect(() => {
+        const fetchHotCounties = async () => {
+            const q = query(collection(db, "countryStats"), orderBy("count", "desc"), limit(4));
+            const snapshot = await getDocs(q);
+
+            const topCountries = snapshot.docs.map(doc => doc.data() as HotCounty);
+            console.log(topCountries);
+            setHotCountries(topCountries);
+        }
+        fetchHotCounties();
+    }, [])
+
     // 讀取公開的旅程並渲染
     useEffect(() => {
         const publicTripRef = query(
@@ -33,9 +52,9 @@ export default function Home() {
                     tripTime: tripData.tripTime,
                     isPublic: tripData.isPublic,
                     createAt: tripData.createAt,
-                    updateAt:tripData.updateAt,
+                    updateAt: tripData.updateAt,
                     tripCountry: tripData.tripCountry,
-                    countryCodes:tripData.countryCodes
+                    countryCodes: tripData.countryCodes
                 };
             });
             setPublicTrips(data);
@@ -72,11 +91,9 @@ export default function Home() {
                             <p className="w-full text-myblue-700 text-2xl-700">熱門國家</p>
                         </div>
                         <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
-                            { }
-                            <HotCounty />
-                            <HotCounty />
-                            <HotCounty />
-                            <HotCounty />
+                            {hotCountries && hotCountries.map(hotCountry =>
+                                <HotCountry key={hotCountry.code} hotCountry={hotCountry}/>
+                            )}
                         </div>
                     </div>
                 </div>
