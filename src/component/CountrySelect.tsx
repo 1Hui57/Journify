@@ -1,17 +1,25 @@
 'use client'
-import { Country } from "@/app/type/trip";
+import { Country, TripTime } from "@/app/type/trip";
+import { Timestamp } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-
+interface Trip {
+    id?: string;
+    tripName: string;
+    person: number;
+    tripTime: TripTime;
+    isPublic: boolean;
+    tripCountry: string;
+    createAt: Timestamp;
+    updateAt: Timestamp;
+}
 
 interface CountrySelectProps {
   selectedCountries: Country[];
   setSelectedCountries: React.Dispatch<React.SetStateAction<Country[]>>;
+
 }
 
-export default function CountrySelect({
-  selectedCountries,
-  setSelectedCountries,
-}: CountrySelectProps) {
+export default function CountrySelect({selectedCountries,setSelectedCountries,}: CountrySelectProps) {
   const [countries, setCountries] = useState<Country[]>([]);
   const [searchWord, setSearchWord] = useState<string>("");
   const [isSelecting, setIsSelecting] = useState<boolean>(false);

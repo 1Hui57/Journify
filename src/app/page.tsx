@@ -1,48 +1,74 @@
 'use client'
-import HotCounty from "@/component/HotCounty";
 import "../style.css"
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
 import SearchBar from "@/component/SearchBar";
 import HomeTripCard from "@/component/HomeTripCard";
-import { query, collection, onSnapshot, where, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { query, collection, onSnapshot, where, serverTimestamp, orderBy, getDocs, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Timestamp } from "firebase/firestore";
-import { DiVim } from "react-icons/di";
 import { PublicTrip } from "./type/trip";
+import HotCountry from "@/component/HotCountry";
 
-
+interface HotCounty {
+    code: string;
+    name: string;
+    count: number;
+}
 export default function Home() {
 
     const router = useRouter();
-    const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
+
+    // 資訊載入中
     const [isLoading, setIsloading] = useState<boolean>(true);
-    // 讀取公開的旅程並渲染
+
+    // 公開行程
+    const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
+
+    // 熱門國家
+    const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null)
+
+    // 讀取公開的旅程
     useEffect(() => {
-        const publicTripRef = query(
-            collection(db, "all_trips"),
-            where("isPublic", "==", true)
-        );
-        const unsubscribe = onSnapshot(publicTripRef, (snapshot) => {
-            const data: PublicTrip[] = snapshot.docs.map((doc) => {
-                const tripData = doc.data() as PublicTrip;
-                return {
-                    userId: tripData.userId,
-                    tripId: tripData.tripId,
-                    tripName: tripData.tripName,
-                    person: tripData.person,
-                    tripTime: tripData.tripTime,
-                    isPublic: tripData.isPublic,
-                    createAt: tripData.createAt,
-                    updateAt:tripData.updateAt,
-                    tripCountry: tripData.tripCountry
-                };
-            });
-            setPublicTrips(data);
-            setIsloading(false);
-        });
-        return () => unsubscribe();
+
+        const fetchHotCounties = async () => {
+            const q = query(collection(db, "countryStats"), orderBy("count", "desc"), limit(4));
+            const snapshot = await getDocs(q);
+
+            const topCountries = snapshot.docs.map(doc => doc.data() as HotCounty);
+            console.log(topCountries);
+            setHotCountries(topCountries);
+        }
+
+        const fetchPublicTrips = async () => {
+            try {
+                const q = query(
+                    collection(db, "all_trips"),
+                    where("isPublic", "==", true),
+                    orderBy("updateAt", "desc"),
+                    limit(12)
+                );
+
+                const snapshot = await getDocs(q);
+                const data: PublicTrip[] = snapshot.docs.map((doc) => {
+                    const tripData = doc.data() as PublicTrip;
+                    return {
+                        ...tripData,
+                    };
+                });
+
+                setPublicTrips(data);
+            } catch (e) {
+                console.error("載入旅程失敗", e);
+            } 
+        };
+
+        fetchPublicTrips();
+        fetchHotCounties();
+        setIsloading(false);
     }, []);
+
+
 
     // 使用者按愛心
 
@@ -72,11 +98,9 @@ export default function Home() {
                             <p className="w-full text-myblue-700 text-2xl-700">熱門國家</p>
                         </div>
                         <div id="hotCounty" className="w-full h-full flex gap-x-4 overflow-x-auto px-3 md:px-0 mb-3 md:mb-0">
-                            { }
-                            <HotCounty />
-                            <HotCounty />
-                            <HotCounty />
-                            <HotCounty />
+                            {hotCountries && hotCountries.map(hotCountry =>
+                                <HotCountry key={hotCountry.code} hotCountry={hotCountry} />
+                            )}
                         </div>
                     </div>
                 </div>

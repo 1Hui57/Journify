@@ -22,6 +22,7 @@ export interface PublicTrip {
   tripTime: TripTime;
   isPublic: boolean;
   tripCountry: Country[];
+  countryCodes:string[]; //["JP","TW"]
   createAt: Timestamp;
   updateAt: Timestamp;
 }
@@ -30,6 +31,7 @@ export interface Country {
   countryName: string;
   lat: number;
   lng: number;
+  photoURL?:string;
 }
 export interface TripDaySchedule {
   id: string;
