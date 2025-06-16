@@ -85,7 +85,6 @@ main {
   --font-family: "Noto Sans TC", "Roboto", sans-serif;
 }
 
-
 h1 {
   font-size: 2rem;
   font-weight: var(--font-weight-700);
@@ -248,18 +247,18 @@ button {
   line-height: 2rem;
 }
 
-.rdp{
+.rdp {
   --rdp-accent-color: #ab6b45; /* Change the accent color to indigo. */
   --rdp-accent-background-color: #cf9573; /* Change the accent background color. */
   /* Add more CSS variables here. */
 }
 
 @media (max-width: 450px) {
-    #logo {
-        content: url('/journify-logo.png');
-        width:30px;
-        height:30px;
-    }
+  #logo {
+    content: url("/journify-logo.png");
+    width: 30px;
+    height: 30px;
+  }
 }
 
 /* 在你的 global.css 或 tailwind.css 中加入 */
@@ -279,4 +278,24 @@ button {
     order: 1; /* 第二個 Panel (地圖) 放前面 */
   }
 }
+@keyframes slideDownFadeIn {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
+@keyframes slideUpFadeOut {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}

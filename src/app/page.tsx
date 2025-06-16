@@ -4,20 +4,41 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
 import SearchBar from "@/component/SearchBar";
 import HomeTripCard from "@/component/HomeTripCard";
-import { query, collection, onSnapshot, where, serverTimestamp, orderBy, getDocs, limit } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { query, collection, onSnapshot, where, serverTimestamp, orderBy, getDocs, limit, getDoc, Firestore, doc, arrayRemove, arrayUnion, updateDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import { PublicTrip } from "./type/trip";
 import HotCountry from "@/component/HotCountry";
+import { useAuth } from "@/context/AuthContext";
 
 interface HotCounty {
     code: string;
     name: string;
     count: number;
 }
+interface UserData {
+    nickName: string;
+    email: string;
+    createAt: Timestamp;
+    likeTrips: string[];
+    saveTrips: string[];
+}
 export default function Home() {
 
     const router = useRouter();
+
+    // useContext取得使用者登入狀態
+    const { isUserSignIn, loading } = useAuth();
+    const user = auth.currentUser;
+    const userId = user?.uid;
+
+    // 跳出請先登入彈窗
+    const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [hideAnimation, setHideAnimation] = useState(false);
+
+    // 使用者按愛心與收藏的旅程
+    const [likeTrips, setLikeTrips] = useState<string[]>([]);
+    const [saveTrips, setSaveTrips] = useState<string[]>([]);
 
     // 資訊載入中
     const [isLoading, setIsloading] = useState<boolean>(true);
@@ -27,6 +48,26 @@ export default function Home() {
 
     // 熱門國家
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null)
+
+    // 取得使用者資料庫中按愛心與收藏的旅程資料
+    useEffect(() => {
+
+        if (!user || !userId) return;
+
+        async function fetchUserData(userId: string) {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (userDoc.exists()) {
+                const data = userDoc.data() as UserData;
+                setLikeTrips(data.likeTrips);
+                setSaveTrips(data.saveTrips);
+            } else {
+                setLikeTrips([]);
+                setSaveTrips([]);
+            }
+        }
+        fetchUserData(userId);
+
+    }, [userId]);
 
     // 讀取公開的旅程
     useEffect(() => {
@@ -60,7 +101,7 @@ export default function Home() {
                 setPublicTrips(data);
             } catch (e) {
                 console.error("載入旅程失敗", e);
-            } 
+            }
         };
 
         fetchPublicTrips();
@@ -70,7 +111,44 @@ export default function Home() {
 
 
 
-    // 使用者按愛心
+    // 使用者按愛心與否
+    const toggleLike = async (tripId: string) => {
+        if (!userId) {
+            return;
+        };
+
+        const userRef = doc(db, "users", userId);
+        const isLiked = likeTrips.includes(tripId);
+
+        try {
+            await updateDoc(userRef, {
+                likeTrips: isLiked ? arrayRemove(tripId) : arrayUnion(tripId),
+            });
+
+            // 更新本地 state，立即反應 UI
+            setLikeTrips((prev) =>
+                isLiked ? prev.filter((id) => id !== tripId) : [...prev, tripId]
+            );
+        } catch (e) {
+            console.error("更新愛心失敗", e);
+        }
+    };
+
+    // 跳出提醒彈出視窗1.5秒後隱藏
+    const showLoginAlert = () => {
+        setShowAlert(true);
+        setHideAnimation(false);
+
+        // 等 1.2 秒後啟動滑出動畫
+        setTimeout(() => {
+            setHideAnimation(true);
+        }, 1200);
+
+        // 再等 0.5 秒後隱藏整個彈窗
+        setTimeout(() => {
+            setShowAlert(false);
+        }, 1700);
+    };
 
     return (
         <div className=' w-full h-full '>
@@ -78,6 +156,12 @@ export default function Home() {
                 <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
                     <img src="/loading.gif" className="w-30 h-30 " />
                     <p className="text-mywhite-100">旅雀加載中...請稍後</p>
+                </div>
+            }
+            {showAlert &&
+                <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 w-72 h-20 px-6 bg-mywhite-100 rounded-lg shadow-2xl z-50 flex justify-center items-center
+                    animate-[slideDownFadeIn_0.3s_ease-out] ${hideAnimation ? "animate-[slideUpFadeOut_0.5s_ease-in]" : ""}`}>
+                    <p className=" text-primary-600">請先登入，才會開啟愛心與藏功能唷!</p>
                 </div>
             }
             <div className="w-full h-full max-w-6xl px-8 m-auto">
@@ -114,7 +198,7 @@ export default function Home() {
                     </button>
                 </div>
                 <div id="tripWrapper" className="w-full mt-5 mb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 px-2 ">
-                    {publicTrips && publicTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} />))}
+                    {publicTrips && publicTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} toggleLike={toggleLike} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn}/>))}
                 </div>
             </div>
 
@@ -122,3 +206,5 @@ export default function Home() {
     )
 
 }
+
+

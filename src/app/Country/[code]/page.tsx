@@ -2,12 +2,30 @@
 
 import { Country, PublicTrip } from "@/app/type/trip";
 import HomeTripCard from "@/component/HomeTripCard";
-import { db } from "@/lib/firebase";
-import { query, collection, where, orderBy, limit, getDocs } from "firebase/firestore";
+import { useAuth } from "@/context/AuthContext";
+import { auth, db } from "@/lib/firebase";
+import { query, collection, where, orderBy, limit, getDocs, getDoc, Timestamp, doc, arrayRemove, arrayUnion, updateDoc } from "firebase/firestore";
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react";
 
+interface UserData {
+    nickName: string;
+    email: string;
+    createAt: Timestamp;
+    likeTrips: string[];
+    saveTrips: string[];
+}
+
 export default function CountryPage() {
+
+    // useContext取得使用者登入狀態
+    const { isUserSignIn, loading } = useAuth();
+    const user = auth.currentUser;
+    const userId = user?.uid;
+
+    // 跳出請先登入彈窗
+    const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [hideAnimation, setHideAnimation] = useState(false);
 
     // 取得國家代碼
     const params = useParams();
@@ -18,8 +36,11 @@ export default function CountryPage() {
 
     // 資訊載入中
     const [isLoading, setIsloading] = useState<boolean>(true);
-
     const [countries, setCountries] = useState<Country[]>([]);
+
+    // 使用者按愛心與收藏的旅程
+    const [likeTrips, setLikeTrips] = useState<string[]>([]);
+    const [saveTrips, setSaveTrips] = useState<string[]>([]);
 
     // 載入國家資料
     useEffect(() => {
@@ -28,6 +49,26 @@ export default function CountryPage() {
             .then((data) => setCountries(data))
             .catch((error) => console.error("載入國家失敗", error));
     }, []);
+
+    // 取得使用者資料庫中按愛心與收藏的旅程資料
+    useEffect(() => {
+
+        if (!user || !userId) return;
+
+        async function fetchUserData(userId: string) {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (userDoc.exists()) {
+                const data = userDoc.data() as UserData;
+                setLikeTrips(data.likeTrips);
+                setSaveTrips(data.saveTrips);
+            } else {
+                setLikeTrips([]);
+                setSaveTrips([]);
+            }
+        }
+        fetchUserData(userId);
+
+    }, [userId]);
 
     useEffect(() => {
 
@@ -59,11 +100,50 @@ export default function CountryPage() {
         setIsloading(false);
     }, [countryCode]);
 
+    // 使用者按愛心與否
+    const toggleLike = async (tripId: string) => {
+        if (!userId) {
+            return;
+        };
+
+        const userRef = doc(db, "users", userId);
+        const isLiked = likeTrips.includes(tripId);
+
+        try {
+            await updateDoc(userRef, {
+                likeTrips: isLiked ? arrayRemove(tripId) : arrayUnion(tripId),
+            });
+
+            // 更新本地 state，立即反應 UI
+            setLikeTrips((prev) =>
+                isLiked ? prev.filter((id) => id !== tripId) : [...prev, tripId]
+            );
+        } catch (e) {
+            console.error("更新愛心失敗", e);
+        }
+    };
+
+    // 跳出提醒彈出視窗1.5秒後隱藏
+    const showLoginAlert = () => {
+        setShowAlert(true);
+        setHideAnimation(false);
+
+        // 等 1.2 秒後啟動滑出動畫
+        setTimeout(() => {
+            setHideAnimation(true);
+        }, 1200);
+
+        // 再等 0.5 秒後隱藏整個彈窗
+        setTimeout(() => {
+            setShowAlert(false);
+        }, 1700);
+    };
+
     const countryName = countries.find(item => item.countryCode === countryCode)?.countryName;
     const countryPhotoUrl = countries.find(item => item.countryCode === countryCode)?.photoURL;
 
     return (
-        <div className="w-full h-full px-5">
+        <div className="w-full h-full max-w-6xl px-8 m-auto">
             <div className="w-full h-50 md:h-100 flex mt-10 rounded-md overflow-hidden">
                 <div className="w-[50%] md:w-[40%] h-full  bg-black flex flex-col items-center justify-center">
                     <p className="w-fit  text-primary-200 text-lg md:text-4xl font-extrabold">旅遊國家。{countryName}</p>
@@ -88,7 +168,7 @@ export default function CountryPage() {
                 </button>
             </div>
             <div id="tripWrapper" className="w-full mt-5 mb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 px-2 ">
-                {publicTrips && publicTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} />))}
+                {publicTrips && publicTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} toggleLike={toggleLike} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
             </div>
         </div>
     )
