@@ -265,7 +265,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
             updateAt: Timestamp.now(),
         };
         const countryCodes = selectedCountries.map((item) => item.countryCode);
-        const newAlltrip: PublicTrip = {
+        const newAlltrip = {
             userId: userId,
             tripId,
             tripName: tripName,

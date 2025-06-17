@@ -18,15 +18,16 @@ import { PublicTrip } from '@/app/type/trip';
 interface HomeTripCardProps {
     item: PublicTrip;
     likeTrips: string[];
+    saveTrips: string[];
     isUserSignIn: boolean;
     toggleLike: (tripId: string) => void;
+    toggleSave: (tripId: string) => void;
     showLoginAlert: () => void;
 }
 
-export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike, showLoginAlert }: HomeTripCardProps) {
+export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn, toggleLike, toggleSave, showLoginAlert }: HomeTripCardProps) {
 
     const router = useRouter();
-    const [isLike, setIsLike] = useState<boolean>(false);
 
     useEffect(() => {
         if(likeTrips.length===0){
@@ -36,6 +37,34 @@ export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike
         const isLiked = likeTrips.includes(item.tripId);
         setIsLike(isLiked);
     }, [likeTrips])
+
+    // 愛心與收藏狀態
+    const [isLike, setIsLike] = useState<boolean>(false);
+    const [isSave, setIsSave] = useState<boolean>(false);
+    const [likeCount, setLikeCount] = useState<number>(0);
+
+    useEffect(() => {
+        if (!item) return;
+        setLikeCount(item.likeCount);
+    }, [item])
+
+    useEffect(() => {
+        if (likeTrips.length === 0) {
+            setIsLike(false);
+            return;
+        }
+        const isLiked = likeTrips.includes(item.tripId);
+        setIsLike(isLiked);
+    }, [likeTrips])
+
+    useEffect(() => {
+        if (saveTrips.length === 0) {
+            setIsSave(false);
+            return;
+        }
+        const isSave = saveTrips.includes(item.tripId);
+        setIsSave(isSave);
+    }, [saveTrips])
 
     // 計算天數
     const tripStartDate = item.tripTime.tripFrom.toDate();
@@ -48,9 +77,6 @@ export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-            // hour: "2-digit",
-            // minute: "2-digit",
-            // second: "2-digit",
             hour12: false
         });
     } else {
@@ -59,6 +85,10 @@ export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike
 
 
     const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
+
+    const toggleLikeCount = () => {
+        setLikeCount(isLike? likeCount-1:likeCount+1)
+    }
 
     // 點擊愛心 icon 時
     const handleLikeClick = (e: React.MouseEvent) => {
@@ -70,6 +100,19 @@ export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike
         }
 
         toggleLike(item.tripId);
+        toggleLikeCount();
+    };
+
+    // 點擊收藏 icon 時
+    const handleSaveClick = (e: React.MouseEvent) => {
+        e.stopPropagation(); // 防止跳轉到詳細頁
+
+        if (!isUserSignIn) {
+            showLoginAlert();
+            return;
+        }
+
+        toggleSave(item.tripId);
     };
 
     return (
@@ -91,15 +134,19 @@ export default function HomeTripCard({ item, likeTrips, isUserSignIn, toggleLike
                     <p className="text-base-400 text-myblue-300">更新：{formatted}</p>
                 </div>
 
-                <div className="w-full h-fit flex justify-between items-center text-myblue-800">
-                    <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由 匿名 建立</p>
+                <div className="w-full h-fit flex justify-between items-center text-myblue-600">
+                    <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由 <span className='text-primary-500'>匿名</span> 建立</p>
                     <div className="relative flex-grow w-fit flex justify-end">
                         {isLike ?
                             <AiFillHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />
                             : <AiOutlineHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />}
 
-                        <p>150</p>
-                        <BsBookmark className='w-5 h-6 ml-2' />
+                        <p>{likeCount}</p>
+                        {isSave ?
+                            <BsBookmarkFill className='w-5 h-6 ml-2' onClick={handleSaveClick} />
+                            : <BsBookmark className='w-5 h-6 ml-2' onClick={handleSaveClick} />
+                        }
+
                     </div>
                 </div>
             </div>

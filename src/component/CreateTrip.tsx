@@ -134,7 +134,8 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             ...newTrip,
             userId,
             tripId,
-            countryCodes
+            countryCodes,
+            likeCount:0
         }
 
         try {

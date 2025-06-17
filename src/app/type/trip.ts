@@ -22,16 +22,17 @@ export interface PublicTrip {
   tripTime: TripTime;
   isPublic: boolean;
   tripCountry: Country[];
-  countryCodes:string[]; //["JP","TW"]
+  countryCodes: string[]; //["JP","TW"]
   createAt: Timestamp;
   updateAt: Timestamp;
+  likeCount: number;
 }
 export interface Country {
   countryCode: string;
   countryName: string;
   lat: number;
   lng: number;
-  photoURL?:string;
+  photoURL?: string;
 }
 export interface TripDaySchedule {
   id: string;
@@ -48,10 +49,10 @@ export interface TripScheduleItem {
   formatted_address: string;
   lat: number;
   lng: number;
-  photo: string|null;
+  photo: string | null;
   startTime?: Timestamp;
   endTime?: Timestamp;
-  timeStamp?:Timestamp; //用以檢查圖片是否過期，超過兩天需重打API取得新圖片
+  timeStamp?: Timestamp; //用以檢查圖片是否過期，超過兩天需重打API取得新圖片
   note?: string;
 }
 export interface ReduxTripScheduleItem {
@@ -61,10 +62,10 @@ export interface ReduxTripScheduleItem {
   formatted_address: string;
   lat: number;
   lng: number;
-  photo: string|null;
+  photo: string | null;
   startTime?: number;
   endTime?: number;
-  timeStamp?:number;
+  timeStamp?: number;
   note?: string;
 }
 export interface TripTransport {
