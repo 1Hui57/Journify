@@ -4,7 +4,7 @@ import { Country, PublicTrip } from "@/app/type/trip";
 import HomeTripCard from "@/component/HomeTripCard";
 import { useAuth } from "@/context/AuthContext";
 import { auth, db } from "@/lib/firebase";
-import { query, collection, where, orderBy, limit, getDocs, getDoc, Timestamp, doc, arrayRemove, arrayUnion, updateDoc } from "firebase/firestore";
+import { query, collection, where, orderBy, limit, getDocs, getDoc, Timestamp, doc, arrayRemove, arrayUnion, updateDoc, increment } from "firebase/firestore";
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react";
 
@@ -100,26 +100,58 @@ export default function CountryPage() {
         setIsloading(false);
     }, [countryCode]);
 
-    // 使用者按愛心與否
+    // 切換使否按愛心
     const toggleLike = async (tripId: string) => {
         if (!userId) {
             return;
         };
 
         const userRef = doc(db, "users", userId);
+        const publicRef = doc(db, "all_trips", tripId);
         const isLiked = likeTrips.includes(tripId);
 
         try {
-            await updateDoc(userRef, {
-                likeTrips: isLiked ? arrayRemove(tripId) : arrayUnion(tripId),
-            });
-
             // 更新本地 state，立即反應 UI
             setLikeTrips((prev) =>
                 isLiked ? prev.filter((id) => id !== tripId) : [...prev, tripId]
             );
+
+            await updateDoc(userRef, {
+                likeTrips: isLiked ? arrayRemove(tripId) : arrayUnion(tripId)
+            });
+
+            await updateDoc(publicRef, {
+                likeCount: increment(isLiked ? -1 : 1)
+            })
+
+
         } catch (e) {
             console.error("更新愛心失敗", e);
+        }
+    };
+
+    // 切換使否收藏
+    const toggleSave = async (tripId: string) => {
+        if (!userId) {
+            return;
+        };
+
+        const userRef = doc(db, "users", userId);
+        const isSave = saveTrips.includes(tripId);
+
+        try {
+            // 更新本地 state，立即反應 UI
+            setSaveTrips((prev) =>
+                isSave ? prev.filter((id) => id !== tripId) : [...prev, tripId]
+            );
+
+            await updateDoc(userRef, {
+                saveTrips: isSave ? arrayRemove(tripId) : arrayUnion(tripId),
+            });
+
+
+        } catch (e) {
+            console.error("更新收藏失敗", e);
         }
     };
 
@@ -168,7 +200,8 @@ export default function CountryPage() {
                 </button>
             </div>
             <div id="tripWrapper" className="w-full mt-5 mb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 px-2 ">
-                {publicTrips && publicTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} toggleLike={toggleLike} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
+                {publicTrips && publicTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} saveTrips={saveTrips}
+                    toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
             </div>
         </div>
     )
