@@ -119,6 +119,7 @@ export default function Home() {
         setIsloading(false);
     }, []);
 
+    // 計算目前排序方式的公開旅程
     const sortedTrips = useMemo(() => {
         if (!publicTrips) return [];
 
