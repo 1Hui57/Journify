@@ -88,9 +88,8 @@ export default function CountryPage() {
                 const q = query(
                     collection(db, "all_trips"),
                     where("isPublic", "==", true),
-                    where("countryCodes", "array-contains", countryCode),
-                    orderBy("updateAt", "desc"),
-                    // limit(12)
+                    orderBy(sorting === "POPULAR" ? "likeCount" : "updateAt", "desc"),
+                    limit(12)
                 );
 
                 const snapshot = await getDocs(q);
@@ -106,8 +105,8 @@ export default function CountryPage() {
                 console.error("載入旅程失敗", e);
             }
         };
-        fetchPublicTrips();
 
+        fetchPublicTrips();
         setIsloading(false);
     }, [countryCode]);
 
