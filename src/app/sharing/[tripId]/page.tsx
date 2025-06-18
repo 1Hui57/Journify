@@ -239,7 +239,7 @@ export default function SharingTripPage() {
                         <div className='w-full h-14 border-myzinc-200 border-1 flex items-center' >
                             <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollLeft}><FaAngleLeft /></div>
                             <div className='w-full h-full flex overflow-x-auto scroll-smooth no-scrollbar' id="dateChoose" ref={scrollRef}>
-                                {trip && trip.tripDaySchedule && trip.tripDaySchedule.map((item: TripDaySchedule) => {
+                                {tripDaySchedule && tripDaySchedule.map((item: TripDaySchedule) => {
                                     return (
                                         <div key={item.id}
                                             onClick={() => setSelectedDay({ id: item.id, date: item.rawDate })}
@@ -256,13 +256,13 @@ export default function SharingTripPage() {
                             <div className='w-fit h-full px-2 flex items-center border-x-1 border-myzinc-200 text-primary-600 cursor-pointer' onClick={scrollRight}><FaAngleRight /></div>
                         </div>
                         <div id='dayContent' className='w-full flex-1 overflow-y-scroll pb-12'>
-                            {trip && selectedDay && trip.tripDaySchedule && trip.tripDaySchedule
+                            {tripDaySchedule && tripDaySchedule
                                 .filter(item => item.id === selectedDay.id)
                                 .map(item => (
                                     <SharingAttractionWrappwer key={item.id} tripDaySchedule={item} timestampToDateTime={timestampToDateTime}
                                     />
                                 ))}
-                            {trip && selectedDay && trip.tripDaySchedule && trip.tripDaySchedule
+                            {tripDaySchedule && tripDaySchedule
                                 .filter(item => item.id === selectedDay.id)[0]?.attractionData.length === 0 && (
                                     <div className="w-full h-full flex items-center justify-center text-myzinc-400 text-sm">
                                         當天無景點
