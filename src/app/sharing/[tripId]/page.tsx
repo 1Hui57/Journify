@@ -17,6 +17,7 @@ import dynamic from 'next/dynamic';
 // 用dynamic包住map
 const SharingMap = dynamic(() => import('@/component/sharingPageComponent/SharingMap'), {
     ssr: false, // 禁止 server side render，避免 Google Maps 衝突
+    loading: () => <div>地圖載入中...</div>
 });
 
 export default function SharingTripPage() {

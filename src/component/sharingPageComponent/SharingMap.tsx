@@ -31,7 +31,7 @@ const libraries: ("places")[] = ["places"];
 export default function SharingMapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay,
     setShowTimePop, tripDaySchedule, setTripDaySchedule, setIsPhotoLoading, trip, setTrip, isPhotoLoading }: SharingMapProps) {
 
-    if (!countryData) return;
+    if (!countryData) return null;
 
     // redux 使用Dispatch
     const dispatch = useDispatch();
@@ -42,7 +42,6 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
     const defaultCenter = activeCountry
         ? { lat: countryData[0].lat, lng: countryData[0].lng }
         : { lat: 25.033964, lng: 121.564468 }; // 台北101
-    const countryCode = countryData !== undefined ? countryData[0].countryCode : "TW";
 
     // 初始化載入google map
     const { isLoaded, loadError } = useJsApiLoader({
@@ -51,11 +50,9 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
         language: 'zh-TW',
     });
 
-    const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
     const [mapCenter, setMapCenter] = useState(defaultCenter);
     const mapRef = useRef<google.maps.Map | null>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+
     const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
 
     // 顯示路線
@@ -158,119 +155,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
 
 
 
-    // useEffect(() => {
-    //     if (!isLoaded || !inputRef.current) return;
-
-    //     // 清除舊的 listener 避免重複綁定（如果有）
-    //     if (autocompleteRef.current) {
-    //         google.maps.event.clearInstanceListeners(autocompleteRef.current);
-    //     }
-
-    //     autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-    //         fields: ['place_id'],
-    //         componentRestrictions: { country: activeCountry.countryCode },
-    //     });
-
-    //     const dummyDiv = document.createElement('div');
-    //     placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
-
-    //     autocompleteRef.current.addListener('place_changed', () => {
-    //         const place = autocompleteRef.current?.getPlace();
-    //         const placeId = place?.place_id;
-
-    //         if (!placeId || !placesServiceRef.current) return;
-
-    //         placesServiceRef.current.getDetails(
-    //             {
-    //                 placeId,
-    //                 fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
-    //             },
-    //             (result, status) => {
-    //                 if (status === google.maps.places.PlacesServiceStatus.OK && result?.geometry?.location) {
-    //                     const location = {
-    //                         lat: result.geometry.location.lat(),
-    //                         lng: result.geometry.location.lng(),
-    //                     };
-    //                     setMapCenter(location);
-    //                     const id = uuidv4();
-    //                     setSelectedPlace({
-    //                         id,
-    //                         place_id: placeId,
-    //                         name: result.name,
-    //                         address: result.formatted_address,
-    //                         location,
-    //                         rating: result.rating,
-    //                         photos: result.photos?.[0]?.getUrl({ maxWidth: 500 }),
-    //                         opening_hours: result.opening_hours,
-    //                     });
-    //                 }
-    //             }
-    //         );
-    //     });
-    // }, [isLoaded, activeCountry.countryCode]);
-
-    //   // 算景點的交通時間並新增至景點資訊中
-    //   useEffect(() => {
-    //     if (!isLoaded) return;
-
-    //     const currentDay = tripDaySchedule.find((item) => item.id === selectedDay.id);
-    //     if (!currentDay) return;
-
-    //     currentDay.transportData.forEach((item) => {
-    //       if (!item.modeOption || item.modeOption.length === 0) {
-    //         const origin = [{ placeId: item.fromAttractionPlaceId }];
-    //         const destination = [{ placeId: item.toAttractionPlaceId }];
-    //         const modes = ["DRIVING", "WALKING", "TRANSIT"] as const;
-
-    //         modes.forEach((mode) => {
-    //           const service = new google.maps.DistanceMatrixService();
-    //           service.getDistanceMatrix(
-    //             {
-    //               origins: origin,
-    //               destinations: destination,
-    //               travelMode: mode as google.maps.TravelMode,
-    //             },
-    //             (response, status) => {
-    //               const element = response?.rows?.[0]?.elements?.[0];
-
-    //               setTripDaySchedule((prev) =>
-    //                 prev.map((day) => {
-    //                   if (day.id !== selectedDay.id) return day;
-
-    //                   const updatedTransports = day.transportData.map((t) => {
-    //                     if (t.id !== item.id) return t;
-
-    //                     const updatedOptions = [...(t.modeOption || [])];
-    //                     const alreadyExists = updatedOptions.some((opt) => opt.mode === mode);
-    //                     if (alreadyExists) return t;
-
-    //                     if (status === "OK" && element && element.status === "OK") {
-    //                       updatedOptions.push({
-    //                         mode,
-    //                         duration: element.duration.value,
-    //                         distance: element.distance.value,
-    //                       });
-    //                     } else {
-    //                       // 記錄無法查詢的交通資料（例如跨國）
-    //                       updatedOptions.push({
-    //                         mode,
-    //                         duration: null,
-    //                         distance: null,
-    //                       });
-    //                     }
-
-    //                     return { ...t, modeOption: updatedOptions };
-    //                   });
-
-    //                   return { ...day, transportData: updatedTransports };
-    //                 })
-    //               );
-    //             }
-    //           );
-    //         });
-    //       }
-    //     });
-    //   }, [selectedDay.id, tripDaySchedule, isLoaded]);
+    
 
     // 縣市目前選擇天數的行程路線渲染
     useEffect(() => {
@@ -321,51 +206,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
         );
     }, [tripDaySchedule, selectedDay]);
 
-    // // 點擊地圖景點出現景點資訊
-    // const handleMapLoad = (map: google.maps.Map) => {
-    //     setMapInstance(map);
-    //     mapRef.current = map;
-    //     // 如果placesServiceRef尚未初始化，則在此綁訂在map上
-    //     if (!placesServiceRef.current) {
-    //         placesServiceRef.current = new window.google.maps.places.PlacesService(map);
-    //     }
-
-    //     map.addListener('click', (e: any) => {
-    //         if (e.placeId) {
-    //             e.stop();
-
-    //             placesServiceRef.current?.getDetails(
-    //                 {
-    //                     placeId: e.placeId,
-    //                     fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
-    //                 },
-    //                 (place, status) => {
-    //                     if (status === google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
-    //                         const location = {
-    //                             lat: place.geometry.location.lat(),
-    //                             lng: place.geometry.location.lng(),
-    //                         };
-    //                         const id = uuidv4();
-    //                         setSelectedPlace({
-    //                             id: id,
-    //                             place_id: e.placeId,
-    //                             name: place.name,
-    //                             address: place.formatted_address,
-    //                             location,
-    //                             rating: place.rating,
-    //                             photos: place.photos?.[0]?.getUrl({ maxWidth: 500 }),
-    //                             opening_hours: place.opening_hours,
-    //                         });
-    //                         if (inputRef.current && place.name) {
-    //                             inputRef.current.value = place.name;
-    //                         }
-    //                     }
-    //                 }
-    //             );
-    //         }
-    //     });
-    // };
-
+   
     // 取得Card現在點擊的place_id並在地圖顯示地點及資訊小卡
     useEffect(() => {
         if (!placesServiceRef.current || !selectedAttractionId) return;
@@ -391,9 +232,6 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
                         photos: place.photos?.[0]?.getUrl({ maxWidth: 500 }),
                         opening_hours: place.opening_hours,
                     });
-                    if (inputRef.current && place.name) {
-                        inputRef.current.value = place.name;
-                    }
                     setMapCenter(location); // 將地圖中心移到選定的景點
                 } else {
                     console.error("無法獲取景點詳細資訊:", status);
@@ -407,35 +245,10 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
         console.log(selectedPlace);
         setSelectedPlace(null);
         dispatch(setSelectedAttractionId(null));
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
+        return;
     }
 
-    //   // 依關鍵字搜尋附近景點並渲染於地圖
-    //   const handleKeywordSearch = () => {
-    //     if (!mapInstance || !inputRef.current) return;
-
-    //     const keyword = inputRef.current.value.trim();
-    //     if (!keyword) return;
-
-    //     const service = new google.maps.places.PlacesService(mapInstance);
-    //     const request: google.maps.places.PlaceSearchRequest = {
-    //       location: mapCenter,
-    //       radius: 3000,
-    //       keyword,
-    //     };
-
-    //     service.nearbySearch(request, (results, status) => {
-    //       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-    //         console.log("搜尋結果：", results);
-    //         setSearchResults(results);
-    //       } else {
-    //         console.error("搜尋失敗或無結果", status);
-    //         setSearchResults([]);
-    //       }
-    //     });
-    //   };
+    
 
     // 點擊渲染的圖標顯示資訊小卡
     const clickKeywordSearchResult = (place_id: string) => {
@@ -461,9 +274,6 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
                         photos: place.photos?.[0]?.getUrl({ maxWidth: 500 }),
                         opening_hours: place.opening_hours,
                     });
-                    if (inputRef.current && place.name) {
-                        inputRef.current.value = place.name;
-                    }
                 }
             }
         );
@@ -481,50 +291,13 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
         }
     };
 
-    //   //動態生成圖片url，防止token過期無法顯示圖片
-    //   const getPhotoUrl = (photo_reference: string) => {
-    //     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
-    //   };
+
 
     if (loadError) return <div>地圖載入錯誤</div>;
     if (!isLoaded) return <div>地圖載入中...</div>;
 
     return (
         <div className='relative w-full h-full'>
-            {/* 搜尋列（固定在畫面上方） */}
-            {/* <div className='flex justify-between absolute top-3 left-3 w-[90%] h-12 px-5 rounded-full z-100 bg-mywhite-100 items-center shadow-md'>
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="搜尋地點"
-          className='w-[80%] h-full'
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleKeywordSearch();
-          }}
-        />
-        <div className='flex items-center gap-2'>
-          <IoSearchSharp className='w-6 h-10 cursor-pointer' onClick={() => handleKeywordSearch()} />
-          <RxCross2 className='w-6 h-10 cursor-pointer' onClick={() => { closeAttractionData(); setSearchResults(null); }} />
-          <select
-            value={activeCountry.countryCode}
-            onChange={(e) => {
-              const selected = countryData.find((c) => c.countryCode === e.target.value);
-              if (selected) {
-                setActiveCountry(selected);
-                setMapCenter({ lat: selected.lat, lng: selected.lng });
-              }
-            }}
-            className=" h-full p-2 rounded cursor-pointer"
-          >
-            {countryData.map((country) => (
-              <option key={country.countryCode} value={country.countryCode}>
-                {country.countryName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-      </div> */}
             {/* 地點資訊卡（點選後才出現） */}
             {selectedPlace && (
                 <div
