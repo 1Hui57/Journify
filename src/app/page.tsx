@@ -234,7 +234,7 @@ export default function Home() {
     };
 
     return (
-        <div className=' w-full h-full '>
+        <div className='w-full'>
             {isLoading &&
                 <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
                     <img src="/loading.gif" className="w-30 h-30 " />
@@ -278,8 +278,8 @@ export default function Home() {
                     <button className="w-fit self-end mt-3 flex items-center gap-2 pr-2 ml-auto">
                         <p onClick={() => { toggleSorting() }} className="w-20 text-md font-400 text-zinc-400 text-right">{sorting === "POPULAR" ? "熱門旅程" : "最新旅程"}</p>
                         {arrow === "DOWN" ?
-                            <FiArrowDown onClick={()=>{toggleArrow()}} className="w-6 h-6 text-zinc-400" />
-                            : <FiArrowUp onClick={()=>{toggleArrow()}} className="w-6 h-6 text-zinc-400" />
+                            <FiArrowDown onClick={() => { toggleArrow() }} className="w-6 h-6 text-zinc-400" />
+                            : <FiArrowUp onClick={() => { toggleArrow() }} className="w-6 h-6 text-zinc-400" />
                         }
 
                     </button>

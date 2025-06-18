@@ -88,6 +88,7 @@ export default function CountryPage() {
                 const q = query(
                     collection(db, "all_trips"),
                     where("isPublic", "==", true),
+                    where("countryCodes", "array-contains", countryCode),
                     orderBy(sorting === "POPULAR" ? "likeCount" : "updateAt", "desc"),
                     limit(12)
                 );
