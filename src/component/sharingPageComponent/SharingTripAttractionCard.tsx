@@ -1,5 +1,6 @@
 import { TripDaySchedule, TripScheduleItem } from "@/app/type/trip";
 import { Timestamp } from "firebase/firestore";
+import SharingTripTransportItem from "./SharingTripTransportItem";
 
 
 interface SharingTripAttractionCardProps{
@@ -36,13 +37,13 @@ export default function SharingTripAttractionCard({tripScheduleItem, index, time
                             })()}
                         </div>
                     </div>
-                    {/* {index < tripDaySchedule.attractionData.length - 1 && (() => {
+                    {index < tripDaySchedule.attractionData.length - 1 && (() => {
                         const tripTransport = tripDaySchedule.transportData.find(transportItem => transportItem.fromAttractionId === tripScheduleItem.id);
                         if (!tripTransport || tripTransport === undefined || tripTransport.modeOption === undefined) return;
                         return (
-                            <TripTransportItem key={index} tripTransport={tripTransport} setTripDaySchedule={setTripDaySchedule} selectedDay={selectedDay} />
+                            <SharingTripTransportItem key={index} tripTransport={tripTransport}  />
                         )
-                    })()} */}
+                    })()}
                 </div>
     )
 }
