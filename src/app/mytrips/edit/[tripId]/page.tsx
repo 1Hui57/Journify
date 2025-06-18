@@ -70,6 +70,11 @@ export default function TripEditPage() {
     // 監聽是不是手機尺寸
     const isMobile = useMediaPredicate('(max-width: 768px)');
 
+    // 用dynamic包住map
+    const EditTripMap = dynamic(() => import('@/component/Map'), {
+        ssr: false, // 禁止 server side render，避免 Google Maps 衝突
+    });
+
     // 使用者是否為登入狀態
     useEffect(() => {
         if (!isUserSignIn && !loading) {
@@ -594,7 +599,7 @@ export default function TripEditPage() {
                         isMobile ? "h-[12px] w-full bg-gray-300 cursor-ns-resize active:bg-primary-600" : "w-[6px] bg-gray-300 cursor-ew-resize hover:bg-primary-600"} />
 
                     <Panel defaultSize={isMobile ? 50 : 40} minSize={isMobile ? 50 : 40}>
-                        <MapComponent countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
+                        <EditTripMap countryData={countryData} selectedPlace={selectedPlace} setSelectedPlace={setSelectedPlace}
                             selectedDay={selectedDay} setPendingPlace={setPendingPlace}
                             setShowTimePop={setShowTimePop} tripDaySchedule={tripDaySchedule} setTripDaySchedule={setTripDaySchedule} isPhotoLoading={isPhotoLoading} setIsPhotoLoading={setIsPhotoLoading} trip={trip} setTrip={setTrip} />
                     </Panel>
