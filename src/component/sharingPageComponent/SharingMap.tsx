@@ -8,8 +8,7 @@ import { RxCross2 } from "react-icons/rx";
 import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
 import { useDispatch, useSelector } from 'react-redux';
-import { TripEditRootState } from '@/store/tripEditStore';
-import { setSelectedAttractionId } from '@/store/tripSlice';
+import { setSelectedAttractionId } from '@/store/sharingSlice';
 import { timeStamp } from 'console';
 import { SharingRootState } from '@/store/sharingStore';
 
@@ -87,6 +86,13 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
     };
 
     useEffect(() => {
+        if (!isLoaded || placesServiceRef.current) return;
+
+        const dummyDiv = document.createElement('div');
+        placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
+    }, [isLoaded]);
+
+    useEffect(() => {
         // 等到 trip 有值，才開始檢查是否需要跑圖片更新
         if (!isLoaded || !trip || !placesServiceRef.current) return;
         if (!isPhotoLoading) return;
@@ -152,56 +158,56 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
 
 
 
-    useEffect(() => {
-        if (!isLoaded || !inputRef.current) return;
+    // useEffect(() => {
+    //     if (!isLoaded || !inputRef.current) return;
 
-        // 清除舊的 listener 避免重複綁定（如果有）
-        if (autocompleteRef.current) {
-            google.maps.event.clearInstanceListeners(autocompleteRef.current);
-        }
+    //     // 清除舊的 listener 避免重複綁定（如果有）
+    //     if (autocompleteRef.current) {
+    //         google.maps.event.clearInstanceListeners(autocompleteRef.current);
+    //     }
 
-        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-            fields: ['place_id'],
-            componentRestrictions: { country: activeCountry.countryCode },
-        });
+    //     autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+    //         fields: ['place_id'],
+    //         componentRestrictions: { country: activeCountry.countryCode },
+    //     });
 
-        const dummyDiv = document.createElement('div');
-        placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
+    //     const dummyDiv = document.createElement('div');
+    //     placesServiceRef.current = new window.google.maps.places.PlacesService(dummyDiv);
 
-        autocompleteRef.current.addListener('place_changed', () => {
-            const place = autocompleteRef.current?.getPlace();
-            const placeId = place?.place_id;
+    //     autocompleteRef.current.addListener('place_changed', () => {
+    //         const place = autocompleteRef.current?.getPlace();
+    //         const placeId = place?.place_id;
 
-            if (!placeId || !placesServiceRef.current) return;
+    //         if (!placeId || !placesServiceRef.current) return;
 
-            placesServiceRef.current.getDetails(
-                {
-                    placeId,
-                    fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
-                },
-                (result, status) => {
-                    if (status === google.maps.places.PlacesServiceStatus.OK && result?.geometry?.location) {
-                        const location = {
-                            lat: result.geometry.location.lat(),
-                            lng: result.geometry.location.lng(),
-                        };
-                        setMapCenter(location);
-                        const id = uuidv4();
-                        setSelectedPlace({
-                            id,
-                            place_id: placeId,
-                            name: result.name,
-                            address: result.formatted_address,
-                            location,
-                            rating: result.rating,
-                            photos: result.photos?.[0]?.getUrl({ maxWidth: 500 }),
-                            opening_hours: result.opening_hours,
-                        });
-                    }
-                }
-            );
-        });
-    }, [isLoaded, activeCountry.countryCode]);
+    //         placesServiceRef.current.getDetails(
+    //             {
+    //                 placeId,
+    //                 fields: ['name', 'formatted_address', 'geometry', 'rating', 'opening_hours', 'photos'],
+    //             },
+    //             (result, status) => {
+    //                 if (status === google.maps.places.PlacesServiceStatus.OK && result?.geometry?.location) {
+    //                     const location = {
+    //                         lat: result.geometry.location.lat(),
+    //                         lng: result.geometry.location.lng(),
+    //                     };
+    //                     setMapCenter(location);
+    //                     const id = uuidv4();
+    //                     setSelectedPlace({
+    //                         id,
+    //                         place_id: placeId,
+    //                         name: result.name,
+    //                         address: result.formatted_address,
+    //                         location,
+    //                         rating: result.rating,
+    //                         photos: result.photos?.[0]?.getUrl({ maxWidth: 500 }),
+    //                         opening_hours: result.opening_hours,
+    //                     });
+    //                 }
+    //             }
+    //         );
+    //     });
+    // }, [isLoaded, activeCountry.countryCode]);
 
     //   // 算景點的交通時間並新增至景點資訊中
     //   useEffect(() => {

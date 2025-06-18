@@ -25,8 +25,9 @@ import { TripEditRootState } from "@/store/tripEditStore";
 import EditTimeComponent from '@/component/EditTimeComponent';
 import TripDaySelect from '@/component/TripDaySelect';
 
-const MapComponent = dynamic(() => import('@/component/Map'), {
-    ssr: false,
+// 用dynamic包住map
+const EditTripMap = dynamic(() => import('@/component/Map'), {
+    ssr: false, // 禁止 server side render，避免 Google Maps 衝突
 });
 
 export default function TripEditPage() {
@@ -70,10 +71,7 @@ export default function TripEditPage() {
     // 監聽是不是手機尺寸
     const isMobile = useMediaPredicate('(max-width: 768px)');
 
-    // 用dynamic包住map
-    const EditTripMap = dynamic(() => import('@/component/Map'), {
-        ssr: false, // 禁止 server side render，避免 Google Maps 衝突
-    });
+
 
     // 使用者是否為登入狀態
     useEffect(() => {

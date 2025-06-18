@@ -14,6 +14,11 @@ import { useMediaPredicate } from 'react-media-hook';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import dynamic from 'next/dynamic';
 
+// 用dynamic包住map
+const SharingMap = dynamic(() => import('@/component/sharingPageComponent/SharingMap'), {
+    ssr: false, // 禁止 server side render，避免 Google Maps 衝突
+});
+
 export default function SharingTripPage() {
 
     const router = useRouter();
@@ -41,11 +46,6 @@ export default function SharingTripPage() {
 
     // 顯示timePop、NotePop
     const [showTimePop, setShowTimePop] = useState<boolean>(false);
-
-    // 用dynamic包住map
-    const SharingMap = dynamic(() => import('@/component/sharingPageComponent/SharingMap'), {
-        ssr: false, // 禁止 server side render，避免 Google Maps 衝突
-    });
 
     // 讀取公開的旅程並渲染
     useEffect(() => {
