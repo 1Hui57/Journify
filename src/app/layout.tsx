@@ -3,6 +3,7 @@ import Header from "../component/Header";
 import "../global.css";
 import Footer from "@/component/Footer";
 import { usePathname } from "next/navigation";
+import { MapProvider } from "@/context/MapContext";
 
 
 export const metadata = {
@@ -21,9 +22,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full">
       <body className="h-full m-0">
         <AuthProvider>
-          <Header />
-          <main className="pt-[60px] m-0">{children}</main>
-          <Footer />
+          <MapProvider>
+            <Header />
+            <main className="pt-[60px] m-0">{children}</main>
+            <Footer />
+          </MapProvider>
         </AuthProvider>
       </body>
     </html>

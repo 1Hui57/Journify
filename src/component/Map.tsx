@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { TripEditRootState } from '@/store/tripEditStore';
 import { setSelectedAttractionId } from '@/store/tripSlice';
 import { timeStamp } from 'console';
+import { useGoogleMaps } from '@/context/MapContext';
 
 interface MapProps {
   trip: Trip | undefined;
@@ -27,7 +28,7 @@ interface MapProps {
   setTrip: React.Dispatch<React.SetStateAction<Trip | undefined>>;
 }
 const containerStyle = { width: '100%', height: '100%' };
-const libraries: ("places")[] = ["places"];
+// const libraries: ("places")[] = ["places"];
 
 export default function MapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay, setPendingPlace,
   setShowTimePop, tripDaySchedule, setTripDaySchedule, setIsPhotoLoading, trip, setTrip, isPhotoLoading }: MapProps) {
@@ -46,11 +47,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
   const countryCode = countryData !== undefined ? countryData[0].countryCode : "TW";
 
   // 初始化載入google map
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-    libraries,
-    language: 'zh-TW',
-  });
+  const { isLoaded } = useGoogleMaps(); // 從 Context 中獲取載入狀態
 
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
@@ -480,7 +477,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
   };
 
-  if (loadError) return <div>地圖載入錯誤</div>;
+  // if (loadError) return <div>地圖載入錯誤</div>;
   if (!isLoaded) return <div>地圖載入中...</div>;
 
   return (

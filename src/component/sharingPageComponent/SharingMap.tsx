@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedAttractionId } from '@/store/sharingSlice';
 import { timeStamp } from 'console';
 import { SharingRootState } from '@/store/sharingStore';
+import { useGoogleMaps } from '@/context/MapContext';
 
 interface SharingMapProps {
     trip: Trip | undefined;
@@ -26,7 +27,7 @@ interface SharingMapProps {
     setTrip: React.Dispatch<React.SetStateAction<Trip | undefined>>;
 }
 const containerStyle = { width: '100%', height: '100%' };
-const libraries: ("places")[] = ["places"];
+// const libraries: ("places")[] = ["places"];
 
 export default function SharingMapComponent({ countryData, selectedPlace, setSelectedPlace, selectedDay,
     setShowTimePop, tripDaySchedule, setTripDaySchedule, setIsPhotoLoading, trip, setTrip, isPhotoLoading }: SharingMapProps) {
@@ -43,12 +44,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
         ? { lat: countryData[0].lat, lng: countryData[0].lng }
         : { lat: 25.033964, lng: 121.564468 }; // 台北101
 
-    // 初始化載入google map
-    const { isLoaded, loadError } = useJsApiLoader({
-        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-        libraries,
-        language: 'zh-TW',
-    });
+    const { isLoaded } = useGoogleMaps(); // 從 Context 中獲取載入狀態
 
     const [mapCenter, setMapCenter] = useState(defaultCenter);
     const mapRef = useRef<google.maps.Map | null>(null);
@@ -293,7 +289,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
 
 
 
-    if (loadError) return <div>地圖載入錯誤</div>;
+    
     if (!isLoaded) return <div>地圖載入中...</div>;
 
     return (
