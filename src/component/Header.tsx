@@ -18,7 +18,14 @@ export default function Header() {
     function handleLogout() {
         signOut(auth)
             .then(() => {
-                router.push("/")
+                const isStayPage =
+                    pathname === "/" ||
+                    pathname.startsWith("/sharing/") ||
+                    pathname.startsWith("/Country/");
+
+                if (!isStayPage) {
+                    router.push("/");
+                }
                 console.log("使用者已登出");
             })
             .catch((error) => {
@@ -31,14 +38,14 @@ export default function Header() {
             <div id="header" className="w-full h-full pl-4 pr-4 flex text-3xl justify-between items-center">
                 <img id="logo" src="/JOURNIFY.png" alt="" className='w-32 h-7 cursor-pointer' onClick={() => { router.push('/') }} />
                 <div className='flex justify-between gap-6'>
-                    <button className='text-base-500  text-primary-900 text-center' onClick={() => { router.push('/mytrips') }}>
+                    <button className='text-base-500  text-primary-900 text-center hover:text-primary-600' onClick={() => { router.push('/mytrips') }}>
                         我的旅程
                     </button>
                     {isUserSignIn ?
-                        <button onClick={handleLogout} className='text-base-500  text-primary-900 text-center'>
+                        <button onClick={handleLogout} className='text-base-500  text-primary-900 text-center hover:text-primary-600'>
                             登出
                         </button>
-                        : <button className='text-base-500  text-primary-900 text-center' onClick={() => { router.push('/login') }}>
+                        : <button className='text-base-500  text-primary-900 text-center hover:text-primary-600' onClick={() => { router.push('/login') }}>
                             登入/註冊
                         </button>}
                 </div>

@@ -233,7 +233,7 @@ export default function MyTrips() {
                     {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
                         setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} />))}
                 </div>
-                <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
+                <button className="fixed bottom-14 right-6 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
                 justify-center gap-1 transition-transform duration-200 hover:bg-myblue-700
                  hover:text-primary-300" onClick={() => setIsAddTrip(true)}>

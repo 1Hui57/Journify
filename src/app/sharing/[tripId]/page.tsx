@@ -222,7 +222,7 @@ export default function SharingTripPage() {
 
 
     return (
-        <div className='h-[calc(100vh-73px)] w-screen flex flex-col'>
+        <div className='h-[calc(100vh-60px)] md:h-[calc(100vh-73px)] w-screen flex flex-col'>
             {isLoading &&
                 <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
                     <img src="/loading.gif" className="w-30 h-30 " />

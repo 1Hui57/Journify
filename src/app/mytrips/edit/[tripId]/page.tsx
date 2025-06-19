@@ -530,7 +530,7 @@ export default function TripEditPage() {
     </div>;
 
     return (
-        <div className="h-[calc(100vh-73px)] w-screen flex flex-col">
+        <div className="h-[calc(100vh-60px)] md:h-[calc(100vh-73px)] w-screen flex flex-col">
             <div className='flex-1 w-full h-full flex flex-col-reverse md:flex-row'>
                 {saveStatus !== "idle" && (
                     <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
