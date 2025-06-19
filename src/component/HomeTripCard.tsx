@@ -116,7 +116,7 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
 
                     ))}
             </div>
-            <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-xl object-cover" />
+            <img src={item.tripPhotoUrl ? `${item.tripPhotoUrl}` : "/Tokyo.jpg"} className="w-full h-[70%] rounded-xl object-cover" />
             <div className="w-full h-fit pl-2 pr-2 pt-1 flex flex-col gap-1">
                 <p className="text-myblue-800 text-base-700 font-bold line-clamp-1">{item.tripName}</p>
                 <div className='w-full h-fit flex justify-between'>

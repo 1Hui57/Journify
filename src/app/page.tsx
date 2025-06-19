@@ -53,7 +53,15 @@ export default function Home() {
     const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
 
     // 熱門國家
-    const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null)
+    const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null);
+
+    // 預設隨機照片
+    const defaultCoverPhotos = [
+        "/default1.jpg",
+        "/default2.jpg",
+        "/default3.jpg",
+        "/default4.jpg",
+    ];
 
     // 取得使用者資料庫中按愛心與收藏的旅程資料
     useEffect(() => {
@@ -103,8 +111,10 @@ export default function Home() {
                 const snapshot = await getDocs(q);
                 const data: PublicTrip[] = snapshot.docs.map((doc) => {
                     const tripData = doc.data() as PublicTrip;
+                    const tripPhotoUrl = tripData.tripPhotoUrl ? tripData.tripPhotoUrl :getRandomCoverPhoto();
                     return {
                         ...tripData,
+                        tripPhotoUrl
                     };
                 });
 
@@ -232,6 +242,11 @@ export default function Home() {
             setShowAlert(false);
         }, 1700);
     };
+
+    // 隨機照片
+    function getRandomCoverPhoto():string {
+        return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
+    }
 
     return (
         <div className='w-full'>
