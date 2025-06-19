@@ -58,6 +58,14 @@ export default function MyTrips() {
     // 儲存旅程資料
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
+    // 預設隨機照片
+    const defaultCoverPhotos = [
+        "/default1.jpg",
+        "/default2.jpg",
+        "/default3.jpg",
+        "/default4.jpg",
+    ];
+
     // 使用者是否為登入狀態
     useEffect(() => {
         if (!isUserSignIn && !loading) {
@@ -76,6 +84,7 @@ export default function MyTrips() {
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const data: Trip[] = snapshot.docs.map((doc) => {
                 const tripData = doc.data() as Trip;
+                const tripPhotoUrl = tripData.tripPhotoUrl ? tripData.tripPhotoUrl : getRandomCoverPhoto();
                 return {
                     id: doc.id,
                     tripName: tripData.tripName,
@@ -85,7 +94,7 @@ export default function MyTrips() {
                     tripCountry: tripData.tripCountry,
                     createAt: tripData.createAt,
                     updateAt: tripData.updateAt,
-                    tripPhotoUrl:tripData.tripPhotoUrl
+                    tripPhotoUrl,
                 };
             });
             setTrips(data);
@@ -211,6 +220,11 @@ export default function MyTrips() {
         await updateCountryStatsOnDelete(toRemove); // 移除的減一
     }
 
+    // 隨機照片
+    function getRandomCoverPhoto(): string {
+        return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
+    }
+
 
     return (
         <div className="w-full h-full ">
@@ -237,7 +251,7 @@ export default function MyTrips() {
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
                     {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
-                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} setTsUploadPhoto={setTsUploadPhoto}/>))}
+                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} setTsUploadPhoto={setTsUploadPhoto} />))}
                 </div>
                 <button className="fixed bottom-14 right-6 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
@@ -249,7 +263,7 @@ export default function MyTrips() {
             </div>
             {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} updateCountryStatsOnCreate={updateCountryStatsOnCreate} />}
             {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData} setSaveStatus={setSaveStatus} updateCountryStatsOnEdit={updateCountryStatsOnEdit} />}
-            {isUploadPhoto && <UploadTripPhoto userId={userId} editTripData={editTripData} setTsUploadPhoto={setTsUploadPhoto}/>}
+            {isUploadPhoto && <UploadTripPhoto userId={userId} editTripData={editTripData} setTsUploadPhoto={setTsUploadPhoto} />}
         </div>
     )
 }
