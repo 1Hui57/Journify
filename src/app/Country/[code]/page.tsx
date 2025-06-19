@@ -48,6 +48,14 @@ export default function CountryPage() {
     const [likeTrips, setLikeTrips] = useState<string[]>([]);
     const [saveTrips, setSaveTrips] = useState<string[]>([]);
 
+    // 預設隨機照片
+    const defaultCoverPhotos = [
+        "/default1.jpg",
+        "/default2.jpg",
+        "/default3.jpg",
+        "/default4.jpg",
+    ];
+
     // 載入國家資料
     useEffect(() => {
         fetch("/countries.json")
@@ -96,8 +104,10 @@ export default function CountryPage() {
                 const snapshot = await getDocs(q);
                 const data: PublicTrip[] = snapshot.docs.map((doc) => {
                     const tripData = doc.data() as PublicTrip;
+                    const tripPhotoUrl = tripData.tripPhotoUrl ? tripData.tripPhotoUrl : getRandomCoverPhoto();
                     return {
                         ...tripData,
+                        tripPhotoUrl
                     };
                 });
 
@@ -223,6 +233,11 @@ export default function CountryPage() {
             setShowAlert(false);
         }, 1700);
     };
+
+    // 隨機照片
+    function getRandomCoverPhoto(): string {
+        return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
+    }
 
     const countryName = countries.find(item => item.countryCode === countryCode)?.countryName;
     const countryPhotoUrl = countries.find(item => item.countryCode === countryCode)?.photoURL;
