@@ -61,6 +61,9 @@ export default function Home() {
         "/default2.jpg",
         "/default3.jpg",
         "/default4.jpg",
+        "/default5.jpg",
+        "/default6.jpg",
+        "/default7.jpg"
     ];
 
     // 取得使用者資料庫中按愛心與收藏的旅程資料
