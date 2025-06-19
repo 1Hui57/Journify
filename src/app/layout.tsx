@@ -1,7 +1,9 @@
-
 import { AuthProvider } from "@/context/AuthContext";
 import Header from "../component/Header";
 import "../global.css";
+import Footer from "@/component/Footer";
+import { usePathname } from "next/navigation";
+import { MapProvider } from "@/context/MapContext";
 
 
 export const metadata = {
@@ -13,17 +15,18 @@ export const metadata = {
 
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="h-full">
+      <body className="h-full m-0">
         <AuthProvider>
+          <MapProvider>
             <Header />
-            <main className="w-full h-full pt-[60px] m-0">{children}</main>
+            <main className="pt-[60px] m-0">{children}</main>
+            <Footer />
+          </MapProvider>
         </AuthProvider>
       </body>
     </html>

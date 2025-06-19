@@ -92,7 +92,7 @@ export default function Login() {
 
 
     return (
-        <div className='relative w-full h-full bg-[url("/beach.jpg")] bg-cover bg-center pt-20'>
+        <div className='flex-1 relative w-full h-full bg-[url("/beach.jpg")] bg-cover bg-center pt-20'>
             <div className="relative  w-[330px]  bg-mywhite-60 shadow-lg rounded-xl p-6 m-auto">
                 {/* 選擇登入 / 註冊 */}
                 <div className="flex justify-center gap-5 mb-6">

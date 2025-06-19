@@ -48,6 +48,14 @@ export default function CountryPage() {
     const [likeTrips, setLikeTrips] = useState<string[]>([]);
     const [saveTrips, setSaveTrips] = useState<string[]>([]);
 
+    // 預設隨機照片
+    const defaultCoverPhotos = [
+        "/default1.jpg",
+        "/default2.jpg",
+        "/default3.jpg",
+        "/default4.jpg",
+    ];
+
     // 載入國家資料
     useEffect(() => {
         fetch("/countries.json")
@@ -55,26 +63,6 @@ export default function CountryPage() {
             .then((data) => setCountries(data))
             .catch((error) => console.error("載入國家失敗", error));
     }, []);
-
-    // 取得使用者資料庫中按愛心與收藏的旅程資料
-    useEffect(() => {
-
-        if (!user || !userId) return;
-
-        async function fetchUserData(userId: string) {
-            const userDoc = await getDoc(doc(db, "users", userId));
-            if (userDoc.exists()) {
-                const data = userDoc.data() as UserData;
-                setLikeTrips(data.likeTrips);
-                setSaveTrips(data.saveTrips);
-            } else {
-                setLikeTrips([]);
-                setSaveTrips([]);
-            }
-        }
-        fetchUserData(userId);
-
-    }, [userId]);
 
     // 取得使用者資料庫中按愛心與收藏的旅程資料
     useEffect(() => {
@@ -109,15 +97,17 @@ export default function CountryPage() {
                     collection(db, "all_trips"),
                     where("isPublic", "==", true),
                     where("countryCodes", "array-contains", countryCode),
-                    orderBy("updateAt", "desc"),
-                    // limit(12)
+                    orderBy(sorting === "POPULAR" ? "likeCount" : "updateAt", "desc"),
+                    limit(12)
                 );
 
                 const snapshot = await getDocs(q);
                 const data: PublicTrip[] = snapshot.docs.map((doc) => {
                     const tripData = doc.data() as PublicTrip;
+                    const tripPhotoUrl = tripData.tripPhotoUrl ? tripData.tripPhotoUrl : getRandomCoverPhoto();
                     return {
                         ...tripData,
+                        tripPhotoUrl
                     };
                 });
 
@@ -126,8 +116,8 @@ export default function CountryPage() {
                 console.error("載入旅程失敗", e);
             }
         };
-        fetchPublicTrips();
 
+        fetchPublicTrips();
         setIsloading(false);
     }, [countryCode]);
 
@@ -244,6 +234,11 @@ export default function CountryPage() {
         }, 1700);
     };
 
+    // 隨機照片
+    function getRandomCoverPhoto(): string {
+        return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
+    }
+
     const countryName = countries.find(item => item.countryCode === countryCode)?.countryName;
     const countryPhotoUrl = countries.find(item => item.countryCode === countryCode)?.photoURL;
 
@@ -295,5 +290,6 @@ export default function CountryPage() {
                 </div>
             </div>
         </div>
+
     )
 }

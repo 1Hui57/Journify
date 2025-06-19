@@ -26,6 +26,7 @@ interface Trip {
     tripCountry: Country[];
     createAt: FieldValue;
     updateAt: FieldValue;
+    tripPhotoUrl:string;
 }
 
 export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnCreate }: CreateTripProps) {
@@ -37,8 +38,13 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
     const [tripName, setTripName] = useState<string>("");
     const [tripPerson, setTripPerson] = useState<number | undefined>();
     const [tripTime, setTripTime] = useState<TripTime | undefined>();
-    // const [tripCountry, setTripCountry] = useState<string>("");
     const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
+    const defaultCoverPhotos = [
+        "/default1.jpg",
+        "/default2.jpg",
+        "/default3.jpg",
+        "/default4.jpg",
+    ];
 
     // 人數input規則
     const personInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,6 +134,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             tripCountry: selectedCountries,
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
+            tripPhotoUrl:getRandomCoverPhoto(),
         };
         const countryCodes = selectedCountries.map((item) => item.countryCode);
         const newAlltrip = {
@@ -135,7 +142,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             userId,
             tripId,
             countryCodes,
-            likeCount:0
+            likeCount: 0
         }
 
         try {
@@ -155,6 +162,10 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             console.error(" 寫入 Firestore 失敗：", error);
             alert("新增資料時發生錯誤，請稍後再試！");
         }
+    }
+
+    function getRandomCoverPhoto() {
+        return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
     }
 
     return (

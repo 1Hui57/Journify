@@ -13,6 +13,7 @@ import { Timestamp } from "firebase/firestore";
 import CreateTrip from "@/component/CreateTrip";
 import UpdateTrip from "@/component/UpdateTrip";
 import { Country, TripDaySchedule } from "../type/trip";
+import UploadTripPhoto from "@/component/UploadTripPhoto";
 
 
 interface Trip {
@@ -28,6 +29,7 @@ interface Trip {
     createAt: Timestamp;
     updateAt: Timestamp;
     tripDaySchedule?: TripDaySchedule[] | null;
+    tripPhotoUrl?: string;
 }
 
 export default function MyTrips() {
@@ -42,6 +44,9 @@ export default function MyTrips() {
 
     // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);
+
+    // 上傳圖片狀態
+    const [isUploadPhoto, setTsUploadPhoto] = useState<boolean>(false);
 
     // 更新旅程狀態
     const [isEditingTrip, setIsEditingTrip] = useState<boolean>(false);
@@ -80,6 +85,7 @@ export default function MyTrips() {
                     tripCountry: tripData.tripCountry,
                     createAt: tripData.createAt,
                     updateAt: tripData.updateAt,
+                    tripPhotoUrl:tripData.tripPhotoUrl
                 };
             });
             setTrips(data);
@@ -231,9 +237,9 @@ export default function MyTrips() {
                 <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
                     {/* trip card */}
                     {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
-                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} />))}
+                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} setTsUploadPhoto={setTsUploadPhoto}/>))}
                 </div>
-                <button className="fixed bottom-6 right-10 w-30 h-10 bg-primary-300 ml-auto 
+                <button className="fixed bottom-14 right-6 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
                 justify-center gap-1 transition-transform duration-200 hover:bg-myblue-700
                  hover:text-primary-300" onClick={() => setIsAddTrip(true)}>
@@ -243,6 +249,7 @@ export default function MyTrips() {
             </div>
             {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} updateCountryStatsOnCreate={updateCountryStatsOnCreate} />}
             {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData} setSaveStatus={setSaveStatus} updateCountryStatsOnEdit={updateCountryStatsOnEdit} />}
+            {isUploadPhoto && <UploadTripPhoto userId={userId} editTripData={editTripData} setTsUploadPhoto={setTsUploadPhoto}/>}
         </div>
     )
 }

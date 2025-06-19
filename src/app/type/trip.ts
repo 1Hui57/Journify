@@ -13,6 +13,7 @@ export interface Trip {
   createAt: Timestamp;
   updateAt: Timestamp;
   tripDaySchedule?: TripDaySchedule[] | null;
+  tripPhotoUrl?: string;
 }
 export interface PublicTrip {
   userId: string;
@@ -26,6 +27,7 @@ export interface PublicTrip {
   createAt: Timestamp;
   updateAt: Timestamp;
   likeCount: number;
+  tripPhotoUrl?: string;
 }
 export interface Country {
   countryCode: string;

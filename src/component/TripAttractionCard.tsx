@@ -50,7 +50,11 @@ export default function TripAttractionCard({ tripScheduleItem, index, selectedDa
                 <AiOutlineMore className="absolute top-2 right-0 w-6 h-6 " onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)} onClick={(e) => {
                     e.stopPropagation(); // 阻止點擊冒泡，不讓外層 onClick 執行
                 }} />
-                {isExpanded ? <IoChevronUp onClick={(e) => { e.stopPropagation(); setIsExpanded(prev => !prev) }} className="absolute bottom-1 right-2 w-5 h-5" /> : <IoChevronDown onClick={(e) => { e.stopPropagation();; setIsExpanded(prev => !prev) }} className="absolute bottom-1 right-2 w-5 h-5" />
+                {isExpanded ?
+                    <IoChevronUp onClick={(e) => { e.stopPropagation(); setIsExpanded(prev => !prev) }}
+                        className="absolute bottom-1 right-2 w-5 h-5" />
+                    : <IoChevronDown onClick={(e) => { e.stopPropagation();; setIsExpanded(prev => !prev) }}
+                        className="absolute bottom-1 right-2 w-5 h-5" />
                 }
                 {isHover &&
                     <div className="absolute top-8 right-0 w-26 h-fit px-2 py-2 flex flex-col gap-2 rounded-md justify-center text-sm-400 text-myzinc-400 bg-mywhite-100 shadow-md z-10"

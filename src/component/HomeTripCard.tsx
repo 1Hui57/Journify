@@ -29,15 +29,6 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
 
     const router = useRouter();
 
-    useEffect(() => {
-        if(likeTrips.length===0){
-            setIsLike(false);
-            return;
-        }
-        const isLiked = likeTrips.includes(item.tripId);
-        setIsLike(isLiked);
-    }, [likeTrips])
-
     // 愛心與收藏狀態
     const [isLike, setIsLike] = useState<boolean>(false);
     const [isSave, setIsSave] = useState<boolean>(false);
@@ -83,7 +74,6 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
         tripUpdateTime = "未設定";
     }
 
-
     const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
 
     const toggleLikeCount = () => {
@@ -126,7 +116,7 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
 
                     ))}
             </div>
-            <img src="/Tokyo.jpg" className="w-full h-[70%] rounded-xl object-cover" />
+            <img src={item.tripPhotoUrl ? `${item.tripPhotoUrl}` : "/Tokyo.jpg"} className="w-full h-[70%] rounded-xl object-cover" />
             <div className="w-full h-fit pl-2 pr-2 pt-1 flex flex-col gap-1">
                 <p className="text-myblue-800 text-base-700 font-bold line-clamp-1">{item.tripName}</p>
                 <div className='w-full h-fit flex justify-between'>

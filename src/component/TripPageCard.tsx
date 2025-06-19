@@ -19,6 +19,7 @@ interface Trip {
     createAt: Timestamp;
     updateAt: Timestamp;
     tripDaySchedule?: TripDaySchedule[] | null;
+    tripPhotoUrl?: string;
 }
 interface TripPageCardProps {
     tripPerson: Number;
@@ -26,31 +27,34 @@ interface TripPageCardProps {
     userId: string | undefined;
     item: Trip;
     updateTripPrivate: (userId: string, tripId: string, isPublic: boolean) => Promise<void>;
-    setIsEditingTrip:React.Dispatch<React.SetStateAction<boolean>>;
-    setEditTripData:React.Dispatch<React.SetStateAction<Trip|null>>;
+    setIsEditingTrip: React.Dispatch<React.SetStateAction<boolean>>;
+    setEditTripData: React.Dispatch<React.SetStateAction<Trip | null>>;
+    setTsUploadPhoto: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function TripPageCard({ tripPerson, deleteTrip, userId, item, updateTripPrivate, setIsEditingTrip, setEditTripData }: TripPageCardProps) {
+export default function TripPageCard({ tripPerson, deleteTrip, userId, item, updateTripPrivate, setIsEditingTrip, setEditTripData, setTsUploadPhoto }: TripPageCardProps) {
 
-    const [ isPublic, setIsPublic] = useState<boolean>(item.isPublic);
+    const [isPublic, setIsPublic] = useState<boolean>(item.isPublic);
     const [isMoreHover, setIsMoreHover] = useState<boolean>(false);
     const router = useRouter();
-    
+
 
     return (
-        <div onClick={()=>router.push(`/mytrips/edit/${item.id}`)} className="bg-mywhite-100 h-50 w-full rounded-md overflow-hidden shadow-md cursor-pointer transition-transform duration-200 hover:scale-105">
+        <div onClick={() => router.push(`/mytrips/edit/${item.id}`)} className="bg-mywhite-100 h-50 w-full rounded-md  overflow-hidden shadow-md cursor-pointer transition-transform duration-200 hover:scale-105">
             <div className="relative w-full h-[70%] text-myzinc-900">
-                <img src="/Osaka.jpg" className="w-full h-full object-cover" />
-                <IoIosMore className="absolute top-0 right-1.5 w-6 h-7"onClick={(e)=>e.stopPropagation()} onMouseEnter={() => {setIsMoreHover(true)}} onMouseLeave={() => setIsMoreHover(false)} />
+                <img src={item.tripPhotoUrl? `${item.tripPhotoUrl}` : "/Osaka.jpg"} className="w-full h-full object-cover" />
+                <IoIosMore className="absolute top-0 right-1.5 w-6 h-7 text-mywhite-100" onClick={(e) => e.stopPropagation()} onMouseEnter={() => { setIsMoreHover(true) }} onMouseLeave={() => setIsMoreHover(false)} />
                 {isMoreHover &&
-                    <div className="absolute top-6 right-0 w-24 h-fit px-2 py-3 flex flex-col gap-2 rounded-md justify-center text-myzinc-400 bg-mywhite-100" onMouseEnter={() => setIsMoreHover(true)} onMouseLeave={() => setIsMoreHover(false)}>
-                        <div onClick={(e)=>{e.stopPropagation();setIsEditingTrip(true); setEditTripData(item);}}
-                        className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100">更新</div>
+                    <div className="absolute top-6 right-0 w-24 h-fit px-2 py-3 flex flex-col gap-2 rounded-md justify-center shadow-md text-myzinc-400 bg-mywhite-100" onMouseEnter={() => setIsMoreHover(true)} onMouseLeave={() => setIsMoreHover(false)}>
+                        <div onClick={(e) => { e.stopPropagation(); setIsEditingTrip(true); setEditTripData(item); }}
+                            className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100">更新</div>
+                        <div onClick={(e) => { e.stopPropagation(); setTsUploadPhoto(true); setEditTripData(item); }}
+                            className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100">上傳圖片</div>
                         {isPublic ?
-                            <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={(e) => {e.stopPropagation();updateTripPrivate(userId as string, item.id as string, isPublic);setIsPublic(false)}}>設為私人</div>
-                            : <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={(e) => {e.stopPropagation();updateTripPrivate(userId as string, item.id as string, isPublic);setIsPublic(true)}}>公開</div>
+                            <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={(e) => { e.stopPropagation(); updateTripPrivate(userId as string, item.id as string, isPublic); setIsPublic(false) }}>設為私人</div>
+                            : <div className="w-full text-center hover:text-myblue-700 hover:font-700 hover:bg-myzinc-100" onClick={(e) => { e.stopPropagation(); updateTripPrivate(userId as string, item.id as string, isPublic); setIsPublic(true) }}>公開</div>
                         }
-                        <div onClick={(e) => {e.stopPropagation();deleteTrip(userId as string, item.id as string)}} className="w-full text-center hover:text-myred-400 hover:font-700 hover:bg-myzinc-100">刪除</div>
+                        <div onClick={(e) => { e.stopPropagation(); deleteTrip(userId as string, item.id as string) }} className="w-full text-center hover:text-myred-400 hover:font-700 hover:bg-myzinc-100">刪除</div>
                     </div>
                 }
             </div>
