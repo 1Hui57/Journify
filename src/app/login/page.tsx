@@ -12,7 +12,13 @@ import { db } from "@/lib/firebase";
 export default function Login() {
 
     const router = useRouter();
-    
+
+    // 預設隨機照片
+    const defaultMemberPhotos = [
+        "/member1.jpg",
+        "/member2.jpg",
+    ];
+
     useEffect(() => {
         // 建立一個監聽器可以監聽firebase的登入狀態
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -75,6 +81,7 @@ export default function Login() {
             await setDoc(doc(db, "users", user.uid), {
                 email: user.email,
                 createdAt: serverTimestamp(),
+                memberPhotoUrl:getRandomMemberPhoto(), // 隨機會員照片
             });
             router.back();
         } catch (err: any) {
@@ -89,6 +96,11 @@ export default function Login() {
             }
         }
     };
+
+    // 隨機照片
+    function getRandomMemberPhoto(): string {
+        return defaultMemberPhotos[Math.floor(Math.random() * defaultMemberPhotos.length)];
+    }
 
 
     return (

@@ -54,6 +54,9 @@ export default function CountryPage() {
         "/default2.jpg",
         "/default3.jpg",
         "/default4.jpg",
+        "/default5.jpg",
+        "/default6.jpg",
+        "/default7.jpg"
     ];
 
     // 載入國家資料
