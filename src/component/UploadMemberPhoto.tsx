@@ -5,27 +5,13 @@ import { db, storage } from '@/lib/firebase';
 import { doc, Timestamp, updateDoc } from 'firebase/firestore';
 import { Country, TripDaySchedule } from '@/app/type/trip';
 
-interface UploadTripPhotoProps {
+interface UploadMemberPhotoProps {
     userId: string | undefined;
-    editTripData: Trip | null;
     setTsUploadPhoto: React.Dispatch<React.SetStateAction<boolean>>;
 }
-interface Trip {
-    id?: string;
-    tripName: string;
-    person: number;
-    tripTime: {
-        tripFrom: Timestamp;
-        tripTo: Timestamp;
-    };
-    isPublic: boolean;
-    tripCountry: Country[];
-    createAt: Timestamp;
-    updateAt: Timestamp;
-    tripDaySchedule?: TripDaySchedule[] | null;
-}
 
-export default function UploadTripPhoto({ userId, editTripData, setTsUploadPhoto }: UploadTripPhotoProps) {
+
+export default function UploadMemberPhoto({ userId, setTsUploadPhoto }: UploadMemberPhotoProps) {
 
     const [file, setFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState<string | null>(null);
@@ -61,19 +47,15 @@ export default function UploadTripPhoto({ userId, editTripData, setTsUploadPhoto
     };
 
     const handleUpload = async () => {
-        if (!file || !editTripData || !editTripData.id || !userId) return;
+        if (!file || !userId) return;
 
         setUploading(true);
-        const storageRef = ref(storage, `tripPhotos/${userId}/${editTripData.id}/${editTripData.id}-tripPhoto.jpg`);
+        const storageRef = ref(storage, `memberPhotos/${userId}/${userId}-tripPhoto.jpg`);
         try {
-            if (!editTripData || !editTripData.id) return;
             await uploadBytes(storageRef, file);
             const downloadUrl = await getDownloadURL(storageRef);
-            await updateDoc(doc(db, "users", userId, "trips", editTripData.id), {
-                tripPhotoUrl: downloadUrl
-            });
-            await updateDoc(doc(db, "all_trips", editTripData.id), {
-                tripPhotoUrl: downloadUrl
+            await updateDoc(doc(db, "users", userId), {
+                memberPhotoUrl: downloadUrl
             });
             console.log("上傳成功 URL:", downloadUrl);
             alert("上傳成功！");
