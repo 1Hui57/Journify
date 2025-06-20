@@ -13,6 +13,7 @@ import { BsBookmark } from "react-icons/bs"; //線條儲存
 import { BsBookmarkFill } from "react-icons/bs"; //實心儲存
 import { IoLocationOutline } from "react-icons/io5"; //地圖標示
 import { PublicTrip } from '@/app/type/trip';
+import { useUserData } from '@/context/UserDataContext';
 
 
 interface HomeTripCardProps {
@@ -33,6 +34,11 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
     const [isLike, setIsLike] = useState<boolean>(false);
     const [isSave, setIsSave] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
+
+    // 取得Context的user資料
+    const { addUserId, userDataMap } = useUserData();
+
+    const nickname = userDataMap.get(item.userId)?.nickName || '匿名';
 
     useEffect(() => {
         if (!item) return;
@@ -77,7 +83,7 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
     const tripDays = Math.ceil((tripEndDate.getTime() - tripStartDate.getTime()) / (1000 * 60 * 60 * 24) + 1);
 
     const toggleLikeCount = () => {
-        setLikeCount(isLike? likeCount-1:likeCount+1)
+        setLikeCount(isLike ? likeCount - 1 : likeCount + 1)
     }
 
     // 點擊愛心 icon 時
@@ -125,7 +131,10 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
                 </div>
 
                 <div className="w-full h-fit flex justify-between items-center text-myblue-600">
-                    <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由 <span className='text-primary-500'>匿名</span> 建立</p>
+                    <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由
+                        <span onClick={(e)=>{e.stopPropagation();router.push(`/User/${item.userId}`)}} className='text-primary-500'>{nickname}</span>
+                        建立
+                    </p>
                     <div className="relative flex-grow w-fit flex justify-end">
                         {isLike ?
                             <AiFillHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />
