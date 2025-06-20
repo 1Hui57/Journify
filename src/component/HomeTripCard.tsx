@@ -112,8 +112,8 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
     };
 
     return (
-        <div onClick={() => { router.push(`/sharing/${item.tripId}`) }}
-            className="relative w-full h-80 rounded-md overflow-hidden cursor-pointer">
+        <div
+            className="relative w-full h-80 rounded-md overflow-hidden">
             <div className='absolute top-3 left-3 w-fit h-fit text-mywhite-100 flex items-end'>
                 <IoLocationOutline className='w-7 h-6 mr-1' />
                 {Array.isArray(item.tripCountry) &&
@@ -122,28 +122,31 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
 
                     ))}
             </div>
-            <img src={item.tripPhotoUrl ? `${item.tripPhotoUrl}` : "/Tokyo.jpg"} className="w-full h-[70%] rounded-xl object-cover" />
+            <img src={item.tripPhotoUrl ? `${item.tripPhotoUrl}` : "/Tokyo.jpg"}
+                onClick={() => { router.push(`/sharing/${item.tripId}`) }}
+                className="w-full h-[70%] rounded-xl object-cover cursor-pointer" />
             <div className="w-full h-fit pl-2 pr-2 pt-1 flex flex-col gap-1">
-                <p className="text-myblue-800 text-base-700 font-bold line-clamp-1">{item.tripName}</p>
+                <p onClick={() => { router.push(`/sharing/${item.tripId}`) }}
+                    className="text-myblue-800 text-base-700 line-clamp-1 cursor-pointer">{item.tripName}</p>
                 <div className='w-full h-fit flex justify-between'>
                     <p className="text-base-400 text-myblue-300">{`${tripDays} 天`}</p>
                     <p className="text-base-400 text-myblue-300">更新：{formatted}</p>
                 </div>
 
-                <div className="w-full h-fit flex justify-between items-center text-myblue-600">
+                <div className="w-full h-fit flex justify-between items-center text-myblue-600 gap-1">
                     <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由
-                        <span onClick={(e)=>{e.stopPropagation();router.push(`/User/${item.userId}`)}} className='text-primary-500'>{nickname}</span>
+                        <span onClick={(e) => { e.stopPropagation(); router.push(`/User/${item.userId}`) }} className='text-primary-500 cursor-pointer'>{nickname}</span>
                         建立
                     </p>
                     <div className="relative flex-grow w-fit flex justify-end">
                         {isLike ?
-                            <AiFillHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />
-                            : <AiOutlineHeart className='w-6 h-6 mr-1' onClick={handleLikeClick} />}
+                            <AiFillHeart className='w-6 h-6 mr-1 cursor-pointer' onClick={handleLikeClick} />
+                            : <AiOutlineHeart className='w-6 h-6 mr-1 cursor-pointer' onClick={handleLikeClick} />}
 
                         <p>{likeCount}</p>
                         {isSave ?
-                            <BsBookmarkFill className='w-5 h-6 ml-2' onClick={handleSaveClick} />
-                            : <BsBookmark className='w-5 h-6 ml-2' onClick={handleSaveClick} />
+                            <BsBookmarkFill className='w-5 h-6 ml-2 cursor-pointer' onClick={handleSaveClick} />
+                            : <BsBookmark className='w-5 h-6 ml-2 cursor-pointer' onClick={handleSaveClick} />
                         }
 
                     </div>

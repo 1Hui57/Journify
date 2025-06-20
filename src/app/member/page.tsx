@@ -2,13 +2,14 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { auth, db } from "@/lib/firebase";
-import { query, collection, onSnapshot, Timestamp, doc, updateDoc } from "firebase/firestore";
+import { query, collection, onSnapshot, Timestamp, doc, updateDoc, getDocs, limit, orderBy, where, arrayRemove, arrayUnion, increment, documentId } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Trip } from "../type/trip";
+import { PublicTrip, Trip } from "../type/trip";
 import { useRouter } from 'next/navigation';
 import { IoIosCamera } from "react-icons/io";
 import UploadMemberPhoto from "@/component/UploadMemberPhoto";
 import { MdEdit } from "react-icons/md";
+import HomeTripCard from "@/component/HomeTripCard";
 
 interface User {
     email: string;
@@ -18,7 +19,6 @@ interface User {
     saveTrips: string[] | null;
     nickName: string | undefined;
 }
-
 export default function MemberPage() {
 
     const router = useRouter();
@@ -41,6 +41,60 @@ export default function MemberPage() {
     // 更新暱稱狀態
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
+    // 收藏與愛心的旅程
+    const [likeTrips, setLikeTrips] = useState<string[]>([]);
+    const [saveTripsId, setSaveTripsId] = useState<string[]>([]);
+
+    // 所有公開旅程的ID
+    const [publicTripsId, setPublicTripsId] = useState<string[]>([]);
+
+    // 每頁的旅程
+    const [saveTripsPages, setSaveTripsPages] = useState<{ page: number; trips: PublicTrip[] }[]>([]);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    // const [currentTrips, setCurrentTrips] = useState<PublicTrip[]>([]);
+    const tripsPerPage = 4;
+    const totalPages = Math.ceil(saveTripsId.length / tripsPerPage);
+
+    // 跳出請先登入彈窗
+    const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [hideAnimation, setHideAnimation] = useState(false);
+
+    // 預設隨機照片
+    const defaultCoverPhotos = [
+        "/default1.jpg",
+        "/default2.jpg",
+        "/default3.jpg",
+        "/default4.jpg",
+        "/default5.jpg",
+        "/default6.jpg",
+        "/default7.jpg"
+    ];
+
+    // 取得公開旅程ID
+    useEffect(() => {
+        const fetchPublicTripIds = async () => {
+            try {
+                const q = query(
+                    collection(db, "all_trips"),
+                    where("isPublic", "==", true),
+                    orderBy("likeCount", "desc"),
+                );
+
+                const snapshot = await getDocs(q);
+                const tripIds = snapshot.docs
+                    .map(doc => doc.data().tripId)
+                    .filter((id): id is string => typeof id === "string");
+
+                console.log("公開旅程 ID：", tripIds);
+                setPublicTripsId(tripIds);
+            } catch (e) {
+                console.error("載入旅程 ID 失敗", e);
+            }
+        };
+
+        fetchPublicTripIds();
+    }, []);
+
     // 取得使用者資料庫的資料
     useEffect(() => {
         if (!user) {
@@ -52,6 +106,10 @@ export default function MemberPage() {
             if (snapshot.exists()) {
                 const data = snapshot.data() as User;
                 setUserData(data);
+                if (data.likeTrips && data.saveTrips) {
+                    setSaveTripsId(data.saveTrips);
+                    setLikeTrips(data.likeTrips);
+                }
             } else {
                 console.log("找不到使用者資料");
             }
@@ -59,6 +117,63 @@ export default function MemberPage() {
 
         return () => unsubscribe();
     }, [user?.uid]);
+
+    // 過濾收藏但已經不存在的旅程
+    useEffect(() => {
+        if (publicTripsId.length === 0 || !userId) return;
+
+        const filtered = saveTripsId.filter(id => publicTripsId.includes(id));
+
+        // 如果有變化才更新
+        if (filtered.length !== saveTripsId.length) {
+            setSaveTripsId(filtered); // 更新本地狀態
+
+            const userRef = doc(db, "users", userId);
+            updateDoc(userRef, {
+                saveTrips: filtered
+            }).catch(err => {
+                console.error("更新使用者 saveTrips 失敗", err);
+            });
+        }
+
+    }, [publicTripsId])
+
+    // 檢查當頁是否有資料
+    useEffect(() => {
+        const pageAlreadyLoaded = saveTripsPages.find(p => p.page === currentPage);
+        if (pageAlreadyLoaded) return;
+
+        const start = (currentPage - 1) * tripsPerPage;
+        const end = start + tripsPerPage;
+        const idsToFetch = saveTripsId.slice(start, end);
+
+        if (idsToFetch.length === 0) return;
+
+        fetchTripsByIds(idsToFetch, currentPage);
+    }, [currentPage, saveTripsId]);
+
+    const fetchTripsByIds = async (tripIds: string[], page: number) => {
+        try {
+            const q = query(
+                collection(db, "all_trips"),
+                where("tripId", "in", tripIds),
+                where("isPublic", "==", true)
+            );
+            const snapshot = await getDocs(q);
+            const trips = snapshot.docs.map(doc => {
+                const data = doc.data() as PublicTrip;
+                return {
+                    ...data,
+                    tripPhotoUrl: data.tripPhotoUrl || getRandomCoverPhoto(),
+                };
+            });
+
+            setSaveTripsPages(prev => [...prev, { page, trips }]);
+        } catch (err) {
+            console.error("載入旅程失敗", err);
+        }
+    };
+    const currentTrips = saveTripsPages.find(p => p.page === currentPage)?.trips || [];
 
     // 儲存使用者更新的暱稱
     const updateUserNickName = async (userId: string, userNickName: string) => {
@@ -86,6 +201,88 @@ export default function MemberPage() {
             setUserNickName(null);
         }
     }
+
+    // 隨機照片
+    function getRandomCoverPhoto(): string {
+        return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
+    }
+
+    // 切換使否按愛心
+    const toggleLike = async (tripId: string) => {
+        if (!userId) {
+            return;
+        };
+
+        const userRef = doc(db, "users", userId);
+        const publicRef = doc(db, "all_trips", tripId);
+        const isLiked = likeTrips.includes(tripId);
+
+        try {
+            // 更新本地 state，立即反應 UI
+            setLikeTrips((prev) =>
+                isLiked ? prev.filter((id) => id !== tripId) : [...prev, tripId]
+            );
+
+            await updateDoc(userRef, {
+                likeTrips: isLiked ? arrayRemove(tripId) : arrayUnion(tripId)
+            });
+
+            await updateDoc(publicRef, {
+                likeCount: increment(isLiked ? -1 : 1)
+            })
+
+
+        } catch (e) {
+            console.error("更新愛心失敗", e);
+        }
+    };
+
+    // 切換使否收藏
+    const toggleSave = async (tripId: string) => {
+        if (!userId) {
+            return;
+        };
+
+        const userRef = doc(db, "users", userId);
+        const isSave = saveTripsId.includes(tripId);
+
+        // 👉 如果是要加入收藏，但數量已經滿了，就不處理
+        if (!isSave && saveTripsId.length >= 12) {
+            alert("最多只能收藏 12 筆旅程！");
+            return;
+        }
+
+        try {
+            // 更新本地 state，立即反應 UI
+            setSaveTripsId((prev) =>
+                isSave ? prev.filter((id) => id !== tripId) : [...prev, tripId]
+            );
+
+            await updateDoc(userRef, {
+                saveTrips: isSave ? arrayRemove(tripId) : arrayUnion(tripId),
+            });
+
+
+        } catch (e) {
+            console.error("更新收藏失敗", e);
+        }
+    };
+
+    // 跳出提醒彈出視窗1.5秒後隱藏
+    const showLoginAlert = () => {
+        setShowAlert(true);
+        setHideAnimation(false);
+
+        // 等 1.2 秒後啟動滑出動畫
+        setTimeout(() => {
+            setHideAnimation(true);
+        }, 1200);
+
+        // 再等 0.5 秒後隱藏整個彈窗
+        setTimeout(() => {
+            setShowAlert(false);
+        }, 1700);
+    };
 
     return (
         <div className="w-full h-full">
@@ -122,9 +319,26 @@ export default function MemberPage() {
                             <MdEdit onClick={() => { setIsEditingNickName(true) }} className="ml-2 cursor-pointer" />
                         </>
                     }
-
                 </div>
                 <p className="text-myzinc-500">ID <span className="text-myzinc-700">{userId}</span></p>
+            </div>
+            <div className="w-full h-fit m-auto flex flex-col items-center mt-2">
+                <div className="text-lg-700 text-primary-600 border-b-2 border-primary-600">我的收藏</div>
+                <div id="tripWrapper" className="w-[80%] max-w-[1000px] mx-auto mt-5 mb-5 px-2 grid grid-cols-1 sm:grid-cols-2 gap-5 place-items-center">
+                    {currentTrips && currentTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} saveTrips={saveTripsId}
+                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
+                </div>
+            </div>
+            <div className="flex justify-center mt-4 mb-4 gap-2">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`px-3 py-1 rounded ${currentPage === i + 1 ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
             </div>
             {isUploadPhoto && <UploadMemberPhoto userId={userId} setTsUploadPhoto={setTsUploadPhoto} />}
         </div>

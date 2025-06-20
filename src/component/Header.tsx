@@ -87,7 +87,7 @@ export default function Header() {
                     </button>
                     {isUserSignIn ?
                         <div className='relative' ref={memberMenuRef}>
-                            <div className='w-6 h-6 rounded-full overflow-hidden'>
+                            <div className='w-6 h-6 rounded-full overflow-hidden cursor-pointer'>
                                 <img src={userData?.memberPhotoUrl} onClick={() => { toggleShowMemberList() }} className='w-full h-full'></img>
                             </div>
                             {showMemberList &&
