@@ -289,7 +289,7 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                <SearchBar />
+                {/* <SearchBar /> */}
                 <div className="w-full pl-3 flex gap-5 mt-6  items-center">
                     <div className="w-1 h-[40px] bg-primary-400"></div>
                     <p className="w-fit text-myblue-700 text-2xl-700">熱門旅程</p>
