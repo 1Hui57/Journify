@@ -188,6 +188,12 @@ export default function CountryPage() {
         const userRef = doc(db, "users", userId);
         const isSave = saveTrips.includes(tripId);
 
+        // 👉 如果是要加入收藏，但數量已經滿了，就不處理
+        if (!isSave && saveTrips.length >= 12) {
+            alert("最多只能收藏 12 筆旅程！");
+            return;
+        }
+
         try {
             // 更新本地 state，立即反應 UI
             setSaveTrips((prev) =>
