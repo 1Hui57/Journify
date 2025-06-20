@@ -4,6 +4,7 @@ import "../global.css";
 import Footer from "@/component/Footer";
 import { usePathname } from "next/navigation";
 import { MapProvider } from "@/context/MapContext";
+import { UserDataProvider } from '@/context/UserDataContext';
 
 
 export const metadata = {
@@ -23,9 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full m-0">
         <AuthProvider>
           <MapProvider>
-            <Header />
-            <main className="pt-[60px] m-0">{children}</main>
-            <Footer />
+            <UserDataProvider>
+              <Header />
+              <main className="pt-[60px] m-0">{children}</main>
+              <Footer />
+            </UserDataProvider>
           </MapProvider>
         </AuthProvider>
       </body>

@@ -12,6 +12,7 @@ import HotCountry from "@/component/HotCountry";
 import { useAuth } from "@/context/AuthContext";
 import { FiArrowDown } from "react-icons/fi"; //向下箭頭
 import { FiArrowUp } from "react-icons/fi"; //向上箭頭
+import { useUserData } from "@/context/UserDataContext";
 
 interface HotCounty {
     code: string;
@@ -19,11 +20,12 @@ interface HotCounty {
     count: number;
 }
 interface UserData {
-    nickName: string;
     email: string;
-    createAt: Timestamp;
-    likeTrips: string[];
-    saveTrips: string[];
+    memberPhotoUrl: string;
+    createdAt: Timestamp;
+    likeTrips: string[] | null;
+    saveTrips: string[] | null;
+    nickName: string | undefined;
 }
 export default function Home() {
 
@@ -55,6 +57,9 @@ export default function Home() {
     // 熱門國家
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null);
 
+    // 取得Context的user資料
+    const { addUserId, userDataMap } = useUserData();
+
     // 預設隨機照片
     const defaultCoverPhotos = [
         "/default1.jpg",
@@ -79,8 +84,10 @@ export default function Home() {
             const userDoc = await getDoc(doc(db, "users", userId));
             if (userDoc.exists()) {
                 const data = userDoc.data() as UserData;
-                setLikeTrips(data.likeTrips);
-                setSaveTrips(data.saveTrips);
+                if (data.likeTrips && data.saveTrips) {
+                    setLikeTrips(data.likeTrips);
+                    setSaveTrips(data.saveTrips);
+                }
             } else {
                 setLikeTrips([]);
                 setSaveTrips([]);
@@ -114,7 +121,7 @@ export default function Home() {
                 const snapshot = await getDocs(q);
                 const data: PublicTrip[] = snapshot.docs.map((doc) => {
                     const tripData = doc.data() as PublicTrip;
-                    const tripPhotoUrl = tripData.tripPhotoUrl ? tripData.tripPhotoUrl :getRandomCoverPhoto();
+                    const tripPhotoUrl = tripData.tripPhotoUrl ? tripData.tripPhotoUrl : getRandomCoverPhoto();
                     return {
                         ...tripData,
                         tripPhotoUrl
@@ -131,6 +138,17 @@ export default function Home() {
         fetchHotCounties();
         setIsloading(false);
     }, []);
+
+    // 取得公開旅程的建立者資訊
+    useEffect(() => {
+        if (!publicTrips) return;
+
+        publicTrips.forEach(trip => {
+            addUserId(trip.userId);  // 會自動去重 + 撈資料
+        });
+
+    }, [publicTrips]);
+
 
     // 計算目前排序方式的公開旅程
     const sortedTrips = useMemo(() => {
@@ -247,7 +265,7 @@ export default function Home() {
     };
 
     // 隨機照片
-    function getRandomCoverPhoto():string {
+    function getRandomCoverPhoto(): string {
         return defaultCoverPhotos[Math.floor(Math.random() * defaultCoverPhotos.length)];
     }
 
