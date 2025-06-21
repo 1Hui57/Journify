@@ -169,7 +169,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
     }
 
     return (
-        <div className="fixed inset-0 bg-myzinc900-50  flex  items-center justify-center overflow-y-auto pt-47" onClick={() => setIsAddTrip(false)}>
+        <div className="fixed inset-0 bg-myzinc900-50  flex  items-center justify-center overflow-y-auto pt-47 2xl:pt-0" onClick={() => setIsAddTrip(false)}>
             <div className="bg-white p-6 rounded-lg shadow-lg w-120 h-fit " onClick={(e) => e.stopPropagation()}>
                 <div className="text-lg font-bold text-myblue-800 mb-2">建立旅程</div>
                 <p className="text-myblue-600 font-light text-md "><span className="text-myred-400">* </span>旅程名稱</p>

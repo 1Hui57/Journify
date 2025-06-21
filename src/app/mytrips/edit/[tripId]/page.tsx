@@ -396,7 +396,7 @@ export default function TripEditPage() {
     */
     const deleteTripDate = (deleteDayId: string) => {
         if (!window.confirm("確定要刪除這一天的行程嗎？後面的天數會往前遞補。")) return;
-        const deleteDay = trip?.tripDaySchedule?.find(item => item.id === deleteDayId);
+        const deleteDay = tripDaySchedule.find(item => item.id === deleteDayId);
         if (!deleteDay) return;
 
         const deletedDate = deleteDay.rawDate;
