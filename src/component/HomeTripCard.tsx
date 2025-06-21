@@ -39,20 +39,21 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
     const { addUserId, userDataMap } = useUserData();
 
     const nickname = userDataMap.get(item.userId)?.nickName || '匿名';
+    const userNameStyle = item.userId === "XGcaaXqyE9caqaGf6lD4Er5nwdN2" ?'text-primary-500 cursor-pointer font-500':'text-myblue-600 cursor-pointer font-500'
+
+        useEffect(() => {
+            if (!item) return;
+            setLikeCount(item.likeCount);
+        }, [item])
 
     useEffect(() => {
-        if (!item) return;
-        setLikeCount(item.likeCount);
-    }, [item])
-
-    useEffect(() => {
-        if (likeTrips.length === 0) {
-            setIsLike(false);
-            return;
-        }
-        const isLiked = likeTrips.includes(item.tripId);
-        setIsLike(isLiked);
-    }, [likeTrips])
+            if (likeTrips.length === 0) {
+                setIsLike(false);
+                return;
+            }
+            const isLiked = likeTrips.includes(item.tripId);
+            setIsLike(isLiked);
+        }, [likeTrips])
 
     useEffect(() => {
         if (saveTrips.length === 0) {
@@ -135,7 +136,7 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
 
                 <div className="w-full h-fit flex justify-between items-center text-myblue-600 gap-1">
                     <p className="text-base-400 text-myblue-300 w-fit line-clamp-1">由
-                        <span onClick={(e) => { e.stopPropagation(); router.push(`/User/${item.userId}`) }} className='text-primary-500 cursor-pointer'>{nickname}</span>
+                        <span onClick={(e) => { e.stopPropagation(); router.push(`/User/${item.userId}`) }} className={userNameStyle}>{nickname}</span>
                         建立
                     </p>
                     <div className="relative flex-grow w-fit flex justify-end">

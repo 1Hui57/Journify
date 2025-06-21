@@ -51,7 +51,6 @@ export default function MemberPage() {
     // 每頁的旅程
     const [saveTripsPages, setSaveTripsPages] = useState<{ page: number; trips: PublicTrip[] }[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
-    // const [currentTrips, setCurrentTrips] = useState<PublicTrip[]>([]);
     const tripsPerPage = 4;
     const totalPages = Math.ceil(saveTripsId.length / tripsPerPage);
 
