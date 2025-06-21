@@ -251,11 +251,13 @@ export default function MyTrips() {
                 <div className="w-fit h-fit mb-6">
                     <p className="text-2xl font-bold text-myblue-800">我的旅程</p>
                 </div>
-                <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
-                    {/* trip card */}
-                    {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
-                        setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} setTsUploadPhoto={setTsUploadPhoto} />))}
-                </div>
+                {trips.length !== 0 &&
+                    <div id="tripsWrapper" className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 w-full lg:grid-cols-4">
+                        {/* trip card */}
+                        {trips.map((item) => (<TripPageCard key={item.id} item={item} tripPerson={item.person} deleteTrip={deleteTrip} userId={userId} updateTripPrivate={updateTripPrivate}
+                            setIsEditingTrip={setIsEditingTrip} setEditTripData={setEditTripData} setTsUploadPhoto={setTsUploadPhoto} />))}
+                    </div>
+                }
                 <button className="fixed bottom-14 right-6 w-30 h-10 bg-primary-300 ml-auto 
                 rounded-full text-base text-myblue-600 font-bold flex items-center 
                 justify-center gap-1 transition-transform duration-200 hover:bg-myblue-700
@@ -264,7 +266,8 @@ export default function MyTrips() {
                     建立旅程
                 </button>
             </div>
-            {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} updateCountryStatsOnCreate={updateCountryStatsOnCreate} />}
+            {trips.length === 0 && <div className="w-fit h-full ml-auto mr-auto text-myzinc-500 text-base-500"> 還沒有旅程，點擊右下角建立旅程！</div>}
+            {isAddTrip && <CreateTrip userId={userId} setIsAddTrip={setIsAddTrip} updateCountryStatsOnCreate={updateCountryStatsOnCreate} setSaveStatus={setSaveStatus}/>}
             {isEditingTrip && <UpdateTrip userId={userId} setIsEditingTrip={setIsEditingTrip} editTripData={editTripData} setSaveStatus={setSaveStatus} updateCountryStatsOnEdit={updateCountryStatsOnEdit} />}
             {isUploadPhoto && <UploadTripPhoto userId={userId} editTripData={editTripData} setTsUploadPhoto={setTsUploadPhoto} />}
         </div>

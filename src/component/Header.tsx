@@ -57,6 +57,7 @@ export default function Header() {
                 const isStayPage =
                     pathname === "/" ||
                     pathname.startsWith("/sharing/") ||
+                    pathname.startsWith("/User/") ||
                     pathname.startsWith("/Country/");
                 setShowMemberList(false);
 

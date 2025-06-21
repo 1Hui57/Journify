@@ -12,6 +12,7 @@ interface CreateTripProps {
     userId: string | undefined;
     setIsAddTrip: React.Dispatch<React.SetStateAction<boolean>>;
     updateCountryStatsOnCreate: (tripCountry: Country[]) => void;
+    setSaveStatus: React.Dispatch<React.SetStateAction<"idle" | "saving" | "success" | "error">>;
 }
 interface TripTime {
     tripFrom: Date;
@@ -26,10 +27,10 @@ interface Trip {
     tripCountry: Country[];
     createAt: FieldValue;
     updateAt: FieldValue;
-    tripPhotoUrl:string;
+    tripPhotoUrl: string;
 }
 
-export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnCreate }: CreateTripProps) {
+export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnCreate, setSaveStatus }: CreateTripProps) {
 
     const [selected, setSelected] = useState<DateRange | undefined>();
     const [deteText, setDateText] = useState<string>("");
@@ -134,7 +135,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             tripCountry: selectedCountries,
             createAt: serverTimestamp(),
             updateAt: serverTimestamp(),
-            tripPhotoUrl:getRandomCoverPhoto(),
+            tripPhotoUrl: getRandomCoverPhoto(),
         };
         const countryCodes = selectedCountries.map((item) => item.countryCode);
         const newAlltrip = {
@@ -155,12 +156,20 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             setTripName("");
             setTripPerson(1);
             setTripTime(undefined);
-            setIsAddTrip(false);
             console.log("寫入成功");
+            setSaveStatus("success");
+            // 1.5 秒後隱藏 loading 並關閉視窗
+            setTimeout(() => {
+                setSaveStatus("idle");
+                setIsAddTrip(false);
+            }, 1500);
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);
-            alert("新增資料時發生錯誤，請稍後再試！");
+            setSaveStatus("error");
+            // 2 秒後自動隱藏提示
+            setTimeout(() => setSaveStatus("idle"), 1500);
+
         }
     }
 
@@ -169,7 +178,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
     }
 
     return (
-        <div className="fixed inset-0 bg-myzinc900-50  flex  items-center justify-center overflow-y-auto pt-47" onClick={() => setIsAddTrip(false)}>
+        <div className="fixed inset-0 bg-myzinc900-50  flex  items-center justify-center overflow-y-auto pt-47 2xl:pt-0" onClick={() => setIsAddTrip(false)}>
             <div className="bg-white p-6 rounded-lg shadow-lg w-120 h-fit " onClick={(e) => e.stopPropagation()}>
                 <div className="text-lg font-bold text-myblue-800 mb-2">建立旅程</div>
                 <p className="text-myblue-600 font-light text-md "><span className="text-myred-400">* </span>旅程名稱</p>
