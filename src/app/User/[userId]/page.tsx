@@ -45,8 +45,8 @@ export default function UserPage() {
     const tripsPerPage = 4;
     const totalPages = Math.ceil(trips.length / tripsPerPage);
 
-    // 使用者資料
-    const [userData, setUserData] = useState<UserData | null>(null);
+    // 該使用者資料
+    const [userData, setUserData] = useState<UserData | undefined>(undefined);
 
     // 使用者按愛心與收藏的旅程
     const [likeTrips, setLikeTrips] = useState<string[]>([]);
@@ -70,10 +70,21 @@ export default function UserPage() {
 
 
     useEffect(() => {
-        if (userId) addUserId(userId);
-    }, [userId]);
+        if (pageUserId) {
+            addUserId(pageUserId);
+        }
+    }, [pageUserId]);
 
-    const pageUserData = userDataMap.get(pageUserId || "");
+    useEffect(() => {
+        if (!pageUserId) return;
+
+        const pageUserData = userDataMap.get(pageUserId);
+        if (pageUserData) {
+            setUserData(pageUserData);
+        }
+    }, [userDataMap, pageUserId]);
+
+
 
     // 取得使用者資料庫中按愛心與收藏的旅程資料
     useEffect(() => {
@@ -237,12 +248,12 @@ export default function UserPage() {
             }
             <div className="relative w-full h-60" style={{ backgroundImage: `url('/member-background.jpg')`, }}>
                 <div className="absolute w-30 h-30 bottom-[-55px] left-1/2 transform -translate-x-1/2  rounded-full bg-amber-100 overflow-hidden">
-                    <img src={pageUserData?.memberPhotoUrl} className="w-full h-full object-cover" />
+                    <img src={userData?.memberPhotoUrl} className="w-full h-full object-cover" />
                 </div>
             </div>
             <div id="userData" className="w-fit h-fit m-auto mt-18 text-myzinc-700 text-center flex flex-col gap-1">
                 <div className="flex justify-center items-center">
-                    <p className="text-md font-500 text-myzinc-500">暱稱  <span className="text-myzinc-700">{pageUserData?.nickName ? pageUserData.nickName : "未設定"}</span></p>
+                    <p className="text-md font-500 text-myzinc-500">暱稱  <span className="text-myzinc-700">{userData?.nickName ? userData.nickName : "未設定"}</span></p>
                 </div>
                 <p className="text-myzinc-500">ID <span className="text-myzinc-700">{pageUserId}</span></p>
             </div>
