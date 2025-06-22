@@ -52,5 +52,6 @@ Journify is a travel planning platform designed for passionate travelers. Easily
 
 ### Trip
 
+
 - **Create a Trip**
-  <!-- ![Create a Trip](https://github.com/carlwang1995/good-to-go/blob/main/public/readme/createTrip.gif) -->
+  ![Create a Trip](https://github.com/1Hui57/Journify/blob/develop/public/%E5%BB%BA%E7%AB%8B%E6%97%85%E7%A8%8B.gif)
