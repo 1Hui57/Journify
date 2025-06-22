@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Journify 旅雀
 
-## Getting Started
+- [Introduction]
+- [Techniques]
+- [Features]
+- [Contact]
 
-First, run the development server:
+## Introduction
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Journify is a travel planning platform designed for passionate travelers. Easily create your own personalized itinerary, or share your thoughtfully crafted journeys to inspire others. Discover popular trips and start building your perfect adventure today!
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**_Link：_**[https://journify-olive.vercel.app/](https://journify-olive.vercel.app/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Test account : test@test.com
+- Test password : test123
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Techniques
 
-## Learn More
+### Front-End
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js**
+  - App Router
+- **React**
+  - React Hooks：`useState`, `useReducer`, `useEffect`, `useContext`, `useRef`
+  - Custom Hooks
+    - useUserData
+    - useAuth
+    - useGoogleMaps
+  - React Context
+- **TypeScript**
+- **Tailwind CSS**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Back-End
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Firebase**
+  - Firestore Database
+  - Storage
+  - Authentication
 
-## Deploy on Vercel
+### Third-Party
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Redux**
+- **Google Map Platform APIs**
+  - Maps JavaScript API
+  - Places API
+  - Distance Matrix API
+  - Direction API
+- **React Day Picker**
+- **react-resizable-panels**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Features
+
+### Trip
+
+- **Create a Trip**
+  <!-- ![Create a Trip](https://github.com/carlwang1995/good-to-go/blob/main/public/readme/createTrip.gif) -->
