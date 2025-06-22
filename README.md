@@ -1,3 +1,5 @@
+  ![Journify](https://github.com/1Hui57/Journify/blob/develop/public/%E6%97%85%E7%A8%8B%E6%94%B6%E8%97%8F%E8%88%87%E6%84%9B%E5%BF%83.gif)
+https://github.com/1Hui57/Journify/blob/develop/public/Journify-structure.jpg
 # Journify 旅雀
 
 - [Introduction](#introduction)
