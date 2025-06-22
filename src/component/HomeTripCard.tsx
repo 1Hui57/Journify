@@ -56,7 +56,7 @@ export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn,
         }, [likeTrips])
 
     useEffect(() => {
-        if (saveTrips.length === 0) {
+        if (!saveTrips || saveTrips.length === 0) {
             setIsSave(false);
             return;
         }
