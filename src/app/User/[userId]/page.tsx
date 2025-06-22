@@ -218,6 +218,21 @@ export default function UserPage() {
             alert("最多只能收藏 12 筆旅程！");
             return;
         }
+        
+        try {
+            // 更新本地 state，立即反應 UI
+            setSaveTrips((prev) =>
+                isSave ? prev.filter((id) => id !== tripId) : [...prev, tripId]
+            );
+
+            await updateDoc(userRef, {
+                saveTrips: isSave ? arrayRemove(tripId) : arrayUnion(tripId),
+            });
+
+
+        } catch (e) {
+            console.error("更新收藏失敗", e);
+        }
 
     };
 
