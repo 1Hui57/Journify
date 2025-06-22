@@ -72,6 +72,7 @@ Journify is a travel planning platform designed for passionate travelers. Easily
 
 - **Like & Save Your Favorite Trips**
   - Like trips to support creators and save your favorites to view later on your profile.
+  
   ![Like & Save Your Favorite Trips](https://github.com/1Hui57/Journify/blob/develop/public/%E6%97%85%E7%A8%8B%E6%94%B6%E8%97%8F%E8%88%87%E6%84%9B%E5%BF%83.gif)
 
 ### Trip
