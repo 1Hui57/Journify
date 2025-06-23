@@ -125,6 +125,8 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             return;
         }
 
+        setSaveStatus("saving");
+        
         const tripId = uuidv4();
 
         const newTrip: Trip = {
