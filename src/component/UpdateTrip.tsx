@@ -256,6 +256,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
         }
 
         if (!trip) return;
+        setSaveStatus("saving");
         const newTrip: Trip = {
             ...trip,
             tripName: tripName,
