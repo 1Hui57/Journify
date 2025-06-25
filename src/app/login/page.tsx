@@ -13,6 +13,14 @@ export default function Login() {
 
     const router = useRouter();
 
+    // 註冊、登入使用useSate
+    const [isSignIn, setIsSignin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isStayIn, setIsStayIn] = useState(true);
+
     // 預設隨機照片
     const defaultMemberPhotos = [
         "/member1.jpg",
@@ -32,14 +40,17 @@ export default function Login() {
         return () => unsubscribe();
     }, [router])
 
-
-    // 註冊、登入使用useSate
-    const [isSignIn, setIsSignin] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isStayIn, setIsStayIn] = useState(true);
+    useEffect(() => {
+        if (isSignIn) {
+            setEmail("test@test.com");
+            setPassword("test123");
+        }
+        else {
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+        }
+    }, [isSignIn])
 
     function changeSignIn() {
         setIsSignin(true);
@@ -81,7 +92,7 @@ export default function Login() {
             await setDoc(doc(db, "users", user.uid), {
                 email: user.email,
                 createdAt: serverTimestamp(),
-                memberPhotoUrl:getRandomMemberPhoto(), // 隨機會員照片
+                memberPhotoUrl: getRandomMemberPhoto(), // 隨機會員照片
             });
             router.back();
         } catch (err: any) {
