@@ -40,17 +40,17 @@ export default function Login() {
         return () => unsubscribe();
     }, [router])
 
-    useEffect(() => {
-        if (isSignIn) {
-            setEmail("test@test.com");
-            setPassword("test123");
-        }
-        else {
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
-        }
-    }, [isSignIn])
+    // useEffect(() => {
+    //     if (isSignIn) {
+    //         setEmail("test@test.com");
+    //         setPassword("test123");
+    //     }
+    //     else {
+    //         setEmail("");
+    //         setPassword("");
+    //         setConfirmPassword("");
+    //     }
+    // }, [isSignIn])
 
     function changeSignIn() {
         setIsSignin(true);
@@ -108,6 +108,17 @@ export default function Login() {
         }
     };
 
+    // 以測試帳號登入
+    async function signInWithTestAccount() {
+        try {
+            await setPersistence(auth, isStayIn ? browserLocalPersistence : browserSessionPersistence);
+            await signInWithEmailAndPassword(auth, "test@test.com", "test123");
+            router.back();
+        } catch (err: any) {
+            setError("帳號或密碼輸入錯誤");
+        }
+    }
+
     // 隨機照片
     function getRandomMemberPhoto(): string {
         return defaultMemberPhotos[Math.floor(Math.random() * defaultMemberPhotos.length)];
@@ -139,6 +150,8 @@ export default function Login() {
                             Stay signed in.
                         </label>
                         <button type="submit" className="w-[150px] bg-primary-300 text-myblue-600 font-extrabold px-4 py-2 rounded-full mx-auto">SIGN IN</button>
+                        {/* <div className=' text-center text-sm text-myblue-600'>or</div> */}
+                        <div onClick={()=>{signInWithTestAccount()}} className=' text-center text-sm text-myblue-600 cursor-pointer hover:font-700 hover:text-mywhite-100'>Sign in with test account.</div>
                     </form>
                 ) : (
                     <form className="flex flex-col gap-4" onSubmit={handleSignUp}>
