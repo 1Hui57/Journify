@@ -13,6 +13,14 @@ export default function Login() {
 
     const router = useRouter();
 
+    // 註冊、登入使用useSate
+    const [isSignIn, setIsSignin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isStayIn, setIsStayIn] = useState(true);
+
     // 預設隨機照片
     const defaultMemberPhotos = [
         "/member1.jpg",
@@ -32,14 +40,17 @@ export default function Login() {
         return () => unsubscribe();
     }, [router])
 
-
-    // 註冊、登入使用useSate
-    const [isSignIn, setIsSignin] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isStayIn, setIsStayIn] = useState(true);
+    // useEffect(() => {
+    //     if (isSignIn) {
+    //         setEmail("test@test.com");
+    //         setPassword("test123");
+    //     }
+    //     else {
+    //         setEmail("");
+    //         setPassword("");
+    //         setConfirmPassword("");
+    //     }
+    // }, [isSignIn])
 
     function changeSignIn() {
         setIsSignin(true);
@@ -81,7 +92,8 @@ export default function Login() {
             await setDoc(doc(db, "users", user.uid), {
                 email: user.email,
                 createdAt: serverTimestamp(),
-                memberPhotoUrl:getRandomMemberPhoto(), // 隨機會員照片
+                memberPhotoUrl: getRandomMemberPhoto(), // 隨機會員照片
+                showEditPageGuide: true,
             });
             router.back();
         } catch (err: any) {
@@ -96,6 +108,17 @@ export default function Login() {
             }
         }
     };
+
+    // 以測試帳號登入
+    async function signInWithTestAccount() {
+        try {
+            await setPersistence(auth, isStayIn ? browserLocalPersistence : browserSessionPersistence);
+            await signInWithEmailAndPassword(auth, "test@test.com", "test123");
+            router.back();
+        } catch (err: any) {
+            setError("帳號或密碼輸入錯誤");
+        }
+    }
 
     // 隨機照片
     function getRandomMemberPhoto(): string {
@@ -128,6 +151,8 @@ export default function Login() {
                             Stay signed in.
                         </label>
                         <button type="submit" className="w-[150px] bg-primary-300 text-myblue-600 font-extrabold px-4 py-2 rounded-full mx-auto">SIGN IN</button>
+                        {/* <div className=' text-center text-sm text-myblue-600'>or</div> */}
+                        <div onClick={() => { signInWithTestAccount() }} className=' text-center text-sm text-myblue-600 cursor-pointer hover:font-700 hover:text-mywhite-100'>Sign in with test account.</div>
                     </form>
                 ) : (
                     <form className="flex flex-col gap-4" onSubmit={handleSignUp}>

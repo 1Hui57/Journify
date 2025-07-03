@@ -30,6 +30,16 @@ const EditTripMap = dynamic(() => import('@/component/Map'), {
     ssr: false, // 禁止 server side render，避免 Google Maps 衝突
 });
 
+interface User {
+    email: string;
+    memberPhotoUrl: string;
+    createdAt: Timestamp;
+    likeTrips: string[] | null;
+    saveTrips: string[] | null;
+    nickName: string | undefined;
+    showEditPageGuide?: boolean;
+}
+
 export default function TripEditPage() {
 
     const router = useRouter();
@@ -40,6 +50,9 @@ export default function TripEditPage() {
     const userId = user?.uid;
     const [countries, setCountries] = useState<Country[]>([]);
     const [countryData, setCountryData] = useState<Country[]>();
+
+    // 顯示新手教學
+    const [showEditPageGuide, setEditPageShowGuide] = useState<boolean | undefined>(false);
 
     // 取得此筆旅程資料
     const { tripId } = useParams();
@@ -80,6 +93,23 @@ export default function TripEditPage() {
             return;
         }
     }, [isUserSignIn, loading])
+
+    useEffect(() => {
+        if (!user) return;
+        const fetchUser = async () => {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) {
+                return;
+            }
+            const userData = userSnap.data() as User;
+            setEditPageShowGuide(userData.showEditPageGuide)
+        }
+
+        fetchUser();
+
+    }, [user])
 
     // 載入國家資料
     useEffect(() => {
@@ -524,6 +554,22 @@ export default function TripEditPage() {
         return { date, time };
     }
 
+    async function colseGuideAndWriteOut(userId: string) {
+        if (!userId) return;
+        setEditPageShowGuide(false);
+        try {
+            // 更新 showEditPageGuide
+            await updateDoc(doc(db, "users", userId), {
+                showEditPageGuide: false,
+            });
+            console.log("寫入成功");
+        }
+        catch (error) {
+            console.error(" 寫入 Firestore 失敗：", error);
+        }
+
+    }
+
     if (isLoading) return <div className="fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center">
         <img src="/loading.gif" className="w-30 h-30 " />
         <p className="text-mywhite-100">旅雀加載中...請稍後</p>
@@ -532,6 +578,21 @@ export default function TripEditPage() {
     return (
         <div className="h-[calc(100vh-60px)] md:h-[calc(100vh-73px)] w-screen flex flex-col">
             <div className='flex-1 w-full h-full flex flex-col-reverse md:flex-row'>
+                {showEditPageGuide && <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
+                    <div className='relative w-full h-full'>
+                        <img src="/whiteArrow.png" className="absolute sm:right-7 sm:bottom-6 sm:w-50 sm:h-70 right-5 bottom-8 w-36 h-60 " />
+                        <img src="/saveTripText.png" className="absolute sm:right-46 sm:bottom-34 sm:w-80 sm:h-50 right-32 bottom-40 w-60 h-36" />
+                        {/* <div className='w-fit h-fit px-5 py-3  text-mywhite-100 text-base-500'>
+                            編輯旅程後記得按下儲存旅程！
+                        </div> */}
+                        <button onClick={() => { if (!userId) return; colseGuideAndWriteOut(userId) }}
+                            className='absolute w-fit h-fit px-2 py-1 text-myblue-800 text-base-500 bg-myzinc-300 hover:bg-myblue-800 hover:text-myzinc-300 right-58 bottom-40 sm:right-70 sm:bottom-40 rounded-full'>以後不要再提醒</button>
+                        <button onClick={() => { setEditPageShowGuide(false); }}
+                            className='absolute w-fit h-fit px-2 py-1 text-myblue-800 text-base-500 bg-myzinc-300 hover:bg-myblue-800 hover:text-myzinc-300 right-38 bottom-40 sm:right-50 sm:bottom-40 rounded-full'>關閉</button>
+                    </div>
+
+                </div>
+                }
                 {saveStatus !== "idle" && (
                     <div className='fixed top-0 w-full h-full bg-myzinc900-60 z-1000 flex flex-col items-center justify-center'>
                         <img src="/loading.gif" className="w-30 h-30 " />
