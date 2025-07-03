@@ -93,6 +93,7 @@ export default function Login() {
                 email: user.email,
                 createdAt: serverTimestamp(),
                 memberPhotoUrl: getRandomMemberPhoto(), // 隨機會員照片
+                showEditPageGuide: true,
             });
             router.back();
         } catch (err: any) {
@@ -151,7 +152,7 @@ export default function Login() {
                         </label>
                         <button type="submit" className="w-[150px] bg-primary-300 text-myblue-600 font-extrabold px-4 py-2 rounded-full mx-auto">SIGN IN</button>
                         {/* <div className=' text-center text-sm text-myblue-600'>or</div> */}
-                        <div onClick={()=>{signInWithTestAccount()}} className=' text-center text-sm text-myblue-600 cursor-pointer hover:font-700 hover:text-mywhite-100'>Sign in with test account.</div>
+                        <div onClick={() => { signInWithTestAccount() }} className=' text-center text-sm text-myblue-600 cursor-pointer hover:font-700 hover:text-mywhite-100'>Sign in with test account.</div>
                     </form>
                 ) : (
                     <form className="flex flex-col gap-4" onSubmit={handleSignUp}>
