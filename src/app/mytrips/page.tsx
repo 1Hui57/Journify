@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { IoMdAdd } from "react-icons/io";
 import "react-day-picker/style.css";
 import { auth } from '@/lib/firebase';
-import { addDoc, collection, query, onSnapshot, doc, deleteDoc, updateDoc, getDoc, increment, setDoc } from "firebase/firestore";
+import { addDoc, collection, query, onSnapshot, doc, deleteDoc, updateDoc, getDoc, increment, setDoc, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from '@/context/AuthContext';
 import { Timestamp } from "firebase/firestore";
@@ -36,29 +36,16 @@ export default function MyTrips() {
 
     const router = useRouter();
     const [isLoading, setIsloading] = useState<boolean>(true);
-
-    // useContext取得使用者登入狀態
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
-
-    // 建立旅程狀態
     const [isAddTrip, setIsAddTrip] = useState<boolean>(false);
-
-    // 上傳圖片狀態
     const [isUploadPhoto, setTsUploadPhoto] = useState<boolean>(false);
-
-    // 更新旅程狀態
     const [isEditingTrip, setIsEditingTrip] = useState<boolean>(false);
     const [editTripData, setEditTripData] = useState<Trip | null>(null);
-
-    // 使用者資料庫的旅程資料
     const [trips, setTrips] = useState<Trip[]>([]);
-
-    // 儲存旅程資料
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
-    // 預設隨機照片
     const defaultCoverPhotos = [
         "/default1.jpg",
         "/default2.jpg",
@@ -81,7 +68,7 @@ export default function MyTrips() {
         if (!user) return;
 
         const q = query(
-            collection(db, "users", user.uid, "trips")
+            collection(db, "users", user.uid, "trips"),orderBy('updateAt','desc')
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {

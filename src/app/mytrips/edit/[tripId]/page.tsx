@@ -508,6 +508,7 @@ export default function TripEditPage() {
         try {
             await setDoc(doc(db, "users", userId, "trips", tripId), {
                 ...trip,
+                updateAt: Timestamp.now(),
                 tripDaySchedule: tripDaySchedule,
             });
             // 更新all_trips的updateTime
