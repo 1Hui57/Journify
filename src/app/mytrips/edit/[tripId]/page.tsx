@@ -163,7 +163,7 @@ export default function TripEditPage() {
             setTripDaySchedule(convertTripDaySchedule);
             setSelectedDay({ id: convertTripDaySchedule[0].id, date: convertTripDaySchedule[0].rawDate, });
         } else {
-            console.log("根據 tripTime 重新生成或更新行程天數");
+            // console.log("根據 tripTime 重新生成或更新行程天數");
             const days = generateTripDays(trip);
             setTripDaySchedule([...days]);
             if (
@@ -185,7 +185,7 @@ export default function TripEditPage() {
     useEffect(() => {
         if (trip && tripDaySchedule.length > 0 && countries.length > 0 && countryData) {
             setIsloading(false);
-            console.log(tripDaySchedule);
+            // console.log(tripDaySchedule);
         }
     }, [trip, tripDaySchedule, countries, countryData]);
 
@@ -508,6 +508,7 @@ export default function TripEditPage() {
         try {
             await setDoc(doc(db, "users", userId, "trips", tripId), {
                 ...trip,
+                updateAt: Timestamp.now(),
                 tripDaySchedule: tripDaySchedule,
             });
             // 更新all_trips的updateTime
@@ -515,13 +516,13 @@ export default function TripEditPage() {
                 tripTime: trip.tripTime,
                 updateAt: Timestamp.now(),
             });
-            console.log("寫入成功");
+            // console.log("寫入成功");
             setSaveStatus("success");
             // 1.5 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1000);
         }
         catch (error) {
-            console.error(" 寫入 Firestore 失敗：", error);
+            // console.error(" 寫入 Firestore 失敗：", error);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1500);
@@ -562,7 +563,7 @@ export default function TripEditPage() {
             await updateDoc(doc(db, "users", userId), {
                 showEditPageGuide: false,
             });
-            console.log("寫入成功");
+            // console.log("寫入成功");
         }
         catch (error) {
             console.error(" 寫入 Firestore 失敗：", error);

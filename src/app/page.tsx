@@ -31,36 +31,27 @@ export default function Home() {
 
     const router = useRouter();
 
-    // useContext取得使用者登入狀態
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
 
-    // 跳出請先登入彈窗
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [hideAnimation, setHideAnimation] = useState(false);
 
-    // 使用者按愛心與收藏的旅程
     const [likeTrips, setLikeTrips] = useState<string[]>([]);
     const [saveTrips, setSaveTrips] = useState<string[]>([]);
 
-    // 熱門排序或時間排序
     const [arrow, setArrow] = useState<"DOWN" | "UP">("DOWN");
     const [sorting, setSorting] = useState<"POPULAR" | "TIME">("POPULAR");
 
-    // 資訊載入中
     const [isLoading, setIsloading] = useState<boolean>(true);
 
-    // 公開行程
     const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
 
-    // 熱門國家
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null);
 
-    // 取得Context的user資料
     const { addUserId, userDataMap } = useUserData();
 
-    // 預設隨機照片
     const defaultCoverPhotos = [
         "/default1.jpg",
         "/default2.jpg",
@@ -105,7 +96,7 @@ export default function Home() {
             const snapshot = await getDocs(q);
 
             const topCountries = snapshot.docs.map(doc => doc.data() as HotCounty);
-            console.log(topCountries);
+            // console.log(topCountries);
             setHotCountries(topCountries);
         }
 

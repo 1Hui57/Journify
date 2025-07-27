@@ -128,7 +128,7 @@ export default function SharingTripPage() {
             setTripDaySchedule(convertTripDaySchedule);
             setSelectedDay({ id: convertTripDaySchedule[0].id, date: convertTripDaySchedule[0].rawDate, });
         } else {
-            console.log("根據 tripTime 重新生成或更新行程天數");
+            // console.log("根據 tripTime 重新生成或更新行程天數");
             const days = generateTripDays(trip);
             setTripDaySchedule([...days]);
             if (
