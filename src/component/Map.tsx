@@ -10,7 +10,6 @@ import { Country, Place, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem 
 import { useDispatch, useSelector } from 'react-redux';
 import { TripEditRootState } from '@/store/tripEditStore';
 import { setSelectedAttractionId } from '@/store/tripSlice';
-import { timeStamp } from 'console';
 import { useGoogleMaps } from '@/context/MapContext';
 
 interface MapProps {
@@ -89,7 +88,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
     if (!isPhotoLoading) return;
 
     const updatePhotos = async () => {
-      console.log("開始更新圖片");
+      // console.log("開始更新圖片");
       // 處理每一天的行程
       const tripDaySchedule = trip?.tripDaySchedule;
       if (!tripDaySchedule) return; // 再次防呆
@@ -140,7 +139,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         tripDaySchedule: updatedTripDaySchedule,
       }));
       setIsPhotoLoading(false);//圖片更新完成
-      console.log("圖片更新完成");
+      // console.log("圖片更新完成");
     };
 
     updatePhotos();
@@ -303,7 +302,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
         if (status === "OK" && result) {
           setDirectionsResult(result);
         } else if (status === "ZERO_RESULTS") {
-          console.warn("無法取得路線（ZERO_RESULTS）：這兩點之間可能沒有可行的路線。");
+          // console.warn("無法取得路線（ZERO_RESULTS）：這兩點之間可能沒有可行的路線。");
           setDirectionsResult(null); // 可選：清空既有結果
         } else {
           console.error("Failed to fetch directions:", status);
@@ -395,7 +394,7 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
   // 關閉景點資訊卡
   function closeAttractionData() {
-    console.log(selectedPlace);
+    // console.log(selectedPlace);
     setSelectedPlace(null);
     dispatch(setSelectedAttractionId(null));
     if (inputRef.current) {
@@ -419,10 +418,10 @@ export default function MapComponent({ countryData, selectedPlace, setSelectedPl
 
     service.nearbySearch(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        console.log("搜尋結果：", results);
+        // console.log("搜尋結果：", results);
         setSearchResults(results);
       } else {
-        console.error("搜尋失敗或無結果", status);
+        // console.error("搜尋失敗或無結果", status);
         setSearchResults([]);
       }
     });
