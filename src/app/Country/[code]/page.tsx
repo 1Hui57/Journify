@@ -20,33 +20,23 @@ interface UserData {
 
 export default function CountryPage() {
 
-    // useContext取得使用者登入狀態
+
     const { isUserSignIn, loading } = useAuth();
     const user = auth.currentUser;
     const userId = user?.uid;
-
-    // 熱門排序或時間排序
     const [arrow, setArrow] = useState<"DOWN" | "UP">("DOWN");
     const [sorting, setSorting] = useState<"POPULAR" | "TIME">("POPULAR");
-
-    // 跳出請先登入彈窗
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [hideAnimation, setHideAnimation] = useState(false);
-
-    // 取得國家代碼
     const params = useParams();
     const countryCode = typeof params.code === "string" ? params.code : params.code?.[0];
-
-    // 公開行程
     const [publicTrips, setPublicTrips] = useState<PublicTrip[]>();
-
-    // 資訊載入中
     const [isLoading, setIsloading] = useState<boolean>(true);
     const [countries, setCountries] = useState<Country[]>([]);
-
-    // 使用者按愛心與收藏的旅程
     const [likeTrips, setLikeTrips] = useState<string[]>([]);
     const [saveTrips, setSaveTrips] = useState<string[]>([]);
+    const founderId: string = process.env.NEXT_PUBLIC_FOUNDER_ID ?? '';
+
 
     // 預設隨機照片
     const defaultCoverPhotos = [
@@ -295,7 +285,7 @@ export default function CountryPage() {
                 </div>
                 <div id="tripWrapper" className="w-full mt-5 mb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 px-2 ">
                     {sortedTrips && sortedTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} saveTrips={saveTrips}
-                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
+                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} founderId={founderId} />))}
                 </div>
             </div>
         </div>
