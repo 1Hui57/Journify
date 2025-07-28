@@ -89,7 +89,7 @@ export default function MyTrips() {
             });
             setTrips(data);
             setIsloading(false);
-            console.log(data);
+            // console.log(data);
         });
         return () => unsubscribe();
     }, [user?.uid]);
@@ -105,7 +105,7 @@ export default function MyTrips() {
                 await deleteDoc(tripRef);
                 await deleteDoc(allTripRef);
                 updateCountryStatsOnDelete(tripCountries);
-                console.log("Trip deleted successfully");
+                // console.log("Trip deleted successfully");
             } catch (error) {
                 console.error("Failed to delete trip:", error);
             }
@@ -124,11 +124,11 @@ export default function MyTrips() {
             await updateDoc(publicRef, {
                 isPublic: !isPublic
             });
-            console.log("旅程的公開狀態已更新");
+            // console.log("旅程的公開狀態已更新");
         }
 
         catch (error) {
-            console.error("更新旅程公開狀態失敗:", error);
+            // console.error("更新旅程公開狀態失敗:", error);
             alert("新增資料時發生錯誤，請稍後再試！");
         }
     }

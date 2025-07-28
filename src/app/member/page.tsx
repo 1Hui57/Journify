@@ -84,7 +84,7 @@ export default function MemberPage() {
                     .map(doc => doc.data().tripId)
                     .filter((id): id is string => typeof id === "string");
 
-                console.log("公開旅程 ID：", tripIds);
+                // console.log("公開旅程 ID：", tripIds);
                 setPublicTripsId(tripIds);
             } catch (e) {
                 console.error("載入旅程 ID 失敗", e);
@@ -186,12 +186,12 @@ export default function MemberPage() {
             await updateDoc(doc(db, "users", userId), {
                 nickName: userNickName
             });
-            console.log("更新成功");
+            // console.log("更新成功");
             setSaveStatus("success");
             // 1.5 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1000);
         } catch (err) {
-            console.error("更新失敗", err);
+            // console.error("更新失敗", err);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1500);

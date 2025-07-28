@@ -284,7 +284,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
             await updateDoc(doc(db, "all_trips", tripId), { ...newAlltrip });
             // 更新熱門國家統計表
             updateCountryStatsOnEdit(oldCountries,selectedCountries);
-            console.log("寫入成功");
+            // console.log("寫入成功");
             setSaveStatus("success");
             // 1.5 秒後隱藏 loading 並關閉視窗
             setTimeout(() => {
@@ -293,7 +293,7 @@ export default function UpdateTrip({ userId, setIsEditingTrip, editTripData, set
             }, 1500);
         }
         catch (error) {
-            console.error(" 寫入 Firestore 失敗：", error);
+            // console.error(" 寫入 Firestore 失敗：", error);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1500);

@@ -65,7 +65,7 @@ export default function Header() {
                     router.push("/");
                     setShowMemberList(false);
                 }
-                console.log("使用者已登出");
+                // console.log("使用者已登出");
             })
             .catch((error) => {
                 console.error("登出失敗：", error);
