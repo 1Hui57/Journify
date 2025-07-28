@@ -51,6 +51,7 @@ export default function Home() {
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null);
 
     const { addUserId, userDataMap } = useUserData();
+    const founderId:string | undefined = process.env.NEXT_PUBLIC_FOUNDER_ID;
 
     const defaultCoverPhotos = [
         "/default1.jpg",
@@ -319,7 +320,7 @@ export default function Home() {
                 </div>
                 <div id="tripWrapper" className="w-full mt-5 mb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 px-2 ">
                     {sortedTrips && sortedTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} saveTrips={saveTrips}
-                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
+                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} founderId={founderId}/>))}
                 </div>
             </div>
 
