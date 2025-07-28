@@ -51,7 +51,7 @@ export default function Home() {
     const [hotCountries, setHotCountries] = useState<HotCounty[] | null>(null);
 
     const { addUserId, userDataMap } = useUserData();
-    const founderId = process.env.NEXT_PUBLIC_FOUNDER_ID as string;
+    const founderId:string = process.env.NEXT_PUBLIC_FOUNDER_ID ?? '';
 
     const defaultCoverPhotos = [
         "/default1.jpg",
