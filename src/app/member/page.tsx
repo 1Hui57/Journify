@@ -57,6 +57,8 @@ export default function MemberPage() {
     // 跳出請先登入彈窗
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [hideAnimation, setHideAnimation] = useState(false);
+    const founderId: string = process.env.NEXT_PUBLIC_FOUNDER_ID ?? '';
+
 
     // 預設隨機照片
     const defaultCoverPhotos = [
@@ -325,7 +327,7 @@ export default function MemberPage() {
                 <div className="text-lg-700 text-primary-600 border-b-2 border-primary-600">我的收藏</div>
                 <div id="tripWrapper" className="w-[80%] max-w-[1000px] mx-auto mt-5 mb-5 px-2 grid grid-cols-1 sm:grid-cols-2 gap-5 place-items-center">
                     {currentTrips && currentTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} saveTrips={saveTripsId}
-                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
+                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} founderId={founderId}/>))}
                 </div>
             </div>
             <div className="flex justify-center mt-4 mb-4 gap-2">
