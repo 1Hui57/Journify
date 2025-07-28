@@ -24,7 +24,7 @@ interface HomeTripCardProps {
     toggleLike: (tripId: string) => void;
     toggleSave: (tripId: string) => void;
     showLoginAlert: () => void;
-    founderId: string | undefined;
+    founderId: string;
 }
 
 export default function HomeTripCard({ item, likeTrips, saveTrips, isUserSignIn, toggleLike, toggleSave, showLoginAlert, founderId }: HomeTripCardProps) {
