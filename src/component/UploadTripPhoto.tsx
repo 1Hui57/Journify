@@ -75,10 +75,10 @@ export default function UploadTripPhoto({ userId, editTripData, setTsUploadPhoto
             await updateDoc(doc(db, "all_trips", editTripData.id), {
                 tripPhotoUrl: downloadUrl
             });
-            console.log("上傳成功 URL:", downloadUrl);
+            // console.log("上傳成功 URL:", downloadUrl);
             alert("上傳成功！");
         } catch (err) {
-            console.error("上傳失敗", err);
+            // console.error("上傳失敗", err);
             alert("圖片上傳失敗");
         } finally {
             setUploading(false);

@@ -31,7 +31,7 @@ export default function Login() {
         // 建立一個監聽器可以監聽firebase的登入狀態
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log(user);
+                // console.log(user);
                 router.push('/mytrips');
             }
 

@@ -158,7 +158,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             setTripName("");
             setTripPerson(1);
             setTripTime(undefined);
-            console.log("寫入成功");
+            // console.log("寫入成功");
             setSaveStatus("success");
             // 1.5 秒後隱藏 loading 並關閉視窗
             setTimeout(() => {
@@ -167,7 +167,7 @@ export default function CreateTrip({ userId, setIsAddTrip, updateCountryStatsOnC
             }, 1500);
         }
         catch (error) {
-            console.error(" 寫入 Firestore 失敗：", error);
+            // console.error(" 寫入 Firestore 失敗：", error);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1500);

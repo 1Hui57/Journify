@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Country, Place, SelectTripDay, Trip, TripDaySchedule, TripScheduleItem } from '@/app/type/trip';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedAttractionId } from '@/store/sharingSlice';
-import { timeStamp } from 'console';
 import { SharingRootState } from '@/store/sharingStore';
 import { useGoogleMaps } from '@/context/MapContext';
 
@@ -91,7 +90,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
         if (!isPhotoLoading) return;
 
         const updatePhotos = async () => {
-            console.log("開始更新圖片");
+            // console.log("開始更新圖片");
             // 處理每一天的行程
             const tripDaySchedule = trip?.tripDaySchedule;
             if (!tripDaySchedule) return; // 再次防呆
@@ -142,7 +141,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
                 tripDaySchedule: updatedTripDaySchedule,
             }));
             setIsPhotoLoading(false);//圖片更新完成
-            console.log("圖片更新完成");
+            // console.log("圖片更新完成");
         };
 
         updatePhotos();
@@ -238,7 +237,7 @@ export default function SharingMapComponent({ countryData, selectedPlace, setSel
 
     // 關閉景點資訊卡
     function closeAttractionData() {
-        console.log(selectedPlace);
+        // console.log(selectedPlace);
         setSelectedPlace(null);
         dispatch(setSelectedAttractionId(null));
         return;

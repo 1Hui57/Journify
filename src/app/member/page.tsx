@@ -57,6 +57,8 @@ export default function MemberPage() {
     // 跳出請先登入彈窗
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [hideAnimation, setHideAnimation] = useState(false);
+    const founderId: string = process.env.NEXT_PUBLIC_FOUNDER_ID ?? '';
+
 
     // 預設隨機照片
     const defaultCoverPhotos = [
@@ -84,7 +86,7 @@ export default function MemberPage() {
                     .map(doc => doc.data().tripId)
                     .filter((id): id is string => typeof id === "string");
 
-                console.log("公開旅程 ID：", tripIds);
+                // console.log("公開旅程 ID：", tripIds);
                 setPublicTripsId(tripIds);
             } catch (e) {
                 console.error("載入旅程 ID 失敗", e);
@@ -186,12 +188,12 @@ export default function MemberPage() {
             await updateDoc(doc(db, "users", userId), {
                 nickName: userNickName
             });
-            console.log("更新成功");
+            // console.log("更新成功");
             setSaveStatus("success");
             // 1.5 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1000);
         } catch (err) {
-            console.error("更新失敗", err);
+            // console.error("更新失敗", err);
             setSaveStatus("error");
             // 2 秒後自動隱藏提示
             setTimeout(() => setSaveStatus("idle"), 1500);
@@ -325,7 +327,7 @@ export default function MemberPage() {
                 <div className="text-lg-700 text-primary-600 border-b-2 border-primary-600">我的收藏</div>
                 <div id="tripWrapper" className="w-[80%] max-w-[1000px] mx-auto mt-5 mb-5 px-2 grid grid-cols-1 sm:grid-cols-2 gap-5 place-items-center">
                     {currentTrips && currentTrips.map((item) => (<HomeTripCard key={item.tripId} item={item} likeTrips={likeTrips} saveTrips={saveTripsId}
-                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} />))}
+                        toggleLike={toggleLike} toggleSave={toggleSave} showLoginAlert={showLoginAlert} isUserSignIn={isUserSignIn} founderId={founderId}/>))}
                 </div>
             </div>
             <div className="flex justify-center mt-4 mb-4 gap-2">
